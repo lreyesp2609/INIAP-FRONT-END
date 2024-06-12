@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/Login/login';
+import MenuEmpleados from './components/Modulo Empleado/menuempleado';
+import PrivateRoute from './components/Login/rutaprivada';
 
-function App() {
+const App = () => {
   const [user, setUser] = useState(null);
 
   const handleLogin = (userData) => {
     setUser(userData);
-    // Aquí podrías almacenar el token en localStorage si lo necesitas
-    // localStorage.setItem("token", userData.token);
-  };
-
-  const renderContent = () => {
-    // Aquí podrías verificar si hay un token almacenado en localStorage
-    // const storedToken = localStorage.getItem("token");
-    // if (user || storedToken) {
-    //   return <AdminMenu />;
-    // }
-    return <LoginForm onLogin={handleLogin} />;
   };
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={renderContent()} />
+        <Route path="/" element={<LoginForm onLogin={handleLogin} />} />
+        <Route path="/menu-empleados" element={
+          <PrivateRoute>
+            <MenuEmpleados />
+          </PrivateRoute>
+        } />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

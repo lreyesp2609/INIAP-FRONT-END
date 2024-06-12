@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, notification } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import API_URL from '../../Config';
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    localStorage.removeItem('token');
+  }, []);
 
+  const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
-      formData.append('usuario', username);
-      formData.append('contrasenia', password);
+      formData.append('usuario', values.username);
+      formData.append('contrasenia', values.password);
 
       const response = await fetch(`${API_URL}/Login/iniciar_sesion/`, {
         method: 'POST',
@@ -21,13 +26,47 @@ const LoginForm = ({ onLogin }) => {
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
 
-      if (response.ok) {        
-        onLogin(data);
+      if (response.ok) {
+        const { token, id_usuario } = data;
+        localStorage.setItem('token', token);
+
+        // Llamar a obtener usuario para redirigir según el rol
+        await obtenerUsuario(id_usuario, token);
       } else {
         console.error('Error en inicio de sesión:', data.mensaje);
+        notification.error({
+          message: 'Error en inicio de sesión',
+          description: data.mensaje,
+        });
       }
     } catch (error) {
       console.error('Error en la solicitud de inicio de sesión:', error);
+    }
+  };
+
+  const obtenerUsuario = async (idUsuario, token) => {
+    try {
+      const response = await fetch(`${API_URL}/Login/obtener_usuario/${idUsuario}/`, {
+        method: 'GET',
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      const userData = await response.json();
+      console.log('Datos del usuario:', userData);
+
+      if (response.ok) {
+        onLogin(userData);
+        if (userData.usuario.rol === 'Empleado') {
+          navigate('/menu-empleados');
+        }
+        // Puedes agregar más lógica aquí para redirigir a otros roles si es necesario
+      } else {
+        console.error('Error al obtener usuario:', userData.mensaje);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud de obtener usuario:', error);
     }
   };
 
@@ -37,42 +76,46 @@ const LoginForm = ({ onLogin }) => {
         <h1 className="text-4xl font-bold text-blue-600">Instituto Nacional de Investigaciones Agropecuarias</h1>
       </div>
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <input
+        <Form
+          name="loginForm"
+          initialValues={{ remember: true }}
+          onFinish={handleSubmit}
+          className="space-y-6"
+        >
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: 'Por favor, ingresa tu usuario' }]}
+          >
+            <Input
               id="username"
-              name="username"
-              type="text"
               autoComplete="username"
-              required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Usuario"
             />
-          </div>
-          <div>
-            <input
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: 'Por favor, ingresa tu contraseña' }]}
+          >
+            <Input.Password
               id="password"
-              name="password"
-              type="password"
               autoComplete="current-password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Contraseña"
             />
-          </div>
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          </Form.Item>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full"
             >
               Iniciar sesión
-            </button>
-          </div>
-        </form>
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );
