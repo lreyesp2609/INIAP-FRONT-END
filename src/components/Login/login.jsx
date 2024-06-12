@@ -10,6 +10,7 @@ const LoginForm = ({ onLogin }) => {
 
   useEffect(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }, []);
 
   const handleSubmit = async (values) => {
@@ -30,7 +31,6 @@ const LoginForm = ({ onLogin }) => {
         const { token, id_usuario } = data;
         localStorage.setItem('token', token);
 
-        // Llamar a obtener usuario para redirigir según el rol
         await obtenerUsuario(id_usuario, token);
       } else {
         console.error('Error en inicio de sesión:', data.mensaje);
@@ -58,10 +58,13 @@ const LoginForm = ({ onLogin }) => {
 
       if (response.ok) {
         onLogin(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+
         if (userData.usuario.rol === 'Empleado') {
           navigate('/menu-empleados');
+        } else if (userData.usuario.rol === 'Administrador') {
+          navigate('/menu-administrador');
         }
-        // Puedes agregar más lógica aquí para redirigir a otros roles si es necesario
       } else {
         console.error('Error al obtener usuario:', userData.mensaje);
       }
