@@ -64,6 +64,8 @@ const LoginForm = ({ onLogin }) => {
           navigate('/menu-empleados');
         } else if (userData.usuario.rol === 'Administrador') {
           navigate('/menu-administrador');
+        } else if (userData.usuario.rol === 'SuperUsuario') {
+          navigate('/menu-superusuario');
         }
       } else {
         console.error('Error al obtener usuario:', userData.mensaje);
@@ -72,7 +74,7 @@ const LoginForm = ({ onLogin }) => {
       console.error('Error en la solicitud de obtener usuario:', error);
     }
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="text-center mb-8">
