@@ -13,7 +13,7 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center w-full fixed top-0 left-0 z-50">
+    <nav className="p-4 flex justify-between items-center w-full fixed top-0 left-0 z-50" style={{ backgroundColor: '#169658', color: 'white' }}>
       <div className="flex items-center space-x-4">
         <div className="text-2xl font-bold">
           {user.estacion ? user.estacion.nombre_estacion : ''}
@@ -39,12 +39,6 @@ const Navbar = ({ user, onLogout }) => {
         {dropdownOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
             <div className="py-1">
-              <button
-                className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
-                onClick={() => alert('Perfil')}
-              >
-                Perfil
-              </button>
               <button
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
                 onClick={handleLogout}
