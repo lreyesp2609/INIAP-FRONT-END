@@ -11,8 +11,7 @@ const MenuEmpleados = () => {
 
   return (
     <div>
-      <h1>Hola Empleado</h1>
-      <button onClick={handleLogout}>Cerrar Sesión</button>
+      
     </div>
   );
 }
