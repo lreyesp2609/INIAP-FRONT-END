@@ -74,11 +74,11 @@ const LoginForm = ({ onLogin }) => {
       console.error('Error en la solicitud de obtener usuario:', error);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-blue-600">Instituto Nacional de Investigaciones Agropecuarias</h1>
+        <h1 className="text-4xl font-bold" style={{ color: '#169658' }}>Instituto Nacional de Investigaciones Agropecuarias</h1>
       </div>
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
         <Form
