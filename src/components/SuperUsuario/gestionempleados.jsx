@@ -1,18 +1,144 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../../Config';
 
 const GestionEmpleados = () => {
-  const [user, setUser] = useState({});
+  const [empleados, setEmpleados] = useState([]);
+  const [filteredEmpleados, setFilteredEmpleados] = useState([]);
+  const [user, setUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
-      setUser(storedUser.usuario);
+      setUser(storedUser);
+      fetchEmpleados(storedUser.usuario.id_usuario);
     }
   }, []);
 
+  const fetchEmpleados = async (id_usuario) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/Empleados/lista-empleados/${id_usuario}/`, {
+        headers: {
+          'Authorization': `${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setEmpleados(data);
+        setFilteredEmpleados(data);
+      } else {
+        console.error('Error fetching empleados:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching empleados:', error);
+    }
+  };
+
+  const handleSearch = (event) => {
+    const searchValue = event.target.value.toLowerCase();
+    setSearchTerm(event.target.value);
+
+    const filtered = empleados.filter((empleado) => {
+      const fullName = `${empleado.nombres.toLowerCase()} ${empleado.apellidos.toLowerCase()}`;
+      const cedula = empleado.cedula.toLowerCase();
+      return (
+        fullName.includes(searchValue) ||
+        cedula.includes(searchValue)
+      );
+    });
+
+    setFilteredEmpleados(filtered);
+  };
+
+  const handleClear = () => {
+    setSearchTerm('');
+    setFilteredEmpleados(empleados);
+  };
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleAddEmpleado = async (empleadoData) => {
+    // Realizar solicitud POST al backend para agregar el nuevo empleado
+    // Una vez completada la operación, cerrar el modal y actualizar la lista de empleados
+    handleCloseModal();
+    fetchEmpleados(user.usuario.id_usuario);
+  };
+
   return (
-    <div className="flex-grow flex justify-center items-center">
-      <h1 className="text-3xl">Hola Super Usuario</h1>
+    <div className="flex-grow flex flex-col items-center p-4">
+      <h1 className="text-2xl font-light mb-4">Hola {user?.usuario?.rol}</h1>
+      <div className="w-full flex mb-4 items-center">
+        <input
+          type="text"
+          placeholder="Buscar por nombres, apellidos o cédula"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-3/4"
+          style={{ minWidth: '200px' }}
+        />
+        <button
+          className="p-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
+          onClick={handleClear}
+          style={{ minWidth: '80px', borderRadius: '0 0.375rem 0.375rem 0' }}
+        >
+          Limpiar
+        </button>
+        <button
+          className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+          onClick={handleOpenModal}
+          style={{ minWidth: '120px' }}
+        >
+          Agregar Empleado
+        </button>
+      </div>
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Nombres</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Apellidos</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cédula</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Usuario</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cargo</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Unidad</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Estación</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEmpleados.map((empleado, index) => (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombres}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.apellidos}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.cedula}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.usuario}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.cargo}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombre_unidad}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombre_estacion}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {showModal && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-8 rounded shadow-lg w-96">
+            {/* Aquí va el modal para agregar empleado */}
+            {/* Puedes implementar el modal y el formulario aquí */}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
