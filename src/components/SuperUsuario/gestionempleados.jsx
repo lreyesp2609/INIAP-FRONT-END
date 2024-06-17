@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../Config';
+import EditarEmpleados from './editarusuario';
+import TablaEmpleados from './tablaempleados';
 
 const GestionEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
   const [filteredEmpleados, setFilteredEmpleados] = useState([]);
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [selectedEmpleado, setSelectedEmpleado] = useState(null);
+  const [cargos, setCargos] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
       setUser(storedUser);
       fetchEmpleados(storedUser.usuario.id_usuario);
+      fetchCargos();
     }
   }, []);
 
@@ -32,8 +36,20 @@ const GestionEmpleados = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setEmpleados(data);
-        setFilteredEmpleados(data);
+        const formattedData = data.map(empleado => ({
+          ...empleado,
+          numero_cedula: empleado.cedula,
+          fecha_nacimiento: empleado.fecha_nacimiento,
+          celular: empleado.celular || '',
+          direccion: empleado.direccion || '', 
+          correo_electronico: empleado.correo_electronico || '',
+          cargo: empleado.cargo|| '',
+          fecha_ingreso: empleado.fecha_ingreso || '',
+          habilitado: empleado.habilitado || '',  
+          usuario: empleado.usuario || ''
+        }));        
+        setEmpleados(formattedData);
+        setFilteredEmpleados(formattedData);
       } else {
         console.error('Error fetching empleados:', response.statusText);
       }
@@ -41,6 +57,29 @@ const GestionEmpleados = () => {
       console.error('Error fetching empleados:', error);
     }
   };
+  const fetchCargos = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${API_URL}/Estaciones/cargos/`, {
+        headers: {
+          'Authorization': `${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Cargos data:", data);
+        setCargos(data);
+      } else {
+        console.error('Error fetching cargos:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching cargos:', error);
+    }
+  };  
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
@@ -56,28 +95,21 @@ const GestionEmpleados = () => {
     });
 
     setFilteredEmpleados(filtered);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
   };
 
   const handleClear = () => {
     setSearchTerm('');
     setFilteredEmpleados(empleados);
-    setCurrentPage(1); // Reset to first page on clear
+    setCurrentPage(1);
   };
 
-  const handleOpenModal = () => {
-    setShowModal(true);
+  const handleEditEmpleado = (empleado) => {
+    setSelectedEmpleado(empleado);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleAddEmpleado = async (empleadoData) => {
-    // Realizar solicitud POST al backend para agregar el nuevo empleado
-    // Una vez completada la operación, cerrar el modal y actualizar la lista de empleados
-    handleCloseModal();
-    fetchEmpleados(user.usuario.id_usuario);
+  const handleCloseEditForm = () => {
+    setSelectedEmpleado(null);
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -92,76 +124,52 @@ const GestionEmpleados = () => {
   return (
     <div className="flex-grow flex flex-col items-center p-4">
       <h1 className="text-2xl font-light mb-4">Hola {user?.usuario?.rol}</h1>
-      <div className="w-full flex mb-4 items-center">
-        <input
-          type="text"
-          placeholder="Buscar por nombres, apellidos o cédula"
-          value={searchTerm}
-          onChange={handleSearch}
-          className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-3/4"
-          style={{ minWidth: '200px' }}
+      {selectedEmpleado ? (
+        <EditarEmpleados
+          onClose={handleCloseEditForm}
+          employeeData={selectedEmpleado}
+          cargos={cargos}
+          user={user}
         />
-        <button
-          className="p-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
-          onClick={handleClear}
-          style={{ minWidth: '80px', borderRadius: '0 0.375rem 0.375rem 0' }}
-        >
-          Limpiar
-        </button>
-        <button
-          className="ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-          onClick={handleOpenModal}
-          style={{ minWidth: '200px' }}
-        >
-          Agregar Empleado
-        </button>
-      </div>
-      <div className="overflow-x-auto w-full">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Nombres</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Apellidos</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cédula</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Usuario</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cargo</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Unidad</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Estación</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((empleado, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombres}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.apellidos}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.cedula}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.usuario}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.cargo}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombre_unidad}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombre_estacion}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => handleClick(index + 1)}
-            className={`mx-1 px-3 py-1 border rounded ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
-      {showModal && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-8 rounded shadow-lg w-96">
-            {/* Aquí va el modal para agregar empleado */}
-            {/* Puedes implementar el modal y el formulario aquí */}
+      ) : (
+        <>
+          <div className="w-full flex mb-4 items-center">
+            <input
+              type="text"
+              placeholder="Buscar por nombres, apellidos o cédula"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-3/4"
+              style={{ minWidth: '200px' }}
+            />
+            <button
+              className="p-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
+              onClick={handleClear}
+              style={{ minWidth: '80px', borderRadius: '0 0.375rem 0.375rem 0' }}
+            >
+              Limpiar
+            </button>
+            <button
+              className="ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+              onClick={() => {}}
+              style={{ minWidth: '200px' }}
+            >
+              Agregar Empleado
+            </button>
           </div>
-        </div>
+          <TablaEmpleados empleados={currentItems} handleEditEmpleado={handleEditEmpleado} />
+          <div className="flex justify-center mt-4">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handleClick(index + 1)}
+                className={`mx-1 px-3 py-1 border rounded ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

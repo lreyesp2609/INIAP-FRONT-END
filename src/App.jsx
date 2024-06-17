@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import LoginForm from './components/Login/login';
