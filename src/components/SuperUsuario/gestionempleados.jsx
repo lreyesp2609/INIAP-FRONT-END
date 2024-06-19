@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import API_URL from '../../Config';
-import EditarEmpleados from './editarusuario';
-import TablaEmpleados from './tablaempleados';
+import React, { useState, useEffect } from "react";
+import API_URL from "../../Config";
+import AgregarEmpleados from "./agregarusuario";
+import TablaEmpleados from "./tablaempleados";
+import EditarUsuario from "./editarusuario";
 
 const GestionEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
   const [filteredEmpleados, setFilteredEmpleados] = useState([]);
   const [user, setUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedEmpleado, setSelectedEmpleado] = useState(null);
   const [cargos, setCargos] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
       fetchEmpleados(storedUser.usuario.id_usuario);
@@ -23,63 +25,66 @@ const GestionEmpleados = () => {
   }, []);
 
   const fetchEmpleados = async (id_usuario) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
       return;
     }
 
     try {
-      const response = await fetch(`${API_URL}/Empleados/lista-empleados/${id_usuario}/`, {
-        headers: {
-          'Authorization': `${token}`,
-        },
-      });
+      const response = await fetch(
+        `${API_URL}/Empleados/lista-empleados/${id_usuario}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
-        const formattedData = data.map(empleado => ({
+        const formattedData = data.map((empleado) => ({
           ...empleado,
           numero_cedula: empleado.cedula,
           fecha_nacimiento: empleado.fecha_nacimiento,
-          celular: empleado.celular || '',
-          direccion: empleado.direccion || '', 
-          correo_electronico: empleado.correo_electronico || '',
-          cargo: empleado.cargo|| '',
-          fecha_ingreso: empleado.fecha_ingreso || '',
-          habilitado: empleado.habilitado || '',  
-          usuario: empleado.usuario || ''
-        }));        
+          celular: empleado.celular || "",
+          direccion: empleado.direccion || "",
+          correo_electronico: empleado.correo_electronico || "",
+          cargo: empleado.cargo || "",
+          fecha_ingreso: empleado.fecha_ingreso || "",
+          habilitado: empleado.habilitado || "",
+          usuario: empleado.usuario || "",
+        }));
         setEmpleados(formattedData);
         setFilteredEmpleados(formattedData);
       } else {
-        console.error('Error fetching empleados:', response.statusText);
+        console.error("Error al obtener empleados:", response.statusText);
       }
     } catch (error) {
-      console.error('Error fetching empleados:', error);
+      console.error("Error al obtener empleados:", error);
     }
   };
+
   const fetchCargos = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
       return;
     }
-  
+
     try {
-      const response = await fetch(`${API_URL}/Estaciones/cargos/`, {
+      const response = await fetch(`${API_URL}/Estaciones/cargoseditar/`, {
         headers: {
-          'Authorization': `${token}`,
+          Authorization: `${token}`,
         },
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Cargos data:", data);
         setCargos(data);
       } else {
-        console.error('Error fetching cargos:', response.statusText);
+        console.error("Error al obtener cargos:", response.statusText);
       }
     } catch (error) {
-      console.error('Error fetching cargos:', error);
+      console.error("Error al obtener cargos:", error);
     }
-  };  
+  };
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
@@ -88,10 +93,7 @@ const GestionEmpleados = () => {
     const filtered = empleados.filter((empleado) => {
       const fullName = `${empleado.nombres.toLowerCase()} ${empleado.apellidos.toLowerCase()}`;
       const cedula = empleado.cedula.toLowerCase();
-      return (
-        fullName.includes(searchValue) ||
-        cedula.includes(searchValue)
-      );
+      return fullName.includes(searchValue) || cedula.includes(searchValue);
     });
 
     setFilteredEmpleados(filtered);
@@ -99,22 +101,63 @@ const GestionEmpleados = () => {
   };
 
   const handleClear = () => {
-    setSearchTerm('');
+    setSearchTerm("");
     setFilteredEmpleados(empleados);
     setCurrentPage(1);
   };
 
-  const handleEditEmpleado = (empleado) => {
+  const handleEditEmpleado = async (empleado) => {
     setSelectedEmpleado(empleado);
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/Empleados/detalle-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedEmpleado({
+          ...empleado,
+          ...data,
+        });
+      } else {
+        console.error(
+          "Error al obtener detalle de empleado:",
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error al obtener detalle de empleado:", error);
+    }
   };
 
   const handleCloseEditForm = () => {
     setSelectedEmpleado(null);
   };
 
+  const handleAddEmpleado = () => {
+    setIsAdding(true);
+  };
+
+  const handleCloseAddForm = () => {
+    setIsAdding(false);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredEmpleados.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredEmpleados.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredEmpleados.length / itemsPerPage);
 
   const handleClick = (pageNumber) => {
@@ -125,11 +168,18 @@ const GestionEmpleados = () => {
     <div className="flex-grow flex flex-col items-center p-4">
       <h1 className="text-2xl font-light mb-4">Hola {user?.usuario?.rol}</h1>
       {selectedEmpleado ? (
-        <EditarEmpleados
+        <EditarUsuario
+          empleado={selectedEmpleado}
           onClose={handleCloseEditForm}
-          employeeData={selectedEmpleado}
+          user={user}
+          fetchEmpleados={fetchEmpleados}
+        />
+      ) : isAdding ? (
+        <AgregarEmpleados
+          onClose={handleCloseAddForm}
           cargos={cargos}
           user={user}
+          fetchEmpleados={fetchEmpleados} // Pasamos la función fetchEmpleados para actualizar la lista después de agregar
         />
       ) : (
         <>
@@ -140,30 +190,40 @@ const GestionEmpleados = () => {
               value={searchTerm}
               onChange={handleSearch}
               className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-3/4"
-              style={{ minWidth: '200px' }}
+              style={{ minWidth: "200px" }}
             />
             <button
               className="p-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
               onClick={handleClear}
-              style={{ minWidth: '80px', borderRadius: '0 0.375rem 0.375rem 0' }}
+              style={{
+                minWidth: "80px",
+                borderRadius: "0 0.375rem 0.375rem 0",
+              }}
             >
               Limpiar
             </button>
             <button
               className="ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-              onClick={() => {}}
-              style={{ minWidth: '200px' }}
+              onClick={handleAddEmpleado}
+              style={{ minWidth: "200px" }}
             >
               Agregar Empleado
             </button>
           </div>
-          <TablaEmpleados empleados={currentItems} handleEditEmpleado={handleEditEmpleado} />
+          <TablaEmpleados
+            empleados={currentItems}
+            handleEditEmpleado={handleEditEmpleado}
+          />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index}
                 onClick={() => handleClick(index + 1)}
-                className={`mx-1 px-3 py-1 border rounded ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+                className={`mx-1 px-3 py-1 border rounded ${
+                  currentPage === index + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-blue-500"
+                }`}
               >
                 {index + 1}
               </button>
