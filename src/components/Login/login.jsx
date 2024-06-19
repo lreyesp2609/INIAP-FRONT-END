@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { Form, Input, Button, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../../Config';
+import logo from "../imgs/CONVENIOS-1.jpg"
+
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -76,53 +80,65 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold" style={{ color: '#169658' }}>Instituto Nacional de Investigaciones Agropecuarias</h1>
-      </div>
-      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
-        <Form
-          name="loginForm"
-          initialValues={{ remember: true }}
-          onFinish={handleSubmit}
-          className="space-y-6"
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-screen">
+  <div className="flex items-center justify-center">
+    <img src={logo} alt="Descripción de la imagen" className="w-32 md:w-auto" />
+  </div>
+  <div className="flex items-center justify-center">
+    <div className=" w-full max-w-md p-4">
+      <Form
+        name="loginForm"
+        initialValues={{ remember: true }}
+        onFinish={handleSubmit}
+        className="space-y-6"
+      >
+        <Form.Item
+          name="username"
+          rules={[{ required: true, message: 'Por favor, ingresa tu usuario' }]}
         >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Por favor, ingresa tu usuario' }]}
+          <Input
+            id="username"
+            autoComplete="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Usuario"
+
+          />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: 'Por favor, ingresa tu contraseña' }]}
+        >
+          <Input.Password
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña"
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="w-full"
+
           >
-            <Input
-              id="username"
-              autoComplete="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Usuario"
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Por favor, ingresa tu contraseña' }]}
-          >
-            <Input.Password
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="w-full"
-            >
-              Iniciar sesión
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
+            <FontAwesomeIcon icon={faUser} />
+            Iniciar sesión
+          </Button>
+        </Form.Item>
+        
+      </Form>
     </div>
+  </div>
+</div>
+
+
+  
+
+
   );
 };
 
