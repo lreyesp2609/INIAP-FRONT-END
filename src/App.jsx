@@ -60,7 +60,7 @@ const AppContent = () => {
             <MenuSuperUsuario />
           </PrivateRoute>
         } />
-        <Route path="/gestion-empleados" element={<GestionEmpleados />} /> {/* Ruta para GestionEmpleados */}
+        <Route path="/gestion-empleados" element={<GestionEmpleados />} />
       </Routes>
     </div>
   );
