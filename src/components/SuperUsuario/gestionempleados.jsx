@@ -3,6 +3,8 @@ import API_URL from "../../Config";
 import AgregarEmpleados from "./agregarusuario";
 import TablaEmpleados from "./tablaempleados";
 import EditarUsuario from "./editarusuario";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faPlus} from '@fortawesome/free-solid-svg-icons';
 
 const GestionEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -183,33 +185,40 @@ const GestionEmpleados = () => {
         />
       ) : (
         <>
-          <div className="w-full flex mb-4 items-center">
-            <input
-              type="text"
-              placeholder="Buscar por nombres, apellidos o cédula"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-3/4"
-              style={{ minWidth: "200px" }}
-            />
-            <button
-              className="p-2 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
-              onClick={handleClear}
-              style={{
-                minWidth: "80px",
-                borderRadius: "0 0.375rem 0.375rem 0",
-              }}
-            >
-              Limpiar
-            </button>
-            <button
-              className="ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-              onClick={handleAddEmpleado}
-              style={{ minWidth: "200px" }}
-            >
-              Agregar Empleado
-            </button>
-          </div>
+            <div className="w-full flex flex-wrap md:flex-nowrap mb-4 items-center">
+                <div className="flex w-full md:w-3/4">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombres, apellidos o cédula"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                    
+                  />
+                  <button
+                    className="p-2 text-white  focus:outline-none
+                    bg-blue-500 hover:bg-blue-400 
+                  text-white font-bold py-2 px-4 border-b-4 border-blue-700
+                  hover:border-blue-500 rounded"
+                    onClick={handleClear}
+                    style={{
+                      minWidth: "80px",
+                      borderRadius: "0 0.375rem 0.375rem 0",
+                    }}
+                  >
+                    Limpiar
+                  </button>
+                </div>
+                <button
+                  className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-green-700 hover:bg-green-600 
+                  text-white font-bold py-2 px-4 border-b-4 border-green-900
+                  hover:border-green-700 rounded"
+                  onClick={handleAddEmpleado}
+                  style={{ minWidth: "200px" }}
+                >
+                  <FontAwesomeIcon icon={faPlus} /> Agregar Empleado
+                </button>
+              </div>
           <TablaEmpleados
             empleados={currentItems}
             handleEditEmpleado={handleEditEmpleado}

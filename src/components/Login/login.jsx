@@ -81,12 +81,12 @@ const LoginForm = ({ onLogin }) => {
 
   return (
     
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-screen">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-screen ">
   <div className="flex items-center justify-center">
     <img src={logo} alt="Descripción de la imagen" className="w-32 md:w-auto" />
   </div>
-  <div className="flex items-center justify-center">
-    <div className=" w-full max-w-md p-4">
+  <div className="flex items-center justify-center bg-gray-500">
+    <div className=" w-full max-w-md p-4 ">
       <Form
         name="loginForm"
         initialValues={{ remember: true }}
@@ -119,15 +119,15 @@ const LoginForm = ({ onLogin }) => {
           />
         </Form.Item>
         <Form.Item>
-          <Button
+          <button
             type="primary"
             htmlType="submit"
-            className="w-full"
-
+            class=" w-full bg-green-500 hover:bg-green-400 
+            text-white font-bold py-2 px-4 border-b-4 border-green-700
+            hover:border-green-500 rounded"
           >
-            <FontAwesomeIcon icon={faUser} />
-            Iniciar sesión
-          </Button>
+            <FontAwesomeIcon icon={faUser} /> Iniciar sesión
+          </button>
         </Form.Item>
         
       </Form>
