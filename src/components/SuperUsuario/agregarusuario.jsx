@@ -21,9 +21,10 @@ const AgregarEmpleados = (props) => {
     direccion: "",
     correo_electronico: "",
     id_cargo: "",
+    distintivo: "",
     fecha_ingreso: "",
     habilitado: "1",
-    id_rol: ""
+    id_rol: "",
   });
 
   useEffect(() => {
@@ -64,7 +65,7 @@ const AgregarEmpleados = (props) => {
         if (data.length > 0) {
           setFormData((prevData) => ({
             ...prevData,
-            id_estacion: data[0].id_estacion
+            id_estacion: data[0].id_estacion,
           }));
           fetchUnidades(data[0].id_estacion);
         }
@@ -88,7 +89,7 @@ const AgregarEmpleados = (props) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
 
     if (name === "id_estacion") {
@@ -107,10 +108,10 @@ const AgregarEmpleados = (props) => {
       }
 
       const formData = new FormData();
-      formData.append('estacion_id', estacionId);
+      formData.append("estacion_id", estacionId);
 
       const response = await fetch(`${API_URL}/Estaciones/unidades/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `${token}`,
         },
@@ -124,7 +125,7 @@ const AgregarEmpleados = (props) => {
         if (data.length > 0) {
           setFormData((prevData) => ({
             ...prevData,
-            id_unidad: data[0].id_unidad
+            id_unidad: data[0].id_unidad,
           }));
           fetchCargos(estacionId, data[0].id_unidad);
         }
@@ -153,11 +154,11 @@ const AgregarEmpleados = (props) => {
       }
 
       const formData = new FormData();
-      formData.append('estacion_id', estacionId);
-      formData.append('unidad_id', unidadId);
+      formData.append("estacion_id", estacionId);
+      formData.append("unidad_id", unidadId);
 
       const response = await fetch(`${API_URL}/Estaciones/cargos/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `${token}`,
         },
@@ -248,17 +249,28 @@ const AgregarEmpleados = (props) => {
           description: "Empleado agregado exitosamente",
         });
       } else {
-        console.error("Error:", response.statusText);
-        notification.error({
-          message: "Error",
-          description: "Error al agregar el empleado",
-        });
+        // Si la respuesta no es exitosa, intenta parsear el JSON
+        const errorText = await response.text();
+        try {
+          const errorJson = JSON.parse(errorText);
+          console.error("Error:", errorJson);
+          notification.error({
+            message: "Error",
+            description: `Error al agregar el empleado: ${errorJson.error}`,
+          });
+        } catch (parseError) {
+          console.error("Error al parsear JSON de error:", parseError);
+          notification.error({
+            message: "Error",
+            description: `Error al agregar el empleado: ${errorText}`,
+          });
+        }
       }
     } catch (error) {
       console.error("Error:", error);
       notification.error({
         message: "Error",
-        description: "Error al agregar el empleado",
+        description: `Error al agregar el empleado: ${error}`,
       });
     }
   };

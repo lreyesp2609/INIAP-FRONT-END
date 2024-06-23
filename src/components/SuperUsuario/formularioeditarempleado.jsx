@@ -52,6 +52,18 @@ const FormularioEditarEmpleado = ({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
+              Distintivo
+            </label>
+            <input
+              type="text"
+              name="distintivo"
+              value={formData.distintivo}
+              onChange={handleInputChange}
+              className="mt-1 p-2 border border-gray-300 rounded w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
               Fecha de Nacimiento
             </label>
             <input

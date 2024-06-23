@@ -9,6 +9,7 @@ const TablaEmpleados = ({ empleados, handleEditEmpleado }) => {
             <tr className="bg-gray-100">
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Nombres</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Apellidos</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Distintivo</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cédula</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Usuario</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Cargo</th>
@@ -22,6 +23,7 @@ const TablaEmpleados = ({ empleados, handleEditEmpleado }) => {
               <tr key={index} className="hover:bg-gray-50">
                 <td className="px-4 py-2 text-sm text-gray-600">{empleado.nombres}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{empleado.apellidos}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{empleado.distintivo}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{empleado.cedula}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{empleado.usuario}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{empleado.cargo}</td>

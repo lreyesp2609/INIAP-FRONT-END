@@ -23,6 +23,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     id_estacion: empleado.id_estacion,
     id_cargo: empleado.id_cargo,
     usuario: empleado.usuario,
+    distintivo: empleado.distintivo,
   });
 
   const [cargos, setCargos] = useState([]);
@@ -130,7 +131,6 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
           const data = await response.json();
           setUnidades(data);
 
-          // Verificar si la unidad actual está en la lista, sino seleccionar la primera disponible
           if (!data.find((u) => u.id_unidad === formData.unidad)) {
             setFormData((prevFormData) => ({
               ...prevFormData,
@@ -215,8 +215,9 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       );
       formDataForUpdate.append("id_cargo", formData.id_cargo);
       formDataForUpdate.append("fecha_ingreso", formData.fecha_ingreso);
-      formDataForUpdate.append("habilitado", formData.habilitado ? 1 : 0); // O deja formData.habilitado si lo dejas como booleano
+      formDataForUpdate.append("habilitado", formData.habilitado ? 1 : 0);
       formDataForUpdate.append("usuario", formData.usuario);
+      formDataForUpdate.append("distintivo", formData.distintivo);
 
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,

@@ -54,6 +54,7 @@ const GestionEmpleados = () => {
           fecha_ingreso: empleado.fecha_ingreso || "",
           habilitado: empleado.habilitado || "",
           usuario: empleado.usuario || "",
+          distintivo: empleado.distintivo || "",
         }));
         setEmpleados(formattedData);
         setFilteredEmpleados(formattedData);
