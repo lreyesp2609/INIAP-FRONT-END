@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../Login/navbar';
 import LeftMenu from './lateralizquierdo';
 import GestionEmpleados from './gestionempleados';
-
+import GestionVehiculos from './gestionvehiculos';
 const MenuSuperUsuario = () => {
   const [user, setUser] = useState({});
   const [view, setView] = useState('home');
@@ -46,6 +46,7 @@ const MenuSuperUsuario = () => {
           </div>
         )}
         {view === 'gestion-empleados' && <GestionEmpleados />}
+        {view === 'gestion-vehiculos' && <GestionVehiculos />}
       </div>
     </div>
   );

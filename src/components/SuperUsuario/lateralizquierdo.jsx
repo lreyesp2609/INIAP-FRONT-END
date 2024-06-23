@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiUsers, FiMenu } from 'react-icons/fi';
+import { FiUsers, FiMenu, FiTruck } from 'react-icons/fi';
 
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +20,7 @@ const LeftMenu = ({ user, onNavigate }) => {
               <FiMenu className="w-8 h-8 text-white" />
             </button>
         </div>
-                <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 overflow-y-auto pt-16`}>
+        <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 overflow-y-auto pt-16`}>
           <div className="flex flex-col items-center space-y-6 w-full">
             <button 
               onClick={() => {
@@ -31,6 +31,16 @@ const LeftMenu = ({ user, onNavigate }) => {
             >
               <FiUsers className="w-8 h-8 text-white mx-4" />
               <span className="text-white text-sm">Gestión de Empleados</span>
+            </button>
+            <button 
+              onClick={() => {
+                onNavigate('gestion-vehiculos');
+                setIsOpen(false);
+              }} 
+              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            >
+              <FiTruck className="w-8 h-8 text-white mx-4" />
+              <span className="text-white text-sm">Gestión de Vehículos</span>
             </button>
           </div>
         </div>
@@ -51,6 +61,13 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <FiUsers className="w-8 h-8 text-white mx-4" />
             <span className="text-white text-sm hidden md:inline">Gestión de Empleados</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-vehiculos')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+          >
+            <FiTruck className="w-8 h-8 text-white mx-4" />
+            <span className="text-white text-sm hidden md:inline">Gestión de Vehículos</span>
           </button>
         </div>
       </div>

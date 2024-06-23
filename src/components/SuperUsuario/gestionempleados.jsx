@@ -168,7 +168,7 @@ const GestionEmpleados = () => {
 
   return (
     <div className="flex-grow flex flex-col items-center p-4">
-      <h1 className="text-2xl font-light mb-4">Hola {user?.usuario?.rol}</h1>
+      <h1 className="text-2xl font-light mb-4">Gestión de Empleados</h1>
       {selectedEmpleado ? (
         <EditarUsuario
           empleado={selectedEmpleado}
