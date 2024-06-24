@@ -8,6 +8,7 @@ import PrivateRoute from './components/Login/rutaprivada';
 import Navbar from './components/Login/navbar';
 import GestionEmpleados from './components/SuperUsuario/gestionempleados';
 import GestionVehiculos from './components/SuperUsuario/gestionvehiculos';
+import GestionCategorias from './components/SuperUsuario/gestioncategoriasbienes';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
@@ -63,6 +64,7 @@ const AppContent = () => {
         } />
         <Route path="/gestion-empleados" element={<GestionEmpleados />} />
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
+        <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
       </Routes>
     </div>
   );

@@ -4,6 +4,8 @@ import Navbar from '../Login/navbar';
 import LeftMenu from './lateralizquierdo';
 import GestionEmpleados from './gestionempleados';
 import GestionVehiculos from './gestionvehiculos';
+import GestionCategorias from './gestioncategoriasbienes';
+
 const MenuSuperUsuario = () => {
   const [user, setUser] = useState({});
   const [view, setView] = useState('home');
@@ -47,6 +49,7 @@ const MenuSuperUsuario = () => {
         )}
         {view === 'gestion-empleados' && <GestionEmpleados />}
         {view === 'gestion-vehiculos' && <GestionVehiculos />}
+        {view === 'gestion-categorias-bienes' && <GestionCategorias />}
       </div>
     </div>
   );
