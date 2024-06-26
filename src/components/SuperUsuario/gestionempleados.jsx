@@ -182,7 +182,7 @@ const GestionEmpleados = () => {
           onClose={handleCloseAddForm}
           cargos={cargos}
           user={user}
-          fetchEmpleados={fetchEmpleados} // Pasamos la función fetchEmpleados para actualizar la lista después de agregar
+          fetchEmpleados={fetchEmpleados}
         />
       ) : (
         <>
