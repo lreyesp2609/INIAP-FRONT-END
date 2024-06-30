@@ -82,11 +82,17 @@ const LoginForm = ({ onLogin }) => {
   return (
     
 <div className="relative flex items-center justify-center min-h-screen bg-green-900">
-  {/* Triángulo de fondo */}
-  <div className="absolute w-0 h-0 border-l-[100vw] border-l-transparent border-b-[100vh] border-b-green-800 rounded-full"></div>
-  <div className="absolute left-0 w-0 h-0 border-l-[95vw] border-l-transparent border-b-[95vh] border-b-green-700 rounded-full"></div>
-  <div className="absolute left-0 w-0 h-0 border-l-[85vw] border-l-transparent border-b-[90vh] border-b-green-600 rounded-full"></div>
-  <div className="absolute left-0 w-0 h-0 border-l-[75vw] border-l-transparent border-b-[85vh] border-b-green-500 rounded-full"></div>
+    {/* Triángulo de fondo grande */}
+    <div className="absolute w-0 h-0 border-l-[100vw] sm:border-l-[70vw] md:border-l-[100vw] border-l-transparent border-b-[100vh] sm:border-b-[70vh] md:border-b-[100vh] border-b-green-800 rounded-full"></div>
+  
+    {/* Triángulo de fondo mediano */}
+    <div className="absolute left-0 w-0 h-0 border-l-[95vw] sm:border-l-[65vw] md:border-l-[95vw] border-l-transparent border-b-[95vh] sm:border-b-[65vh] md:border-b-[95vh] border-b-green-700 rounded-full"></div>
+    
+    {/* Triángulo de fondo pequeño */}
+    <div className="absolute left-0 w-0 h-0 border-l-[85vw] sm:border-l-[60vw] md:border-l-[85vw] border-l-transparent border-b-[90vh] sm:border-b-[60vh] md:border-b-[90vh] border-b-green-600 rounded-full"></div>
+    
+    {/* Triángulo de fondo más pequeño */}
+    <div className="absolute left-0 w-0 h-0 border-l-[75vw] sm:border-l-[55vw] md:border-l-[75vw] border-l-transparent border-b-[85vh] sm:border-b-[55vh] md:border-b-[85vh] border-b-green-500 rounded-full"></div>
 
   <div className="bg-white shadow-lg rounded-lg p-4 sm:p-8 max-w-md w-full z-10 m-4 sm:m-0">
     <div className="mb-4 flex justify-center">
@@ -99,7 +105,7 @@ const LoginForm = ({ onLogin }) => {
       name="loginForm"
       initialValues={{ remember: true }}
       onFinish={handleSubmit}
-      className="space-y-6"
+      className="space-y-10"
     >
       <Form.Item
         name="username"
