@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import API_URL from "../../Config";
 import AgregarCategoriasBienes from "./agregarcategoriasbienes";
 import TablaGestionCategorias from "./tablacategoriasbienes";
@@ -17,6 +17,7 @@ const GestionCategorias = () => {
   const [categoryIdToAdd, setCategoryIdToAdd] = useState(null);
   const [showSubcategorias, setShowSubcategorias] = useState(false);
   const [subcategorias, setSubcategorias] = useState([]);
+  const forceUpdate = useRef(0);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -25,6 +26,10 @@ const GestionCategorias = () => {
       fetchCategorias(storedUser.usuario.id_usuario);
     }
   }, []);
+
+  useEffect(() => {
+    forceUpdate.current = forceUpdate.current + 1;
+  }, [subcategorias]); // Incrementa forceUpdate cuando subcategorias cambia
 
   const fetchCategorias = async (id_usuario) => {
     const token = localStorage.getItem("token");
@@ -165,6 +170,7 @@ const GestionCategorias = () => {
             </button>
           </div>
           <TablaGestionCategorias
+            key={forceUpdate.current} // Key para forzar la actualización
             categorias={currentItems}
             handleAddCategoria={handleAddCategoria}
             handleOpenSubcategorias={handleOpenSubcategorias}

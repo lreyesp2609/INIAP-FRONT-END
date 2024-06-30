@@ -53,7 +53,7 @@ const AgregarSubCategoriasBienes = ({
         });
 
         // Actualizar las subcategorías en el componente padre
-        updateSubcategorias(newSubcategoria); 
+        updateSubcategorias(newSubcategoria);
 
         onClose();
       } else {
