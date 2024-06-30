@@ -81,63 +81,62 @@ const LoginForm = ({ onLogin }) => {
 
   return (
     
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-screen ">
-  <div className="flex items-center justify-center">
-    <img src={logo} alt="Descripción de la imagen" className="w-32 md:w-auto" />
-  </div>
-  <div className="flex items-center justify-center bg-gray-500">
-    <div className=" w-full max-w-md p-4 ">
-      <Form
-        name="loginForm"
-        initialValues={{ remember: true }}
-        onFinish={handleSubmit}
-        className="space-y-6"
-      >
-        <Form.Item
-          name="username"
-          rules={[{ required: true, message: 'Por favor, ingresa tu usuario' }]}
-        >
-          <Input
-            id="username"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Usuario"
+<div className="relative flex items-center justify-center min-h-screen bg-green-900">
+  {/* Triángulo de fondo */}
+  <div className="absolute w-0 h-0 border-l-[100vw] border-l-transparent border-b-[100vh] border-b-green-800 rounded-full"></div>
+  <div className="absolute left-0 w-0 h-0 border-l-[95vw] border-l-transparent border-b-[95vh] border-b-green-700 rounded-full"></div>
+  <div className="absolute left-0 w-0 h-0 border-l-[85vw] border-l-transparent border-b-[90vh] border-b-green-600 rounded-full"></div>
+  <div className="absolute left-0 w-0 h-0 border-l-[75vw] border-l-transparent border-b-[85vh] border-b-green-500 rounded-full"></div>
 
-          />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          rules={[{ required: true, message: 'Por favor, ingresa tu contraseña' }]}
-        >
-          <Input.Password
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-          />
-        </Form.Item>
-        <Form.Item>
-          <button
-            type="primary"
-            htmlType="submit"
-            class=" w-full bg-green-500 hover:bg-green-400 
-            text-white font-bold py-2 px-4 border-b-4 border-green-700
-            hover:border-green-500 rounded"
-          >
-            <FontAwesomeIcon icon={faUser} /> Iniciar sesión
-          </button>
-        </Form.Item>
-        
-      </Form>
+  <div className="bg-white shadow-lg rounded-lg p-4 sm:p-8 max-w-md w-full z-10 m-4 sm:m-0">
+    <div className="mb-4 flex justify-center">
+      <div className="flex items-center justify-center">
+        <img src={logo} alt="Descripción de la imagen" className="w-24 sm:w-32 md:w-auto" />
+      </div>
     </div>
+
+    <Form
+      name="loginForm"
+      initialValues={{ remember: true }}
+      onFinish={handleSubmit}
+      className="space-y-6"
+    >
+      <Form.Item
+        name="username"
+        rules={[{ required: true, message: 'Por favor, ingresa tu usuario' }]}
+      >
+        <Input
+          id="username"
+          autoComplete="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Usuario"
+        />
+      </Form.Item>
+      <Form.Item
+        name="password"
+        rules={[{ required: true, message: 'Por favor, ingresa tu contraseña' }]}
+      >
+        <Input.Password
+          id="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Contraseña"
+        />
+      </Form.Item>
+      <Form.Item>
+        <button
+          type="primary"
+          htmlType="submit"
+          className="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+        >
+          <FontAwesomeIcon icon={faUser} /> Iniciar sesión
+        </button>
+      </Form.Item>
+    </Form>
   </div>
 </div>
-
-
-  
-
 
   );
 };
