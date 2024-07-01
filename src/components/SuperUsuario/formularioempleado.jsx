@@ -5,7 +5,6 @@ const FormularioEmpleado = ({
   handleInputChange,
   cargos = [],
   roles = [],
-  estaciones = [],
   unidades = [],
 }) => {
   return (
@@ -130,27 +129,6 @@ const FormularioEmpleado = ({
         <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Estación
-            </label>
-            <select
-              name="id_estacion"
-              value={formData.id_estacion}
-              onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-              {estaciones &&
-                estaciones.map((estacion) => (
-                  <option
-                    key={estacion.id_estacion}
-                    value={estacion.id_estacion}
-                  >
-                    {estacion.nombre_estacion}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
               Unidad
             </label>
             <select
@@ -196,20 +174,6 @@ const FormularioEmpleado = ({
               onChange={handleInputChange}
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Habilitado
-            </label>
-            <select
-              name="habilitado"
-              value={formData.habilitado}
-              onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-              <option value="1">Sí</option>
-              <option value="0">No</option>
-            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">

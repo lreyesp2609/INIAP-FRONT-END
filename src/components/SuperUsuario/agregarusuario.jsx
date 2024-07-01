@@ -23,7 +23,6 @@ const AgregarEmpleados = (props) => {
     id_cargo: "",
     distintivo: "",
     fecha_ingreso: "",
-    habilitado: "1",
     id_rol: "",
   });
 

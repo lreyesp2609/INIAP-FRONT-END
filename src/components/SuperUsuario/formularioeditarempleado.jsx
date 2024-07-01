@@ -7,7 +7,6 @@ const FormularioEditarEmpleado = ({
   roles = [],
   estaciones = [],
   unidades = [],
-  handleSave,
 }) => {
   return (
     <form id="employeeForm" className="space-y-8">

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../Config";
 import AgregarEmpleados from "./agregarusuario";
-import TablaEmpleados from "./tablaempleados";
+import TablaEmpleados from "./tablaempleadoshabilitados";
 import EditarUsuario from "./editarusuario";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import HabilitarEmpleado from "./habilitarempleado";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 
 const GestionEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -16,6 +17,8 @@ const GestionEmpleados = () => {
   const [selectedEmpleado, setSelectedEmpleado] = useState(null);
   const [cargos, setCargos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [isHabilitarEmpleadoVisible, setIsHabilitarEmpleadoVisible] =
+    useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -28,9 +31,7 @@ const GestionEmpleados = () => {
 
   const fetchEmpleados = async (id_usuario) => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     try {
       const response = await fetch(
@@ -155,6 +156,14 @@ const GestionEmpleados = () => {
     setIsAdding(false);
   };
 
+  const handleShowHabilitarEmpleado = () => {
+    setIsHabilitarEmpleadoVisible(true);
+  };
+
+  const handleCloseHabilitarEmpleado = () => {
+    setIsHabilitarEmpleadoVisible(false);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredEmpleados.slice(
@@ -184,45 +193,61 @@ const GestionEmpleados = () => {
           user={user}
           fetchEmpleados={fetchEmpleados}
         />
+      ) : isHabilitarEmpleadoVisible && user ? (
+        <HabilitarEmpleado 
+          user={user} 
+          fetchEmpleados={fetchEmpleados} 
+          onVolver={handleCloseHabilitarEmpleado}
+        />
       ) : (
         <>
-            <div className="w-full flex flex-wrap md:flex-nowrap mb-4 items-center">
-                <div className="flex w-full md:w-3/4">
-                  <input
-                    type="text"
-                    placeholder="Buscar por nombres, apellidos o cédula"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                    
-                  />
-                  <button
-                    className="p-2 text-white  focus:outline-none
-                    bg-blue-500 hover:bg-blue-400 
-                  text-white font-bold py-2 px-4 border-b-4 border-blue-700
-                  hover:border-blue-500 rounded"
-                    onClick={handleClear}
-                    style={{
-                      minWidth: "80px",
-                      borderRadius: "0 0.375rem 0.375rem 0",
-                    }}
-                  >
-                    Limpiar
-                  </button>
-                </div>
-                <button
-                  className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-green-700 hover:bg-green-600 
-                  text-white font-bold py-2 px-4 border-b-4 border-green-900
-                  hover:border-green-700 rounded"
-                  onClick={handleAddEmpleado}
-                  style={{ minWidth: "200px" }}
-                >
-                  <FontAwesomeIcon icon={faPlus} /> Agregar Empleado
-                </button>
-              </div>
+          <div className="w-full flex flex-wrap md:flex-nowrap mb-4 items-center">
+            <div className="flex w-full md:w-3/4">
+              <input
+                type="text"
+                placeholder="Buscar por nombres, apellidos o cédula"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+              />
+              <button
+                className="p-2 text-white  focus:outline-none
+                  bg-blue-500 hover:bg-blue-400 
+                text-white font-bold py-2 px-4 border-b-4 border-blue-700
+                hover:border-blue-500 rounded"
+                onClick={handleClear}
+                style={{
+                  minWidth: "80px",
+                  borderRadius: "0 0.375rem 0.375rem 0",
+                }}
+              >
+                Limpiar
+              </button>
+            </div>
+            <button
+              className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-green-700 hover:bg-green-600 
+                text-white font-bold py-2 px-4 border-b-4 border-green-900
+                hover:border-green-700 rounded"
+              onClick={handleAddEmpleado}
+              style={{ minWidth: "200px" }}
+            >
+              <FontAwesomeIcon icon={faPlus} /> Agregar Empleado
+            </button>
+            <button
+              className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-yellow-500 hover:bg-yellow-400 
+                text-white font-bold py-2 px-4 border-b-4 border-yellow-700
+                hover:border-yellow-600 rounded"
+              onClick={handleShowHabilitarEmpleado}
+              style={{ minWidth: "200px" }}
+            >
+              <FontAwesomeIcon icon={faEye} /> Ver Empleados Deshabilitados
+            </button>
+          </div>
           <TablaEmpleados
             empleados={currentItems}
             handleEditEmpleado={handleEditEmpleado}
+            user={user}
+            fetchEmpleados={fetchEmpleados}
           />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
