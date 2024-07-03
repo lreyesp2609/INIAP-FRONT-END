@@ -29,7 +29,7 @@ const GestionVehiculos = () => {
     if (!token) {
       return;
     }
-
+  
     try {
       const response = await fetch(
         `${API_URL}/Vehiculos/vehiculos/${id_usuario}/`,
@@ -55,7 +55,7 @@ const GestionVehiculos = () => {
       );
     }
   };
-
+  
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
@@ -142,7 +142,11 @@ const GestionVehiculos = () => {
               <FontAwesomeIcon icon={faPlus} /> Agregar Vehículo
             </button>
           </div>
-          <TablaVehiculos vehiculos={currentItems} />
+          <TablaVehiculos
+            vehiculos={currentItems}
+            userId={userId}
+            fetchVehiculos={fetchVehiculos}
+          />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
               <button

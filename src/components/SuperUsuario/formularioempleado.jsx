@@ -126,22 +126,6 @@ const FormularioEmpleado = ({
     }
   };
 
-  // Función para manejar el cambio en el campo de correo electrónico
-  const handleCorreoElectronicoChange = (event) => {
-    const { value } = event.target;
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (emailRegex.test(value)) {
-      handleInputChange(event); // Llamar a la función para manejar el cambio de datos
-      setErrors((prevErrors) => ({ ...prevErrors, correo_electronico: "" })); // Limpiar el error si es válido
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        correo_electronico: "El correo electrónico debe ser válido",
-      }));
-    }
-  };
-
   // Función para manejar el cambio en el campo de unidad
   const handleUnidadChange = (event) => {
     const { value } = event.target;
@@ -336,7 +320,7 @@ const FormularioEmpleado = ({
               type="email"
               name="correo_electronico"
               value={formData.correo_electronico}
-              onChange={handleCorreoElectronicoChange}
+              onChange={handleInputChange}
               className={`mt-1 p-2 border border-gray-300 rounded w-full ${
                 errors.correo_electronico ? "border-red-500" : ""
               }`}
