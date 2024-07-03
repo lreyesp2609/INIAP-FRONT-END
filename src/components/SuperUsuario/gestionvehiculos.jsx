@@ -56,12 +56,8 @@ const GestionVehiculos = () => {
 
     const filtered = vehiculos.filter((vehiculo) => {
       const placa = vehiculo.placa.toLowerCase();
-      const modelo = vehiculo.modelo.toLowerCase();
-      const marca = vehiculo.marca.toLowerCase();
       return (
-        placa.includes(searchValue) ||
-        modelo.includes(searchValue) ||
-        marca.includes(searchValue)
+        placa.includes(searchValue)
       );
     });
 
@@ -107,7 +103,7 @@ const GestionVehiculos = () => {
             }
             setIsAdding(false);
           }}
-          userId={userId} // Passing userId to AgregarVehiculo
+          userId={userId}
         />
       ) : (
         <>
@@ -115,7 +111,7 @@ const GestionVehiculos = () => {
             <div className="flex w-full md:w-3/4">
               <input
                 type="text"
-                placeholder="Placa, modelo o marca"
+                placeholder="Placa"
                 value={searchTerm}
                 onChange={handleSearch}
                 className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"

@@ -17,7 +17,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     fecha_ingreso: empleado.fecha_ingreso,
     direccion: empleado.direccion,
     habilitado: empleado.habilitado || false,
-    id_rol: empleado.id_rol,
+    id_rol: empleado.rol ? empleado.rol.id_rol : "",
     genero: empleado.genero,
     id_unidad: empleado.id_unidad,
     id_estacion: empleado.id_estacion,
@@ -29,6 +29,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
   const [cargos, setCargos] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [estaciones, setEstaciones] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   useEffect(() => {
     const fetchEmpleadoDetalle = async () => {
@@ -57,6 +58,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
             unidad: data.unidad ? data.unidad.id_unidad : "",
             id_unidad: data.unidad ? data.unidad.id_unidad : "",
             habilitado: data.habilitado || false,
+            id_rol: data.rol ? data.rol.id_rol : "",
           }));
         } else {
           console.error(
@@ -71,6 +73,33 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
 
     fetchEmpleadoDetalle();
   }, [empleado.id_empleado, user.usuario.id_usuario]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/Roles/roles/`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setRoles(data.roles);
+        } else {
+          console.error("Error al obtener roles:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   useEffect(() => {
     const fetchCargos = async () => {
@@ -186,7 +215,11 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         ? JSON.parse(value)
         : value;
 
-    console.log(`Nuevo valor de ${name}:`, newValue);
+    console.log("Nuevo valor de id_cargo:", value);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      id_cargo: value,
+    }));
 
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -218,6 +251,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("habilitado", formData.habilitado ? 1 : 0);
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
+      formDataForUpdate.append("id_rol", formData.id_rol);
 
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
@@ -229,19 +263,26 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
           body: formDataForUpdate,
         }
       );
+
+      const data = await response.json();
       if (response.ok) {
         onClose();
         fetchEmpleados(user.usuario.id_usuario);
         notification.success({
           message: "Empleado actualizado",
           description:
+            data.mensaje ||
             "Los datos del empleado han sido actualizados correctamente.",
         });
       } else {
-        console.error("Error al actualizar empleado:", response.statusText);
+        console.error(
+          "Error al actualizar empleado:",
+          data.error || response.statusText
+        );
         notification.error({
           message: "Error al actualizar",
           description:
+            data.error ||
             "Hubo un problema al intentar actualizar los datos del empleado.",
         });
       }
@@ -268,6 +309,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         formData={formData}
         handleInputChange={handleInputChange}
         cargos={cargos}
+        roles={roles}
         unidades={unidades}
         estaciones={estaciones}
         handleSave={handleSave}

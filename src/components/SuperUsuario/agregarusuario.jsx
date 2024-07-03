@@ -22,12 +22,11 @@ const AgregarEmpleados = (props) => {
     correo_electronico: "",
     id_cargo: "",
     distintivo: "",
-    fecha_ingreso: "",
     id_rol: "",
   });
 
   useEffect(() => {
-    fetchEstaciones();
+    fetchUserDetails(user.usuario.id_usuario); // Fetch user details on component mount
     fetchRoles();
   }, []);
 
@@ -42,6 +41,58 @@ const AgregarEmpleados = (props) => {
       fetchCargos(formData.id_estacion, formData.id_unidad);
     }
   }, [formData.id_estacion, formData.id_unidad]);
+
+  const fetchUserDetails = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/Login/obtener_usuario/${userId}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const usuario = data.usuario;
+
+        setFormData((prevData) => ({
+          ...prevData,
+          id_estacion: usuario.estacion.id_estacion,
+          id_unidad:
+            usuario.unidades.length > 0 ? usuario.unidades[0].id_unidad : "",
+        }));
+        setEstaciones([usuario.estacion]);
+        setUnidades(usuario.unidades);
+
+        if (usuario.unidades.length > 0) {
+          fetchCargos(
+            usuario.estacion.id_estacion,
+            usuario.unidades[0].id_unidad
+          );
+        }
+      } else {
+        console.error("Error:", response.statusText);
+        notification.error({
+          message: "Error",
+          description: "Error al obtener los detalles del usuario",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      notification.error({
+        message: "Error",
+        description: "Error al obtener los detalles del usuario",
+      });
+    }
+  };
 
   const fetchEstaciones = async () => {
     try {
@@ -248,7 +299,6 @@ const AgregarEmpleados = (props) => {
           description: "Empleado agregado exitosamente",
         });
       } else {
-        // Si la respuesta no es exitosa, intenta parsear el JSON
         const errorText = await response.text();
         try {
           const errorJson = JSON.parse(errorText);
