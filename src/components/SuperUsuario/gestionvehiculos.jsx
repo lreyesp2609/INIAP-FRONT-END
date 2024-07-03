@@ -13,6 +13,7 @@ const GestionVehiculos = () => {
   const [itemsPerPage] = useState(10);
   const [isAdding, setIsAdding] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,10 +44,15 @@ const GestionVehiculos = () => {
         setVehiculos(data.vehiculos);
         setFilteredVehiculos(data.vehiculos);
       } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.error); // Mostrar el error en caso de fallo en la solicitud
         console.error("Error al obtener vehículos:", response.statusText);
       }
     } catch (error) {
       console.error("Error al obtener vehículos:", error);
+      setErrorMessage(
+        "Error al obtener vehículos. Por favor, inténtalo de nuevo más tarde."
+      );
     }
   };
 
@@ -56,9 +62,7 @@ const GestionVehiculos = () => {
 
     const filtered = vehiculos.filter((vehiculo) => {
       const placa = vehiculo.placa.toLowerCase();
-      return (
-        placa.includes(searchValue)
-      );
+      return placa.includes(searchValue);
     });
 
     setFilteredVehiculos(filtered);
@@ -79,6 +83,13 @@ const GestionVehiculos = () => {
     setIsAdding(false);
   };
 
+  const handleVehiculoAdded = () => {
+    if (userId) {
+      fetchVehiculos(userId);
+    }
+    setIsAdding(false);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredVehiculos.slice(
@@ -94,15 +105,11 @@ const GestionVehiculos = () => {
   return (
     <div className="flex-grow flex flex-col items-center p-4">
       <h1 className="text-2xl font-light mb-4">Gestión de Vehículos</h1>
+      {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
       {isAdding ? (
         <AgregarVehiculo
           onClose={handleCancelAdd}
-          onVehiculoAdded={() => {
-            if (userId) {
-              fetchVehiculos(userId);
-            }
-            setIsAdding(false);
-          }}
+          onVehiculoAdded={handleVehiculoAdded}
           userId={userId}
         />
       ) : (

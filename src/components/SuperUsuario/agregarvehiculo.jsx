@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { notification } from "antd";
 import API_URL from "../../Config";
 import FormularioVehiculo from "./formulariovehiculos";
 
 const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
   const [formData, setFormData] = useState({
+    id_categoria_bien: "",
     id_subcategoria_bien: "",
     placa: "",
     codigo_inventario: "",
@@ -16,8 +17,59 @@ const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
     numero_motor: "",
     numero_chasis: "",
     numero_matricula: "",
-    habilitado: "",
   });
+
+  const [categorias, setCategorias] = useState([]);
+  const [subcategorias, setSubcategorias] = useState([]);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("Token no encontrado");
+          return;
+        }
+
+        const response = await fetch(
+          `${API_URL}/CategoriasBienes/categorias-bienes/${userId}/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const categoriasData = await response.json();
+          setCategorias(categoriasData);
+        } else {
+          const errorText = await response.text();
+          console.error("Error al obtener categorías:", errorText);
+        }
+      } catch (error) {
+        console.error("Error al obtener categorías:", error);
+      }
+    };
+
+    fetchCategorias();
+  }, [userId]);
+
+  const handleCategoriaChange = (e) => {
+    const categoriaId = e.target.value;
+    setFormData({
+      ...formData,
+      id_categoria_bien: categoriaId,
+      id_subcategoria_bien: "", // Limpiar la subcategoría seleccionada al cambiar de categoría
+    });
+
+    const selectedCategoria = categorias.find(
+      (categoria) => categoria.id_categorias_bien === parseInt(categoriaId)
+    );
+
+    setSubcategorias(selectedCategoria ? selectedCategoria.subcategorias : []);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +83,7 @@ const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("Token not found");
+        console.error("Token no encontrado");
         return;
       }
 
@@ -97,6 +149,9 @@ const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
         <FormularioVehiculo
           formData={formData}
           handleInputChange={handleInputChange}
+          categorias={categorias}
+          subcategorias={subcategorias}
+          handleCategoriaChange={handleCategoriaChange}
         />
         <div className="flex justify-end space-x-4">
           <button

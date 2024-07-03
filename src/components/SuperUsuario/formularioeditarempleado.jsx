@@ -177,6 +177,7 @@ const FormularioEditarEmpleado = ({
               onChange={handleInputChange}
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             >
+              <option value="">Seleccionar Cargo</option>
               {cargos &&
                 cargos.map((cargo) => (
                   <option key={cargo.id_cargo} value={cargo.id_cargo}>

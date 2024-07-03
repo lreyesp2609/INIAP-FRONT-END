@@ -16,7 +16,6 @@ const GestionCategorias = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [categoryIdToAdd, setCategoryIdToAdd] = useState(null);
   const [showSubcategorias, setShowSubcategorias] = useState(false);
-  const [subcategorias, setSubcategorias] = useState([]);
   const forceUpdate = useRef(0);
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const GestionCategorias = () => {
 
   useEffect(() => {
     forceUpdate.current = forceUpdate.current + 1;
-  }, [subcategorias]); // Incrementa forceUpdate cuando subcategorias cambia
+  }, [categorias]); // Incrementa forceUpdate cuando categorias cambia
 
   const fetchCategorias = async (id_usuario) => {
     const token = localStorage.getItem("token");
@@ -90,6 +89,7 @@ const GestionCategorias = () => {
 
   const handleCloseSubcategorias = () => {
     setShowSubcategorias(false);
+    fetchCategorias(user.usuario.id_usuario); // Actualiza la lista de categorías y subcategorías
   };
 
   const handleCloseAddForm = () => {
@@ -99,10 +99,16 @@ const GestionCategorias = () => {
   };
 
   const updateSubcategorias = (newSubcategoria) => {
-    setSubcategorias((prevSubcategorias) => [
-      ...prevSubcategorias,
-      newSubcategoria,
-    ]);
+    setCategorias((prevCategorias) =>
+      prevCategorias.map((categoria) =>
+        categoria.id_categorias_bien === newSubcategoria.id_categorias_bien
+          ? {
+              ...categoria,
+              subcategorias: [...categoria.subcategorias, newSubcategoria],
+            }
+          : categoria
+      )
+    );
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -174,7 +180,7 @@ const GestionCategorias = () => {
             categorias={currentItems}
             handleAddCategoria={handleAddCategoria}
             handleOpenSubcategorias={handleOpenSubcategorias}
-            subcategorias={subcategorias}
+            subcategorias={categorias.flatMap(c => c.subcategorias)} // Asegúrate de pasar todas las subcategorías
           />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (

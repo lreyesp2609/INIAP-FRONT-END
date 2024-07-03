@@ -215,16 +215,18 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         ? JSON.parse(value)
         : value;
 
-    console.log("Nuevo valor de id_cargo:", value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      id_cargo: value,
-    }));
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: name === "habilitado" ? newValue === true : newValue,
-    }));
+    if (name === "id_cargo") {
+      console.log("Nuevo valor de id_cargo:", value);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: newValue,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: name === "habilitado" ? newValue === true : newValue,
+      }));
+    }
   };
 
   const handleSave = async () => {
