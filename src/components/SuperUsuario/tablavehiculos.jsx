@@ -2,9 +2,18 @@ import React from "react";
 import { FaEdit } from "react-icons/fa";
 import DeshabilitarVehiculo from "./deshabilitarvehiculo";
 
-const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos }) => {
+const TablaVehiculos = ({
+  vehiculos,
+  userId,
+  fetchVehiculos,
+  onEditVehiculo,
+}) => {
   const handleDeshabilitar = () => {
     fetchVehiculos(userId);
+  };
+
+  const handleEditClick = (vehiculo, userId) => {
+    onEditVehiculo(vehiculo, userId);
   };
 
   return (
@@ -55,6 +64,7 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos }) => {
                   <button
                     className="p-2 bg-blue-500 text-white rounded-full"
                     title="Editar vehículo"
+                    onClick={() => handleEditClick(vehiculo, userId)} // Llama a la nueva función
                   >
                     <FaEdit />
                   </button>
@@ -92,6 +102,7 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos }) => {
               <button
                 className="p-2 bg-blue-500 text-white rounded-full"
                 title="Editar vehículo"
+                onClick={() => handleEditClick(vehiculo, userId)}
               >
                 <FaEdit />
               </button>

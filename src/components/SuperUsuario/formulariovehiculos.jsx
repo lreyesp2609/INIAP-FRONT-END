@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcategorias, handleCategoriaChange }) => {
+const FormularioVehiculo = ({
+  formData,
+  handleInputChange,
+  categorias,
+  subcategorias,
+  handleCategoriaChange,
+}) => {
   const [errors, setErrors] = useState({});
-  const años = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i); // Años desde el presente hasta 50 años atrás
+  const años = Array.from(
+    { length: 50 },
+    (_, i) => new Date().getFullYear() - i
+  ); // Años desde el presente hasta 50 años atrás
 
   useEffect(() => {
     // Resetear los errores de subcategoría cuando cambia la categoría
@@ -118,7 +127,8 @@ const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcatego
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        numero_chasis: "El número de chasis debe contener solo letras y números",
+        numero_chasis:
+          "El número de chasis debe contener solo letras y números",
       }));
     }
   };
@@ -155,7 +165,7 @@ const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcatego
               }`}
             >
               <option value="">Selecciona una Categoría</option>
-              {categorias.map(categoria => (
+              {categorias.map((categoria) => (
                 <option
                   key={categoria.id_categorias_bien}
                   value={categoria.id_categorias_bien}
@@ -182,7 +192,7 @@ const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcatego
               disabled={!formData.id_categoria_bien}
             >
               <option value="">Selecciona una Subcategoría</option>
-              {subcategorias.map(subcategoria => (
+              {subcategorias.map((subcategoria) => (
                 <option
                   key={subcategoria.id_subcategoria_bien}
                   value={subcategoria.id_subcategoria_bien}
@@ -192,7 +202,9 @@ const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcatego
               ))}
             </select>
             {errors.id_subcategoria_bien && (
-              <p className="text-red-500 text-sm">{errors.id_subcategoria_bien}</p>
+              <p className="text-red-500 text-sm">
+                {errors.id_subcategoria_bien}
+              </p>
             )}
           </div>
           <div>
@@ -293,7 +305,7 @@ const FormularioVehiculo = ({ formData, handleInputChange, categorias, subcatego
               }`}
             >
               <option value="">Selecciona un Año</option>
-              {años.map(anio => (
+              {años.map((anio) => (
                 <option key={anio} value={anio}>
                   {anio}
                 </option>

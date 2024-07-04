@@ -28,7 +28,7 @@ const GestionCategorias = () => {
 
   useEffect(() => {
     forceUpdate.current = forceUpdate.current + 1;
-  }, [categorias]); // Incrementa forceUpdate cuando categorias cambia
+  }, [categorias]);
 
   const fetchCategorias = async (id_usuario) => {
     const token = localStorage.getItem("token");
@@ -128,10 +128,7 @@ const GestionCategorias = () => {
   }
 
   return (
-    <div className="flex-grow flex flex-col items-center p-4">
-      <h1 className="text-2xl font-light mb-4">
-        Gestión de Categorías de Bienes
-      </h1>
+    <div className="p-4">
       {isAdding ? (
         <AgregarCategoriasBienes
           onClose={handleCloseAddForm}
@@ -147,55 +144,50 @@ const GestionCategorias = () => {
         />
       ) : (
         <>
-          <div className="w-full flex flex-wrap md:flex-nowrap mb-4 items-center">
-            <div className="flex w-full md:w-3/4">
-              <input
-                type="text"
-                placeholder="Descripción de la categoría"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-              />
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-light">Gestión de Categorías de Bienes</h1>
+            <div className="flex space-x-4">
               <button
-                className="p-2 text-white focus:outline-none bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-                onClick={handleClear}
-                style={{
-                  minWidth: "80px",
-                  borderRadius: "0 0.375rem 0.375rem 0",
-                }}
+                onClick={() => setIsAdding(true)}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
               >
-                Limpiar
+                <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                Agregar Categoría de Bienes
               </button>
             </div>
-            <button
-              className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-700 rounded"
-              onClick={() => setIsAdding(true)}
-              style={{ minWidth: "200px" }}
-            >
-              <FontAwesomeIcon icon={faPlus} /> Agregar Categoría de Bienes
-            </button>
+          </div>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Descripción de la categoría"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
           </div>
           <TablaGestionCategorias
-            key={forceUpdate.current} // Key para forzar la actualización
+            key={forceUpdate.current}
             categorias={currentItems}
             handleAddCategoria={handleAddCategoria}
             handleOpenSubcategorias={handleOpenSubcategorias}
-            subcategorias={categorias.flatMap(c => c.subcategorias)} // Asegúrate de pasar todas las subcategorías
+            subcategorias={categorias.flatMap(c => c.subcategorias)}
           />
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => handleClick(index + 1)}
-                className={`mx-1 px-3 py-1 border rounded ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Anterior
+            </button>
+            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Siguiente
+            </button>
           </div>
         </>
       )}

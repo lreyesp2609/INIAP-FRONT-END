@@ -209,12 +209,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
     const newValue =
-      type === "checkbox"
-        ? checked
-        : type === "select-one"
-        ? JSON.parse(value)
-        : value;
-
+      type === "checkbox" ? checked : value;
+  
     if (name === "id_cargo") {
       console.log("Nuevo valor de id_cargo:", value);
       setFormData((prevFormData) => ({
@@ -228,13 +224,21 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       }));
     }
   };
-
+  
   const handleSave = async () => {
+    if (!formData.id_cargo) {
+      notification.error({
+        message: "Error al actualizar",
+        description: "Se necesita un cargo para actualizar.",
+      });
+      return;
+    }
+  
     const token = localStorage.getItem("token");
     if (!token) {
       return;
     }
-
+  
     try {
       const formDataForUpdate = new FormData();
       formDataForUpdate.append("numero_cedula", formData.cedula);
@@ -254,7 +258,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
       formDataForUpdate.append("id_rol", formData.id_rol);
-
+  
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
         {
@@ -265,7 +269,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
           body: formDataForUpdate,
         }
       );
-
+  
       const data = await response.json();
       if (response.ok) {
         onClose();
@@ -297,6 +301,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       });
     }
   };
+  
 
   return (
     <div>

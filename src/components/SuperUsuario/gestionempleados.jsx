@@ -17,8 +17,7 @@ const GestionEmpleados = () => {
   const [selectedEmpleado, setSelectedEmpleado] = useState(null);
   const [cargos, setCargos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [isHabilitarEmpleadoVisible, setIsHabilitarEmpleadoVisible] =
-    useState(false);
+  const [isHabilitarEmpleadoVisible, setIsHabilitarEmpleadoVisible] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -177,8 +176,7 @@ const GestionEmpleados = () => {
   };
 
   return (
-    <div className="flex-grow flex flex-col items-center p-4">
-      <h1 className="text-2xl font-light mb-4">Gestión de Empleados</h1>
+    <div className="p-4">
       {selectedEmpleado ? (
         <EditarUsuario
           empleado={selectedEmpleado}
@@ -201,47 +199,42 @@ const GestionEmpleados = () => {
         />
       ) : (
         <>
-          <div className="w-full flex flex-wrap md:flex-nowrap mb-4 items-center">
-            <div className="flex w-full md:w-3/4">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-light">Gestión de Empleados</h1>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleShowHabilitarEmpleado}
+                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-400"
+              >
+                <FontAwesomeIcon icon={faEye} className="mr-2" />
+                Ver Empleados Deshabilitados
+              </button>
+              <button
+                onClick={handleAddEmpleado}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                Agregar Empleado
+              </button>
+            </div>
+          </div>
+          <div className="mb-4">
+            <div className="flex">
               <input
                 type="text"
                 placeholder="Buscar por nombres, apellidos o cédula"
                 value={searchTerm}
                 onChange={handleSearch}
-                className="p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-                className="p-2 text-white  focus:outline-none
-                  bg-blue-500 hover:bg-blue-400 
-                text-white font-bold py-2 px-4 border-b-4 border-blue-700
-                hover:border-blue-500 rounded"
+                className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
                 onClick={handleClear}
-                style={{
-                  minWidth: "80px",
-                  borderRadius: "0 0.375rem 0.375rem 0",
-                }}
+                style={{ minWidth: "80px" }}
               >
                 Limpiar
               </button>
             </div>
-            <button
-              className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-green-700 hover:bg-green-600 
-                text-white font-bold py-2 px-4 border-b-4 border-green-900
-                hover:border-green-700 rounded"
-              onClick={handleAddEmpleado}
-              style={{ minWidth: "200px" }}
-            >
-              <FontAwesomeIcon icon={faPlus} /> Agregar Empleado
-            </button>
-            <button
-              className="mt-2 md:mt-0 md:ml-2 p-2 focus:outline-none w-full bg-yellow-500 hover:bg-yellow-400 
-                text-white font-bold py-2 px-4 border-b-4 border-yellow-700
-                hover:border-yellow-600 rounded"
-              onClick={handleShowHabilitarEmpleado}
-              style={{ minWidth: "200px" }}
-            >
-              <FontAwesomeIcon icon={faEye} /> Ver Empleados Deshabilitados
-            </button>
           </div>
           <TablaEmpleados
             empleados={currentItems}
@@ -249,20 +242,20 @@ const GestionEmpleados = () => {
             user={user}
             fetchEmpleados={fetchEmpleados}
           />
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => handleClick(index + 1)}
-                className={`mx-1 px-3 py-1 border rounded ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Anterior
+            </button>
+            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Siguiente
+            </button>
           </div>
         </>
       )}

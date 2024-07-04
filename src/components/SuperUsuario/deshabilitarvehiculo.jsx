@@ -39,7 +39,7 @@ const DeshabilitarVehiculo = ({
 
     try {
       const response = await fetch(
-        `${API_URL}/Vehiculos/deshabilitar/${userId}/${vehiculoId}/`,
+        `${API_URL}/Vehiculos/deshabilitar-vehiculo/${userId}/${vehiculoId}/`,
         {
           method: "POST",
           headers: {
