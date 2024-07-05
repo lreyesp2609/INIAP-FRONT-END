@@ -9,6 +9,7 @@ import Navbar from './components/Login/navbar';
 import GestionEmpleados from './components/SuperUsuario/gestionempleados';
 import GestionVehiculos from './components/SuperUsuario/gestionvehiculos';
 import GestionCategorias from './components/SuperUsuario/gestioncategoriasbienes';
+import GestionEstaciones from './components/SuperUsuario/gestionestaciones ';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
@@ -65,6 +66,7 @@ const AppContent = () => {
         <Route path="/gestion-empleados" element={<GestionEmpleados />} />
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
         <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
+        <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
       </Routes>
     </div>
   );

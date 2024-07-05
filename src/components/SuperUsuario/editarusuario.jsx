@@ -187,7 +187,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       }
 
       try {
-        const response = await fetch(`${API_URL}/Estaciones/estaciones/`, {
+        const response = await fetch(`${API_URL}/Estaciones/estaciones/${user.usuario.id_usuario}/`, {
           headers: {
             Authorization: token,
           },

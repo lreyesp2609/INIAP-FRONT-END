@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FiUsers, FiMenu, FiTruck, FiList } from 'react-icons/fi';
+import { FaBuilding } from 'react-icons/fa';
 
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,11 +15,11 @@ const LeftMenu = ({ user, onNavigate }) => {
         <div className="flex items-center justify-between px-4 py-3">
           {/* Botón de menú */}
           <button 
-              onClick={() => setIsOpen(!isOpen)} 
-              className="fixed top-40 left-2 z-5 bg-[#169658] p-2 rounded-full focus:outline-none "
-            >
-              <FiMenu className="w-8 h-8 text-white" />
-            </button>
+            onClick={() => setIsOpen(!isOpen)} 
+            className="fixed top-40 left-2 z-5 bg-[#169658] p-2 rounded-full focus:outline-none"
+          >
+            <FiMenu className="w-8 h-8 text-white" />
+          </button>
         </div>
         <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 overflow-y-auto pt-16`}>
           <div className="flex flex-col items-center space-y-6 w-full">
@@ -51,6 +52,16 @@ const LeftMenu = ({ user, onNavigate }) => {
             >
               <FiList className="w-8 h-8 text-white mx-4" />
               <span className="text-white text-sm">Gestión de Categorías de Bienes</span>
+            </button>
+            <button 
+              onClick={() => {
+                onNavigate('gestion-estaciones');
+                setIsOpen(false);
+              }} 
+              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            >
+              <FaBuilding className="w-8 h-8 text-white mx-4" />
+              <span className="text-white text-sm">Gestión de Estaciones</span>
             </button>
           </div>
         </div>
@@ -85,6 +96,13 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <FiList className="w-8 h-8 text-white mx-4" />
             <span className="text-white text-sm hidden md:inline">Gestión de Categorías de Bienes</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-estaciones')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+          >
+            <FaBuilding className="w-8 h-8 text-white mx-4" />
+            <span className="text-white text-sm hidden md:inline">Gestión de Estaciones</span>
           </button>
         </div>
       </div>

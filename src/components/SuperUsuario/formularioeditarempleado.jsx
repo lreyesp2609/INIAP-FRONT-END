@@ -159,6 +159,7 @@ const FormularioEditarEmpleado = ({
               onChange={handleInputChange}
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             >
+              <option value="">Seleccionar Unidad</option>
               {unidades &&
                 unidades.map((unidad) => (
                   <option key={unidad.id_unidad} value={unidad.id_unidad}>
