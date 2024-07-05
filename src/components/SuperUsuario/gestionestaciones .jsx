@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import API_URL from "../../Config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import TablaEstaciones from './tablaestaciones';
-import EditarEstacion from './editarestacion';
-import AgregarEstacion from './agregarestacion';
+import TablaEstaciones from "./tablaestaciones";
+import EditarEstacion from "./editarestacion";
+import AgregarEstacion from "./agregarestacion";
+import GestionUnidadesPorEstacion from "./gestionunidades";
 
 const GestionEstaciones = () => {
   const [estaciones, setEstaciones] = useState([]);
@@ -17,6 +18,8 @@ const GestionEstaciones = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [estacionToEdit, setEstacionToEdit] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isAddingUnidad, setIsAddingUnidad] = useState(false);
+
   const forceUpdate = useRef(0);
 
   useEffect(() => {
@@ -102,6 +105,11 @@ const GestionEstaciones = () => {
     setIsEditing(false);
   };
 
+  const handleAgregarUnidades = (estacion) => {
+    setEstacionToEdit(estacion);
+    setIsAddingUnidad(true);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredEstaciones.slice(
@@ -123,6 +131,16 @@ const GestionEstaciones = () => {
           estacion={estacionToEdit}
           onCancel={handleCancelEdit}
           onActualizacion={handleActualizacion}
+        />
+      ) : isAddingUnidad ? (
+        <GestionUnidadesPorEstacion
+          onClose={() => setIsAddingUnidad(false)}
+          onUnidadAdded={() => {
+            setIsAddingUnidad(false);
+            fetchEstaciones(userId);
+          }}
+          id_estacion={estacionToEdit.id_estacion}
+          id_usuario={userId}
         />
       ) : (
         <>
@@ -147,7 +165,11 @@ const GestionEstaciones = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <TablaEstaciones currentItems={currentItems} onEditEstacion={handleEditEstacion} />
+          <TablaEstaciones
+            currentItems={currentItems}
+            onEditEstacion={handleEditEstacion}
+            onAgregarUnidades={handleAgregarUnidades}
+          />
           <div className="flex justify-between items-center mt-4">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

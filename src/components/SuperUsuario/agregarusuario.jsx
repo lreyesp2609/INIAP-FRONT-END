@@ -160,7 +160,7 @@ const AgregarEmpleados = (props) => {
       const formData = new FormData();
       formData.append("estacion_id", estacionId);
 
-      const response = await fetch(`${API_URL}/Estaciones/unidades/`, {
+      const response = await fetch(`${API_URL}/Unidades/unidades/`, {
         method: "POST",
         headers: {
           Authorization: `${token}`,
@@ -207,7 +207,7 @@ const AgregarEmpleados = (props) => {
       formData.append("estacion_id", estacionId);
       formData.append("unidad_id", unidadId);
 
-      const response = await fetch(`${API_URL}/Estaciones/cargos/`, {
+      const response = await fetch(`${API_URL}/Cargos/cargos/`, {
         method: "POST",
         headers: {
           Authorization: `${token}`,

@@ -113,7 +113,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         formDataForCargos.append("estacion_id", formData.estacion);
         formDataForCargos.append("unidad_id", formData.unidad);
 
-        const response = await fetch(`${API_URL}/Estaciones/cargos/`, {
+        const response = await fetch(`${API_URL}/Cargos/cargos/`, {
           method: "POST",
           headers: {
             Authorization: token,
@@ -148,7 +148,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         const formDataForUnidades = new FormData();
         formDataForUnidades.append("estacion_id", formData.estacion);
 
-        const response = await fetch(`${API_URL}/Estaciones/unidades/`, {
+        const response = await fetch(`${API_URL}/Unidades/unidades/`, {
           method: "POST",
           headers: {
             Authorization: token,

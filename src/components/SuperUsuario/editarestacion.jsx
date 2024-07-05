@@ -61,11 +61,20 @@ const EditarEstacion = ({ estacion, onCancel, onActualizacion }) => {
   };
 
   return (
-    <FormularioEditarEstacion
-      estacion={estacion}
-      onSubmit={handleSubmit}
-      onCancel={onCancel}
-    />
+    <div>
+      <button
+        onClick={onCancel}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Volver a la Lista
+      </button>
+      <h2 className="text-2xl font-bold mb-4">Editar Estación</h2>
+      <FormularioEditarEstacion
+        estacion={estacion}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+      />
+    </div>
   );
 };
 

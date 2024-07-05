@@ -1,9 +1,17 @@
-import React from 'react';
-import { FaEdit } from 'react-icons/fa';
+import React from "react";
+import { FaEdit, FaPlus } from "react-icons/fa";
 
-const TablaEstaciones = ({ currentItems, onEditEstacion }) => {
+const TablaEstaciones = ({
+  currentItems,
+  onEditEstacion,
+  onAgregarUnidades,
+}) => {
   const handleEditClick = (estacion) => {
     onEditEstacion(estacion);
+  };
+
+  const handleAgregarUnidadesClick = (estacion) => {
+    onAgregarUnidades(estacion);
   };
 
   return (
@@ -64,6 +72,15 @@ const TablaEstaciones = ({ currentItems, onEditEstacion }) => {
                   >
                     <FaEdit />
                   </button>
+                  <div className="flex items-center">
+                    <button
+                      className="p-2 bg-green-500 text-white rounded-full"
+                      title="Agregar unidades"
+                      onClick={() => handleAgregarUnidadesClick(estacion)}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -18,8 +18,8 @@ const FormularioEditarEstacion = ({ estacion, onSubmit, onCancel }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-light mb-4">Editar Estación</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="text-xl font-semibold mb-4">Datos de la Estación</h3>
         <div>
           <label className="block text-sm font-medium text-gray-700">Nombre de la Estación</label>
           <input

@@ -1,22 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { notification } from "antd";
 import API_URL from "../../Config";
-import FormularioEstacion from "./formularioestacion";
+import FormularioUnidad from "./formulariounidad";
 
-const AgregarEstacion = ({ onClose, onEstacionAdded, userId }) => {
-  const [formData, setFormData] = useState({
-    nombre_estacion: "",
-    ruc: "",
-    direccion: "",
-    telefono: "",
-  });
+const AgregarUnidad = ({ onClose, onUnidadAdded, id_usuario, id_estacion }) => {
+  const [nombre_unidad, setNombreUnidad] = useState("");
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setNombreUnidad(e.target.value);
   };
 
   const handleSave = async () => {
@@ -28,12 +19,10 @@ const AgregarEstacion = ({ onClose, onEstacionAdded, userId }) => {
       }
 
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach((key) => {
-        formDataToSend.append(key, formData[key]);
-      });
+      formDataToSend.append("nombre_unidad", nombre_unidad);
 
       const response = await fetch(
-        `${API_URL}/Estaciones/crear-estacion/${userId}/`,
+        `${API_URL}/Unidades/crear-unidades/${id_usuario}/${id_estacion}/`,
         {
           method: "POST",
           headers: {
@@ -46,9 +35,9 @@ const AgregarEstacion = ({ onClose, onEstacionAdded, userId }) => {
       if (response.ok) {
         notification.success({
           message: "Éxito",
-          description: "Estación agregada correctamente",
+          description: "Unidad agregada correctamente",
         });
-        onEstacionAdded();
+        onUnidadAdded();
         onClose();
       } else {
         const errorText = await response.text();
@@ -57,43 +46,43 @@ const AgregarEstacion = ({ onClose, onEstacionAdded, userId }) => {
           console.error("Error:", errorJson);
           notification.error({
             message: "Error",
-            description: `Error al agregar la estación: ${errorJson.error}`,
+            description: `Error al agregar la unidad: ${errorJson.error}`,
           });
         } catch (parseError) {
           console.error("Error al parsear JSON de error:", parseError);
           notification.error({
             message: "Error",
-            description: `Error al agregar la estación: ${errorText}`,
+            description: `Error al agregar la unidad: ${errorText}`,
           });
         }
       }
     } catch (error) {
-      console.error("Error al agregar la estación:", error);
+      console.error("Error al agregar la unidad:", error);
       notification.error({
         message: "Error",
-        description: `Error al agregar la estación: ${error}`,
+        description: `Error al agregar la unidad: ${error}`,
       });
     }
   };
 
   return (
     <div className="w-full flex justify-center">
-      <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
+      <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
         <button
           onClick={onClose}
           className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Volver a la Lista
         </button>
-        <h2 className="text-2xl font-bold mb-4">Agregar Estación</h2>
-        <FormularioEstacion
-          formData={formData}
-          handleInputChange={handleInputChange}
+        <h2 className="text-2xl font-bold mb-4">Agregar Unidad</h2>
+        <FormularioUnidad
+          nombre_unidad={nombre_unidad}
+          onInputChange={handleInputChange}
         />
         <div className="flex justify-end space-x-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose()} // Cierra el formulario sin hacer cambios
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             Cancelar
@@ -111,4 +100,4 @@ const AgregarEstacion = ({ onClose, onEstacionAdded, userId }) => {
   );
 };
 
-export default AgregarEstacion;
+export default AgregarUnidad;

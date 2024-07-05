@@ -73,7 +73,7 @@ const GestionEmpleados = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/Estaciones/cargoseditar/`, {
+      const response = await fetch(`${API_URL}/Cargos/cargoseditar/`, {
         headers: {
           Authorization: `${token}`,
         },
