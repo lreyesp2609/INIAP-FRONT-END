@@ -1,9 +1,13 @@
 import React from 'react';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaPlus } from 'react-icons/fa';
 
-const TablaUnidades = ({ unidades, onEditUnidad }) => {
+const TablaUnidades = ({ unidades, onEditUnidad, onAddCargos }) => {
   const handleEditClick = (unidad) => {
     onEditUnidad(unidad);
+  };
+
+  const handleAddCargosClick = (unidad) => {
+    onAddCargos(unidad);
   };
 
   return (
@@ -45,6 +49,13 @@ const TablaUnidades = ({ unidades, onEditUnidad }) => {
                     onClick={() => handleEditClick(unidad)}
                   >
                     <FaEdit />
+                  </button>
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full"
+                    title="Añadir cargos"
+                    onClick={() => handleAddCargosClick(unidad)}
+                  >
+                    <FaPlus />
                   </button>
                 </td>
               </tr>
