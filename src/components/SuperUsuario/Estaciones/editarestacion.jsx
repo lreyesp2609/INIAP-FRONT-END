@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import FormularioEditarEstacion from './formularioeditarestacion';
-import API_URL from "../../Config";
+import FormularioEditarEstacion from './Formularios/formularioeditarestacion';
+import API_URL from "../../../Config";
 import { notification } from "antd";
 
 const EditarEstacion = ({ estacion, onCancel, onActualizacion }) => {

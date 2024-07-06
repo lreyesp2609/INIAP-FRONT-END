@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import { notification, Modal, Input, Button } from "antd";
-import TablaVehiculosDeshabilitados from "./tablavehiculosdeshabilitado";
+import TablaVehiculosDeshabilitados from "./Tablas/tablavehiculosdeshabilitado";
 
 const HabilitarVehiculo = ({ userId, fetchVehiculos, onVolver }) => {
   const [vehiculosDeshabilitados, setVehiculosDeshabilitados] = useState([]);

@@ -1,6 +1,6 @@
 import React from "react";
 import { FaEdit } from "react-icons/fa";
-import DeshabilitarVehiculo from "./deshabilitarvehiculo";
+import DeshabilitarVehiculo from "../deshabilitarvehiculo";
 
 const TablaVehiculos = ({
   vehiculos,

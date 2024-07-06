@@ -1,6 +1,6 @@
 import React from "react";
 import { MdPersonOff } from "react-icons/md";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import { notification, Modal } from "antd";
 
 const DeshabilitarEmpleado = ({

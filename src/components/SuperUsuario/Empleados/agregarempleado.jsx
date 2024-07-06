@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import { notification } from "antd";
-import FormularioEmpleado from "./formularioempleado";
+import FormularioEmpleado from "./Formularios/formularioempleado";
 
 const AgregarEmpleados = (props) => {
   const { onClose, user } = props;

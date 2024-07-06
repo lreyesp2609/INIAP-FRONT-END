@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaBan } from "react-icons/fa";
 import { Modal, notification, Input } from "antd";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 
 const DeshabilitarVehiculo = ({
   vehiculoId,

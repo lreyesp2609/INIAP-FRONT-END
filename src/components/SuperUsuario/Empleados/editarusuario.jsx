@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { notification } from "antd";
-import API_URL from "../../Config";
-import FormularioEditarEmpleado from "./formularioeditarempleado";
+import API_URL from "../../../Config";
+import FormularioEditarEmpleado from "./Formularios/formularioeditarempleado";
 
 const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
   const [formData, setFormData] = useState({

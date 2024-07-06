@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import AgregarCategoriasBienes from "./agregarcategoriasbienes";
-import TablaGestionCategorias from "./tablacategoriasbienes";
+import TablaGestionCategorias from "./Tablas/tablacategoriasbienes";
 import AgregarSubCategoriasBienes from "./agregarsubcategorias";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";

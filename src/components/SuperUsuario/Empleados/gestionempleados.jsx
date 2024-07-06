@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import API_URL from "../../Config";
-import AgregarEmpleados from "./agregarusuario";
-import TablaEmpleados from "./tablaempleadoshabilitados";
+import API_URL from "../../../Config";
+import AgregarEmpleados from "./agregarempleado";
+import TablaEmpleados from "./Tablas/tablaempleadoshabilitados";
 import EditarUsuario from "./editarusuario";
 import HabilitarEmpleado from "./habilitarempleado";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { notification } from "antd";
-import API_URL from "../../Config";
-import FormularioEditarVehiculo from "./formularioeditarvehiculo";
+import API_URL from "../../../Config";
+import FormularioEditarVehiculo from "./Formularios/formularioeditarvehiculo";
 
 const EditarVehiculo = ({ vehiculo, onClose, onVehiculoUpdated, userId }) => {
   const [formData, setFormData] = useState({ ...vehiculo });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import API_URL from "../../Config";
-import TablaVehiculos from "./tablavehiculos";
+import API_URL from "../../../Config";
+import TablaVehiculos from "./Tablas/tablavehiculos";
 import AgregarVehiculo from "./agregarvehiculo";
 import HabilitarVehiculo from "./habilitarvehiculo";
 import EditarVehiculo from "./editarvehiculo";

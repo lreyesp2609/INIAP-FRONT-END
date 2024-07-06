@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import TablaEstaciones from "./tablaestaciones";
+import TablaEstaciones from "./Tablas/tablaestaciones";
 import EditarEstacion from "./editarestacion";
 import AgregarEstacion from "./agregarestacion";
-import GestionUnidadesPorEstacion from "./gestionunidades";
+import GestionUnidadesPorEstacion from "../Unidades/gestionunidades";
 
 const GestionEstaciones = () => {
   const [estaciones, setEstaciones] = useState([]);

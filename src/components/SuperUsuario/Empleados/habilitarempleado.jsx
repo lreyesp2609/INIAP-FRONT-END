@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import { notification } from "antd";
-import TablaEmpleadosDeshabilitados from "./tablaempleadosdeshabilitado";
+import TablaEmpleadosDeshabilitados from "./Tablas/tablaempleadosdeshabilitado";
 
 const HabilitarEmpleado = ({ user, fetchEmpleados, onVolver }) => {
   const [empleadosDeshabilitados, setEmpleadosDeshabilitados] = useState([]);

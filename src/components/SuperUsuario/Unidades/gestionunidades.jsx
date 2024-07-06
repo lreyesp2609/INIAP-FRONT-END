@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import API_URL from '../../Config';
+import API_URL from '../../../Config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import TablaUnidades from './tablaunidades';
+import TablaUnidades from './Tablas/tablaunidades';
 import AgregarUnidad from './agregarunidad';
 
 const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {

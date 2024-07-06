@@ -6,10 +6,10 @@ import MenuAdministrador from './components/Modulo Administrador/menuadministrad
 import MenuSuperUsuario from './components/SuperUsuario/menusuperusuario';
 import PrivateRoute from './components/Login/rutaprivada';
 import Navbar from './components/Login/navbar';
-import GestionEmpleados from './components/SuperUsuario/gestionempleados';
-import GestionVehiculos from './components/SuperUsuario/gestionvehiculos';
-import GestionCategorias from './components/SuperUsuario/gestioncategoriasbienes';
-import GestionEstaciones from './components/SuperUsuario/gestionestaciones ';
+import GestionEmpleados from './components/SuperUsuario/Empleados/gestionempleados';
+import GestionVehiculos from './components/SuperUsuario/Vehiculos/gestionvehiculos';
+import GestionCategorias from './components/SuperUsuario/CategoriasBienes/gestioncategoriasbienes';
+import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones ';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);

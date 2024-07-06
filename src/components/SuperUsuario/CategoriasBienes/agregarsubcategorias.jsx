@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { notification } from "antd";
-import API_URL from "../../Config";
+import API_URL from "../../../Config";
 import FormularioSubcategorias from "./formulariosubcategorias";
 
 const AgregarSubCategoriasBienes = ({

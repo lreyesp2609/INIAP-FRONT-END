@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { notification } from "antd";
-import API_URL from "../../Config";
-import FormularioVehiculo from "./formulariovehiculos";
+import API_URL from "../../../Config";
+import FormularioVehiculo from "./Formularios/formulariovehiculos";
 
 const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
   const [formData, setFormData] = useState({

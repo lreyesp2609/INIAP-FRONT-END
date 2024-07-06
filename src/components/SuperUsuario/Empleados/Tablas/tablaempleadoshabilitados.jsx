@@ -1,6 +1,6 @@
 import React from "react";
 import { FaEdit } from "react-icons/fa";
-import DeshabilitarEmpleado from "./deshabilitarempleado";
+import DeshabilitarEmpleado from "../deshabilitarempleado";
 
 const TablaEmpleados = ({
   empleados,

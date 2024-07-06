@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Login/navbar';
 import LeftMenu from './lateralizquierdo';
-import GestionEmpleados from './gestionempleados';
-import GestionVehiculos from './gestionvehiculos';
-import GestionCategorias from './gestioncategoriasbienes';
-import GestionEstaciones from './gestionestaciones ';
+import GestionEmpleados from './Empleados/gestionempleados';
+import GestionVehiculos from './Vehiculos/gestionvehiculos';
+import GestionCategorias from './CategoriasBienes/gestioncategoriasbienes';
+import GestionEstaciones from './Estaciones/gestionestaciones ';
 
 const MenuSuperUsuario = () => {
   const [user, setUser] = useState({});
