@@ -167,6 +167,8 @@ const GestionVehiculos = () => {
           <TablaVehiculos
             vehiculos={currentItems}
             onEditVehiculo={handleEditVehiculo}
+            userId={userId}
+            fetchVehiculos={fetchVehiculos}
           />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
