@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
-import { notification } from "antd";
+import { notification, Modal, Input, Button } from "antd";
 import TablaEmpleadosDeshabilitados from "./Tablas/tablaempleadosdeshabilitado";
+import { MdPersonAdd } from "react-icons/md";
 
 const HabilitarEmpleado = ({ user, fetchEmpleados, onVolver }) => {
   const [empleadosDeshabilitados, setEmpleadosDeshabilitados] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);  // Estado para mostrar el modal
+  const [motivo, setMotivo] = useState('');  // Estado para el motivo
+  const [empleadoIdSeleccionado, setEmpleadoIdSeleccionado] = useState(null);  // Estado para el ID del empleado seleccionado
 
   useEffect(() => {
     if (user && user.usuario && user.usuario.id_usuario) {
@@ -41,48 +45,74 @@ const HabilitarEmpleado = ({ user, fetchEmpleados, onVolver }) => {
     }
   };
 
-  const handleHabilitarEmpleado = async (empleadoId) => {
-    const token = localStorage.getItem("token");
+  const showModal = (empleadoId) => {
+    setEmpleadoIdSeleccionado(empleadoId);
+    setModalVisible(true);
+  };
+
+  const handleOk = async () => {
+    if (!motivo) {
+      notification.error({
+        message: 'Error',
+        description: 'Debes proporcionar un motivo para habilitar al empleado.',
+      });
+      return;
+    }
+
+    const token = localStorage.getItem('token');
     if (!token) {
       notification.error({
-        message: "Error",
-        description: "No estás autenticado",
+        message: 'Error',
+        description: 'No estás autenticado',
       });
       return;
     }
 
     try {
+      const formData = new FormData();
+      formData.append('motivo', motivo);
+
       const response = await fetch(
-        `${API_URL}/Empleados/habilitar-empleado/${user.usuario.id_usuario}/${empleadoId}/`,
+        `${API_URL}/Empleados/habilitar-empleado/${user.usuario.id_usuario}/${empleadoIdSeleccionado}/`,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
             Authorization: `${token}`,
-            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ habilitado: 1 }),
+          body: formData,
         }
       );
 
       if (response.ok) {
         notification.success({
-          message: "Empleado Habilitado",
-          description: "El empleado ha sido habilitado exitosamente.",
+          message: 'Éxito',
+          description: 'Empleado habilitado exitosamente',
         });
         if (user && user.usuario && user.usuario.id_usuario) {
           fetchEmpleados(user.usuario.id_usuario);
           fetchEmpleadosDeshabilitados(user.usuario.id_usuario);
         }
+        setModalVisible(false);  // Cierra el modal después de habilitar
+        setMotivo('');  // Limpia el campo de motivo
       } else {
         const errorData = await response.json();
         notification.error({
-          message: "Error al habilitar empleado",
+          message: 'Error',
           description: errorData.error || response.statusText,
         });
       }
     } catch (error) {
-      console.error("Error al habilitar empleado:", error);
+      console.error('Error al habilitar empleado:', error);
+      notification.error({
+        message: 'Error',
+        description: 'Error al habilitar empleado',
+      });
     }
+  };
+
+  const handleCancel = () => {
+    setModalVisible(false);
+    setMotivo('');  // Limpia el campo de motivo al cancelar
   };
 
   return (
@@ -98,8 +128,24 @@ const HabilitarEmpleado = ({ user, fetchEmpleados, onVolver }) => {
       </div>
       <TablaEmpleadosDeshabilitados
         empleados={empleadosDeshabilitados}
-        onHabilitarEmpleado={handleHabilitarEmpleado}
+        onHabilitarEmpleado={showModal}  // Pasar la función para mostrar el modal
       />
+      <Modal
+        title={`¿Estás seguro de habilitar al empleado?`}
+        visible={modalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Sí"
+        cancelText="No"
+      >
+        <p>Esta acción habilitará al empleado para que pueda acceder nuevamente al sistema.</p>
+        <Input.TextArea
+          placeholder="Ingresa el motivo para habilitar al empleado"
+          value={motivo}
+          onChange={(e) => setMotivo(e.target.value)}  // Manejo del cambio del motivo
+          rows={4}
+        />
+      </Modal>
     </div>
   );
 };
