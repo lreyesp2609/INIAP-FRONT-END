@@ -144,12 +144,12 @@ const GestionEstaciones = () => {
         />
       ) : (
         <>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
             <h1 className="text-2xl font-light">Gestión de Estaciones</h1>
             <div className="flex space-x-4">
               <button
                 onClick={handleAddEstacion}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Agregar Estación
@@ -170,19 +170,18 @@ const GestionEstaciones = () => {
             onEditEstacion={handleEditEstacion}
             onAgregarUnidades={handleAgregarUnidades}
           />
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              className="
+              bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
             >
               Anterior
             </button>
-            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
             >
               Siguiente
             </button>

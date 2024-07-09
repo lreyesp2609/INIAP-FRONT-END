@@ -12,7 +12,7 @@ const FormularioEstacion = ({ formData, handleInputChange }) => {
           name="nombre_estacion"
           value={formData.nombre_estacion}
           onChange={handleInputChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
       </div>
       <div>
@@ -22,7 +22,7 @@ const FormularioEstacion = ({ formData, handleInputChange }) => {
           name="ruc"
           value={formData.ruc}
           onChange={handleInputChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
       </div>
       <div>
@@ -34,7 +34,7 @@ const FormularioEstacion = ({ formData, handleInputChange }) => {
           name="direccion"
           value={formData.direccion}
           onChange={handleInputChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
       </div>
       <div>
@@ -46,7 +46,7 @@ const FormularioEstacion = ({ formData, handleInputChange }) => {
           name="telefono"
           value={formData.telefono}
           onChange={handleInputChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
       </div>
     </form>

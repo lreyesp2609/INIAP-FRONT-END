@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { notification } from "antd";
 import API_URL from "../../../Config";
 import FormularioVehiculo from "./Formularios/formulariovehiculos";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
   const [formData, setFormData] = useState({
@@ -139,12 +141,6 @@ const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
   return (
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
-        <button
-          onClick={onClose}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Volver a la Lista
-        </button>
         <h2 className="text-2xl font-bold mb-4">Agregar Vehículo</h2>
         <FormularioVehiculo
           formData={formData}
@@ -153,20 +149,22 @@ const AgregarVehiculo = ({ onClose, onVehiculoAdded, userId }) => {
           subcategorias={subcategorias}
           handleCategoriaChange={handleCategoriaChange}
         />
-        <div className="flex justify-end space-x-4">
+        <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="
+            w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded
+            "
           >
-            Cancelar
+           <FontAwesomeIcon icon={faTimes} /> Cancelar
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded"
           >
-            Guardar
+            <FontAwesomeIcon icon={faSave} /> Guardar
           </button>
         </div>
       </div>

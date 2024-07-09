@@ -15,7 +15,7 @@ const FormularioCargo = ({ formData, handleInputChange }) => {
               name="cargo"
               value={formData.cargo}
               onChange={handleInputChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
+              className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
               required
             />
           </div>

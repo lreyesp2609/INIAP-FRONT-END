@@ -16,7 +16,7 @@ const FormularioSubcategorias = ({ formData, handleInputChange }) => {
           name="descripcion"
           value={formData.descripcion}
           onChange={handleInputChange}
-          className="p-2 border border-gray-300 rounded w-full"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
           placeholder="Ingrese la descripción"
         />
       </div>
@@ -33,7 +33,7 @@ const FormularioSubcategorias = ({ formData, handleInputChange }) => {
           name="identificador"
           value={formData.identificador}
           onChange={handleInputChange}
-          className="p-2 border border-gray-300 rounded w-full"
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
           placeholder="Ingrese el identificador"
         />
       </div>

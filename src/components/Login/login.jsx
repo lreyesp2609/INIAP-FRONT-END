@@ -111,6 +111,7 @@ const LoginForm = ({ onLogin }) => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Usuario"
+          className='bg-gray-300 text-black border border-gray-500 rounded py-2 px-4'
         />
       </Form.Item>
       <Form.Item
@@ -123,13 +124,14 @@ const LoginForm = ({ onLogin }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Contraseña"
+          className='bg-gray-300 text-black border border-gray-500 rounded py-2 px-4'
         />
       </Form.Item>
       <Form.Item>
         <button
           type="primary"
           htmlType="submit"
-          className="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border-b-4 border-green-400 hover:border-green-900 rounded"
         >
           <FontAwesomeIcon icon={faUser} /> Iniciar sesión
         </button>

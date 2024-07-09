@@ -16,7 +16,7 @@ const TablaEstaciones = ({
 
   return (
     <div className="w-full">
-      <div className="overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 table-auto">
           <thead>
             <tr className="bg-gray-100">
@@ -86,6 +86,46 @@ const TablaEstaciones = ({
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="block md:hidden">
+        {currentItems.map((estacion) => (
+          <div key={estacion.id_estacion} className="bg-white shadow-md rounded-lg p-4 mb-4">
+            <p className="text-sm text-gray-700">
+              <strong>ID:</strong> {estacion.id_estacion}
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>Nombre de la Estación:</strong> {estacion.nombre_estacion}
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>Siglas:</strong> {estacion.siglas_estacion}
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>RUC:</strong> {estacion.ruc}
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>Dirección:</strong> {estacion.direccion}
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>Teléfono:</strong> {estacion.telefono}
+            </p>
+            <div className="flex space-x-2 mt-2">
+              <button
+                className="p-2 bg-blue-500 text-white rounded-full"
+                title="Editar estación"
+                onClick={() => handleEditClick(estacion)}
+              >
+                <FaEdit />
+              </button>
+              <button
+                className="p-2 bg-green-500 text-white rounded-full"
+                title="Agregar unidades"
+                onClick={() => handleAgregarUnidadesClick(estacion)}
+              >
+                <FaPlus />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

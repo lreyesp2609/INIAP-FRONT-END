@@ -170,259 +170,258 @@ const FormularioEmpleado = ({
 
   return (
     <form id="employeeForm" className="space-y-8">
+  <div>
+    <h3 className="text-xl font-semibold mb-4">Datos del Usuario</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div>
-        <h3 className="text-xl font-semibold mb-4">Datos del Usuario</h3>
-        <div className="grid grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Número de Cédula
-            </label>
-            <input
-              type="text"
-              name="numero_cedula"
-              value={formData.numero_cedula}
-              onChange={handleCedulaChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.numero_cedula ? "border-red-500" : ""
-              }`}
-            />
-            {errors.numero_cedula && (
-              <p className="text-red-500 text-sm">{errors.numero_cedula}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nombres
-            </label>
-            <input
-              type="text"
-              name="nombres"
-              value={formData.nombres}
-              onChange={handleNombresChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.nombres ? "border-red-500" : ""
-              }`}
-            />
-            {errors.nombres && (
-              <p className="text-red-500 text-sm">{errors.nombres}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Apellidos
-            </label>
-            <input
-              type="text"
-              name="apellidos"
-              value={formData.apellidos}
-              onChange={handleApellidosChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.apellidos ? "border-red-500" : ""
-              }`}
-            />
-            {errors.apellidos && (
-              <p className="text-red-500 text-sm">{errors.apellidos}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Distintivo
-            </label>
-            <input
-              type="text"
-              name="distintivo"
-              value={formData.distintivo}
-              onChange={handleDistintivoChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.distintivo ? "border-red-500" : ""
-              }`}
-            />
-            {errors.distintivo && (
-              <p className="text-red-500 text-sm">{errors.distintivo}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Fecha de Nacimiento
-            </label>
-            <input
-              type="date"
-              name="fecha_nacimiento"
-              value={formData.fecha_nacimiento}
-              onChange={handleFechaNacimientoChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.fecha_nacimiento ? "border-red-500" : ""
-              }`}
-            />
-            {errors.fecha_nacimiento && (
-              <p className="text-red-500 text-sm">{errors.fecha_nacimiento}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Género
-            </label>
-            <select
-              name="genero"
-              value={formData.genero}
-              onChange={handleGeneroChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.genero ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">Seleccionar Género</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Femenino">Femenino</option>
-            </select>
-            {errors.genero && (
-              <p className="text-red-500 text-sm">{errors.genero}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Celular
-            </label>
-            <input
-              type="text"
-              name="celular"
-              value={formData.celular}
-              onChange={handleCelularChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.celular ? "border-red-500" : ""
-              }`}
-            />
-            {errors.celular && (
-              <p className="text-red-500 text-sm">{errors.celular}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Dirección
-            </label>
-            <input
-              type="text"
-              name="direccion"
-              value={formData.direccion}
-              onChange={handleDireccionChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.direccion ? "border-red-500" : ""
-              }`}
-            />
-            {errors.direccion && (
-              <p className="text-red-500 text-sm">{errors.direccion}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              name="correo_electronico"
-              value={formData.correo_electronico}
-              onChange={handleInputChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.correo_electronico ? "border-red-500" : ""
-              }`}
-            />
-            {errors.correo_electronico && (
-              <p className="text-red-500 text-sm">
-                {errors.correo_electronico}
-              </p>
-            )}
-          </div>
-        </div>
+        <label className="block text-sm font-medium text-gray-700">
+          Número de Cédula
+        </label>
+        <input
+          type="text"
+          name="numero_cedula"
+          value={formData.numero_cedula}
+          onChange={handleCedulaChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.numero_cedula ? "border-red-500" : ""
+          }`}
+        />
+        {errors.numero_cedula && (
+          <p className="text-red-500 text-sm">{errors.numero_cedula}</p>
+        )}
       </div>
       <div>
-        <h3 className="text-xl font-semibold mb-4">Datos de la Empresa</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Unidad
-            </label>
-            <select
-              name="id_unidad"
-              value={formData.id_unidad}
-              onChange={handleUnidadChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.id_unidad ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">Seleccionar Unidad</option>
-              {unidades &&
-                unidades.map((unidad) => (
-                  <option key={unidad.id_unidad} value={unidad.id_unidad}>
-                    {unidad.nombre_unidad}
-                  </option>
-                ))}
-            </select>
-            {errors.id_unidad && (
-              <p className="text-red-500 text-sm">{errors.id_unidad}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Cargo
-            </label>
-            <select
-              name="id_cargo"
-              value={formData.id_cargo}
-              onChange={handleCargoChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.id_cargo ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">Seleccionar Cargo</option>
-              {cargos &&
-                cargos.map((cargo) => (
-                  <option key={cargo.id_cargo} value={cargo.id_cargo}>
-                    {cargo.cargo}
-                  </option>
-                ))}
-            </select>
-            {errors.id_cargo && (
-              <p className="text-red-500 text-sm">{errors.id_cargo}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Fecha de Ingreso
-            </label>
-            <input
-              type="date"
-              name="fecha_ingreso"
-              value={fechaActual} // Asignar la fecha actual
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-              readOnly // Hacer el campo de solo lectura
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Rol
-            </label>
-            <select
-              name="id_rol"
-              value={formData.id_rol}
-              onChange={handleRolChange}
-              className={`mt-1 p-2 border border-gray-300 rounded w-full ${
-                errors.id_rol ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">Seleccionar Rol</option>
-              {roles &&
-                roles.map((rol) => (
-                  <option key={rol.id_rol} value={rol.id_rol}>
-                    {rol.rol}
-                  </option>
-                ))}
-            </select>
-            {errors.id_rol && (
-              <p className="text-red-500 text-sm">{errors.id_rol}</p>
-            )}
-          </div>
-        </div>
+        <label className="block text-sm font-medium text-gray-700">
+          Nombres
+        </label>
+        <input
+          type="text"
+          name="nombres"
+          value={formData.nombres}
+          onChange={handleNombresChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.nombres ? "border-red-500" : ""
+          }`}
+        />
+        {errors.nombres && (
+          <p className="text-red-500 text-sm">{errors.nombres}</p>
+        )}
       </div>
-    </form>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Apellidos
+        </label>
+        <input
+          type="text"
+          name="apellidos"
+          value={formData.apellidos}
+          onChange={handleApellidosChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.apellidos ? "border-red-500" : ""
+          }`}
+        />
+        {errors.apellidos && (
+          <p className="text-red-500 text-sm">{errors.apellidos}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Distintivo
+        </label>
+        <input
+          type="text"
+          name="distintivo"
+          value={formData.distintivo}
+          onChange={handleDistintivoChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.distintivo ? "border-red-500" : ""
+          }`}
+        />
+        {errors.distintivo && (
+          <p className="text-red-500 text-sm">{errors.distintivo}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Fecha de Nacimiento
+        </label>
+        <input
+          type="date"
+          name="fecha_nacimiento"
+          value={formData.fecha_nacimiento}
+          onChange={handleFechaNacimientoChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.fecha_nacimiento ? "border-red-500" : ""
+          }`}
+        />
+        {errors.fecha_nacimiento && (
+          <p className="text-red-500 text-sm">{errors.fecha_nacimiento}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Género
+        </label>
+        <select
+          name="genero"
+          value={formData.genero}
+          onChange={handleGeneroChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.genero ? "border-red-500" : ""
+          }`}
+        >
+          <option value="">Seleccionar Género</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+        </select>
+        {errors.genero && (
+          <p className="text-red-500 text-sm">{errors.genero}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Celular
+        </label>
+        <input
+          type="text"
+          name="celular"
+          value={formData.celular}
+          onChange={handleCelularChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.celular ? "border-red-500" : ""
+          }`}
+        />
+        {errors.celular && (
+          <p className="text-red-500 text-sm">{errors.celular}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Dirección
+        </label>
+        <input
+          type="text"
+          name="direccion"
+          value={formData.direccion}
+          onChange={handleDireccionChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.direccion ? "border-red-500" : ""
+          }`}
+        />
+        {errors.direccion && (
+          <p className="text-red-500 text-sm">{errors.direccion}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          name="correo_electronico"
+          value={formData.correo_electronico}
+          onChange={handleInputChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.correo_electronico ? "border-red-500" : ""
+          }`}
+        />
+        {errors.correo_electronico && (
+          <p className="text-red-500 text-sm">{errors.correo_electronico}</p>
+        )}
+      </div>
+    </div>
+  </div>
+  <div>
+    <h3 className="text-xl font-semibold mb-4">Datos de la Empresa</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Unidad
+        </label>
+        <select
+          name="id_unidad"
+          value={formData.id_unidad}
+          onChange={handleUnidadChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.id_unidad ? "border-red-500" : ""
+          }`}
+        >
+          <option value="">Seleccionar Unidad</option>
+          {unidades &&
+            unidades.map((unidad) => (
+              <option key={unidad.id_unidad} value={unidad.id_unidad}>
+                {unidad.nombre_unidad}
+              </option>
+            ))}
+        </select>
+        {errors.id_unidad && (
+          <p className="text-red-500 text-sm">{errors.id_unidad}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Cargo
+        </label>
+        <select
+          name="id_cargo"
+          value={formData.id_cargo}
+          onChange={handleCargoChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.id_cargo ? "border-red-500" : ""
+          }`}
+        >
+          <option value="">Seleccionar Cargo</option>
+          {cargos &&
+            cargos.map((cargo) => (
+              <option key={cargo.id_cargo} value={cargo.id_cargo}>
+                {cargo.cargo}
+              </option>
+            ))}
+        </select>
+        {errors.id_cargo && (
+          <p className="text-red-500 text-sm">{errors.id_cargo}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Fecha de Ingreso
+        </label>
+        <input
+          type="date"
+          name="fecha_ingreso"
+          value={fechaActual} // Asignar la fecha actual
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
+          readOnly // Hacer el campo de solo lectura
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Rol
+        </label>
+        <select
+          name="id_rol"
+          value={formData.id_rol}
+          onChange={handleRolChange}
+          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
+            errors.id_rol ? "border-red-500" : ""
+          }`}
+        >
+          <option value="">Seleccionar Rol</option>
+          {roles &&
+            roles.map((rol) => (
+              <option key={rol.id_rol} value={rol.id_rol}>
+                {rol.rol}
+              </option>
+            ))}
+        </select>
+        {errors.id_rol && (
+          <p className="text-red-500 text-sm">{errors.id_rol}</p>
+        )}
+      </div>
+    </div>
+  </div>
+</form>
+
   );
 };
 
