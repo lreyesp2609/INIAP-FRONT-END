@@ -7,13 +7,14 @@ const DeshabilitarVehiculo = ({
   vehiculoId,
   userId,
   onDeshabilitar,
+  fetchVehiculos, // Asegúrate de que esta prop esté presente
   vehiculoPlaca,
 }) => {
-  const [motivo, setMotivo] = useState("");  // Estado para almacenar el motivo de deshabilitación
-  const [modalVisible, setModalVisible] = useState(false);  // Estado para manejar la visibilidad del modal
+  const [motivo, setMotivo] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleDeshabilitar = () => {
-    setModalVisible(true);  // Muestra el modal
+    setModalVisible(true);
   };
 
   const handleOk = async () => {
@@ -49,31 +50,34 @@ const DeshabilitarVehiculo = ({
         }
       );
 
+      const responseData = await response.json();
+
       if (response.ok) {
         notification.success({
           message: "Éxito",
-          description: "Vehículo deshabilitado exitosamente.",
+          description: responseData.mensaje || "Vehículo deshabilitado correctamente.",
         });
-        onDeshabilitar();
-        setModalVisible(false);  // Oculta el modal
+        if (fetchVehiculos) {
+          fetchVehiculos(); // Llama a la función para actualizar la lista de vehículos
+        }
+        onDeshabilitar(); // Llama a la función para actualizar la lista de vehículos
+        setModalVisible(false);
       } else {
-        const errorData = await response.json();
         notification.error({
           message: "Error",
-          description: errorData.error || "Error al deshabilitar el vehículo.",
+          description: responseData.error || "Error al deshabilitar el vehículo.",
         });
       }
     } catch (error) {
       notification.error({
         message: "Error",
-        description:
-          "Error al deshabilitar el vehículo. Por favor, inténtalo de nuevo más tarde.",
+        description: "Error al deshabilitar el vehículo. Por favor, inténtalo de nuevo más tarde.",
       });
     }
   };
 
   const handleCancel = () => {
-    setModalVisible(false);  // Oculta el modal
+    setModalVisible(false);
   };
 
   return (

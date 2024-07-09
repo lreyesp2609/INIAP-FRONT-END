@@ -38,7 +38,7 @@ const LeftMenu = ({ user, onNavigate }) => {
             </button>
             <button 
               onClick={() => {
-                onNavigate('gestion-vehiculos');
+                onNavigate('gestion-solicitud');
                 setIsOpen(false);
               }} 
               className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
@@ -68,7 +68,7 @@ const LeftMenu = ({ user, onNavigate }) => {
             <span className="text-white text-sm hidden md:inline ">Órdenes de movilización</span>
           </button>
           <button 
-            onClick={() => onNavigate('gestion-vehiculos')} 
+            onClick={() => onNavigate('gestion-solicitud')} 
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
           >
             <IoDocumentText className="w-10 h-10 text-white mx-6" />
