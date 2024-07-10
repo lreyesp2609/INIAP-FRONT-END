@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftMenu from './lateralizquierdoEmpleado';
 import ListarSolicitudes from './ListaSolicitude';
+import ListarMovilizacion from './ListarMovilizacion';
 import Navbar from '../Login/navbar';
 import ChangePasswordModal from '../Login/changepasswordmodal';  // Asegúrate de importar el modal
 import API_URL from '../../Config';
@@ -95,6 +96,7 @@ const MenuEmpleados = () => {
           </div>
         )}
         {view === 'gestion-solicitud' && <ListarSolicitudes />}
+        {view === 'gestion-empleados' && <ListarMovilizacion />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}

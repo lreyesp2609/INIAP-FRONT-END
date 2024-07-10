@@ -10,6 +10,8 @@ import GestionEmpleados from './components/SuperUsuario/Empleados/gestionemplead
 import GestionVehiculos from './components/SuperUsuario/Vehiculos/gestionvehiculos';
 import GestionCategorias from './components/SuperUsuario/CategoriasBienes/gestioncategoriasbienes';
 import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones';
+import SolicitarMovilizacion from './components/Modulo Empleado/SolicitarMovilizacion';
+import ListarMovilizacion from './components/Modulo Empleado/ListarMovilizacion';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
@@ -67,6 +69,8 @@ const AppContent = () => {
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
         <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
         <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
+        <Route path="/solicitar-movilizacion" element={<SolicitarMovilizacion />} />
+        <Route path="/listar-movilizacion" element={<ListarMovilizacion />} /> 
       </Routes>
     </div>
   );
