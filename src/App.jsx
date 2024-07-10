@@ -9,7 +9,7 @@ import Navbar from './components/Login/navbar';
 import GestionEmpleados from './components/SuperUsuario/Empleados/gestionempleados';
 import GestionVehiculos from './components/SuperUsuario/Vehiculos/gestionvehiculos';
 import GestionCategorias from './components/SuperUsuario/CategoriasBienes/gestioncategoriasbienes';
-import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones ';
+import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);

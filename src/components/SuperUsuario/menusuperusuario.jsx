@@ -5,37 +5,87 @@ import LeftMenu from './lateralizquierdo';
 import GestionEmpleados from './Empleados/gestionempleados';
 import GestionVehiculos from './Vehiculos/gestionvehiculos';
 import GestionCategorias from './CategoriasBienes/gestioncategoriasbienes';
-import GestionEstaciones from './Estaciones/gestionestaciones ';
+import GestionEstaciones from './Estaciones/gestionestaciones';
+import GestionLicencias from './Licencias/gestionlicencias';
+import ChangePasswordModal from '../Login/changepasswordmodal';
+import API_URL from '../../Config';
+import { notification } from 'antd';
 
 const MenuSuperUsuario = () => {
   const [user, setUser] = useState({});
   const [view, setView] = useState('home');
+  const [isPasswordChangeModalVisible, setIsPasswordChangeModalVisible] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [token, setToken] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedToken = localStorage.getItem('token');
+    const needsPasswordChange = localStorage.getItem('needs_password_change') === 'true';
+
     if (storedUser) {
       setUser(storedUser.usuario);
+      setUserId(storedUser.usuario.id);
     } else {
       navigate('/');
     }
-  }, [navigate]);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
       navigate('/');
+    }
+
+    if (needsPasswordChange) {
+      setIsPasswordChangeModalVisible(true);
     }
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('needs_password_change');
     navigate('/');
   };
 
   const handleNavigate = (view) => {
     setView(view);
+  };
+
+  const handlePasswordChange = async (newPassword) => {
+    try {
+      const formData = new FormData();
+      formData.append('nueva_contrasenia', newPassword);
+
+      const response = await fetch(`${API_URL}/Login/cambiar-contrasenia/${userId}/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        notification.success({
+          message: 'Contraseña cambiada exitosamente',
+        });
+        setIsPasswordChangeModalVisible(false);
+        localStorage.removeItem('needs_password_change');
+      } else {
+        notification.error({
+          message: 'Error al cambiar la contraseña',
+          description: data.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error al cambiar la contraseña:', error);
+      notification.error({
+        message: 'Error al cambiar la contraseña',
+        description: error.message,
+      });
+    }
   };
 
   return (
@@ -52,7 +102,13 @@ const MenuSuperUsuario = () => {
         {view === 'gestion-vehiculos' && <GestionVehiculos />}
         {view === 'gestion-categorias-bienes' && <GestionCategorias />}
         {view === 'gestion-estaciones' && <GestionEstaciones />}
+        {view === 'gestion-licencias' && <GestionLicencias />}
       </div>
+      <ChangePasswordModal
+        visible={isPasswordChangeModalVisible}
+        onChangePassword={handlePasswordChange}
+        onCancel={() => setIsPasswordChangeModalVisible(false)}
+      />
     </div>
   );
 };

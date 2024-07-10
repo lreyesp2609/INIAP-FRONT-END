@@ -145,8 +145,8 @@ const GestionCategorias = () => {
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-            <h1 className="text-2xl font-light">Gestión de Categorías de Bienes</h1>
-            <div className="flex space-x-4">
+          <h1 className="text-2xl font-light">Gestión de Categorías de Bienes</h1>
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
                 onClick={() => setIsAdding(true)}
                 className="
