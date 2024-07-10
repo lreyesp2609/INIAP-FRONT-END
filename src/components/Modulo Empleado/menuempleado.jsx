@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftMenu from './lateralizquierdoEmpleado';
 import ListarSolicitudes from './ListaSolicitude';
+import ListarMovilizacion from './ListarMovilizacion';
 import Navbar from '../Login/navbar';
 
 const MenuEmpleados = () => {
@@ -36,6 +37,7 @@ const MenuEmpleados = () => {
         </div>
       )}
       {view === 'gestion-solicitud' && <ListarSolicitudes/>}
+      {view === 'gestion-empleados' && <ListarMovilizacion idUsuario={user.id_usuario}  />}
     </div>
   </div>
   );
