@@ -6,6 +6,7 @@ import GestionEmpleados from './Empleados/gestionempleados';
 import GestionVehiculos from './Vehiculos/gestionvehiculos';
 import GestionCategorias from './CategoriasBienes/gestioncategoriasbienes';
 import GestionEstaciones from './Estaciones/gestionestaciones';
+import GestionLicencias from './Licencias/gestionlicencias';
 import ChangePasswordModal from '../Login/changepasswordmodal';
 import API_URL from '../../Config';
 import { notification } from 'antd';
@@ -101,6 +102,7 @@ const MenuSuperUsuario = () => {
         {view === 'gestion-vehiculos' && <GestionVehiculos />}
         {view === 'gestion-categorias-bienes' && <GestionCategorias />}
         {view === 'gestion-estaciones' && <GestionEstaciones />}
+        {view === 'gestion-licencias' && <GestionLicencias />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
