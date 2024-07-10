@@ -17,7 +17,8 @@ const GestionEmpleados = () => {
   const [selectedEmpleado, setSelectedEmpleado] = useState(null);
   const [cargos, setCargos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [isHabilitarEmpleadoVisible, setIsHabilitarEmpleadoVisible] = useState(false);
+  const [isHabilitarEmpleadoVisible, setIsHabilitarEmpleadoVisible] =
+    useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -192,77 +193,78 @@ const GestionEmpleados = () => {
           fetchEmpleados={fetchEmpleados}
         />
       ) : isHabilitarEmpleadoVisible && user ? (
-        <HabilitarEmpleado 
-          user={user} 
-          fetchEmpleados={fetchEmpleados} 
+        <HabilitarEmpleado
+          user={user}
+          fetchEmpleados={fetchEmpleados}
           onVolver={handleCloseHabilitarEmpleado}
         />
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-  <h1 className="text-2xl font-light">Gestión de Empleados</h1>
-  <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-    <button
-      onClick={handleShowHabilitarEmpleado}
-      className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 
+            <h1 className="text-2xl font-light">Gestión de Empleados</h1>
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+              <button
+                onClick={handleShowHabilitarEmpleado}
+                className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 
       border-yellow-700 hover:border-yellow-300 rounded"
-    >
-      <FontAwesomeIcon icon={faEye} className="mr-2" />
-      Ver Empleados Deshabilitados
-    </button>
-    <button
-      onClick={handleAddEmpleado}
-      className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 
+              >
+                <FontAwesomeIcon icon={faEye} className="mr-2" />
+                Ver Empleados Deshabilitados
+              </button>
+              <button
+                onClick={handleAddEmpleado}
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 
       border-b-4 border-green-900 hover:border-green-300 rounded"
-    >
-      <FontAwesomeIcon icon={faPlus} className="mr-2" />
-      Agregar Empleado
-    </button>
-  </div>
-</div>
-<div className="mb-4">
-  <div className="flex flex-col md:flex-row">
-    <input
-      type="text"
-      placeholder="Buscar por nombres, apellidos o cédula"
-      value={searchTerm}
-      onChange={handleSearch}
-      className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-    <button
-      className="
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                Agregar Empleado
+              </button>
+            </div>
+          </div>
+          <div className="mb-4">
+            <div className="flex flex-col md:flex-row">
+              <input
+                type="text"
+                placeholder="Buscar por nombres, apellidos o cédula"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                className="
       bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded
       mt-2 md:mt-0 md:ml-2"
-      onClick={handleClear}
-      style={{ minWidth: "80px" }}
-    >
-      Limpiar
-    </button>
-  </div>
-</div>
-<TablaEmpleados
-  empleados={currentItems}
-  handleEditEmpleado={handleEditEmpleado}
-  user={user}
-  fetchEmpleados={fetchEmpleados}
-/>
-<div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
-  <button
-    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-    className="
+                onClick={handleClear}
+                style={{ minWidth: "80px" }}
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+          <TablaEmpleados
+            empleados={currentItems}
+            handleEditEmpleado={handleEditEmpleado}
+            user={user}
+            fetchEmpleados={fetchEmpleados}
+          />
+          <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="
     bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-  >
-    Anterior
-  </button>
-  <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
-  <button
-    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-  >
-    Siguiente
-  </button>
-</div>
-
+            >
+              Anterior
+            </button>
+            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+            >
+              Siguiente
+            </button>
+          </div>
         </>
       )}
     </div>

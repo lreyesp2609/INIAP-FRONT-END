@@ -11,6 +11,7 @@ const AgregarEmpleados = (props) => {
   const [estaciones, setEstaciones] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [cargos, setCargos] = useState([]);
+  const [licencias, setLicencias] = useState([]);
   const [formData, setFormData] = useState({
     id_estacion: "",
     id_unidad: "",
@@ -30,6 +31,7 @@ const AgregarEmpleados = (props) => {
   useEffect(() => {
     fetchUserDetails(user.usuario.id_usuario); // Fetch user details on component mount
     fetchRoles();
+    fetchTiposLicencia(user.usuario.id_usuario);
   }, []);
 
   useEffect(() => {
@@ -268,6 +270,43 @@ const AgregarEmpleados = (props) => {
       });
     }
   };
+  const fetchTiposLicencia = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found");
+        return;
+      }
+  
+      const response = await fetch(
+        `${API_URL}/Licencias/listar-tipos/${userId}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        setLicencias(data);  // Asegúrate de que data sea un array
+        console.log("Licencias:", data);
+      } else {
+        console.error("Error:", response.statusText);
+        notification.error({
+          message: "Error",
+          description: "Error al obtener los tipos de licencia",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      notification.error({
+        message: "Error",
+        description: "Error al obtener los tipos de licencia",
+      });
+    }
+  };
+  
 
   const handleSave = async () => {
     try {
@@ -337,6 +376,7 @@ const AgregarEmpleados = (props) => {
           roles={roles}
           estaciones={estaciones}
           unidades={unidades}
+          licencias={licencias} 
         />
         <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
           <button
