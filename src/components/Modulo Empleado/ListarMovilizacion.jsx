@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import API_URL from '../../Config';
+import SolicitarMovilizacion from './SolicitarMovilizacion';
 
 const ListarMovilizacion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -10,8 +10,7 @@ const ListarMovilizacion = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
-  const navigate = useNavigate();
+  const [showSolicitar, setShowSolicitar] = useState(false);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -31,6 +30,7 @@ const ListarMovilizacion = () => {
           Authorization: `${token}`,
         },
       });
+
       if (!response.ok) throw new Error('Error al obtener solicitudes');
 
       const data = await response.json();
@@ -69,13 +69,18 @@ const ListarMovilizacion = () => {
   const currentItems = filteredSolicitudes.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
 
-  const handleClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handleClickSolicitarMovilizacion = () => {
+    setShowSolicitar(true);
   };
 
-  const handleSolicitarMovilizacion = () => {
-    navigate('/solicitar-movilizacion');
+  const handleCloseSolicitarMovilizacion = () => {
+    setShowSolicitar(false);
+    fetchSolicitudes(); // Puedes incluir una función para actualizar las solicitudes después de cerrar el formulario
   };
+
+  if (showSolicitar) {
+    return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
+  }
 
   return (
     <div className="p-4 sm:p-6">
@@ -83,7 +88,7 @@ const ListarMovilizacion = () => {
         <h2 className="text-2xl font-bold text-center">Lista de Solicitudes de Movilización</h2>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleSolicitarMovilizacion}
+          onClick={handleClickSolicitarMovilizacion}
         >
           Solicitar Movilización
         </button>

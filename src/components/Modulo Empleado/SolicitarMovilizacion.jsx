@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../../Config';
+import { notification } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const SolicitarMovilizacion = () => {
+const SolicitarMovilizacion = ({ onClose }) => {
   const navigate = useNavigate();
-  const [secuencialOrden, setSecuencialOrden] = useState('');
-  const [fechaViaje, setFechaViaje] = useState('');
-  const [horaIda, setHoraIda] = useState('');
-  const [horaRegreso, setHoraRegreso] = useState('');
+  const [formData, setFormData] = useState({
+    secuencial_orden_movilizacion: '',
+    fecha_viaje: '',
+    hora_ida: '',
+    hora_regreso: ''
+  });
   const [error, setError] = useState(null);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,12 +37,7 @@ const SolicitarMovilizacion = () => {
           'Content-Type': 'application/json',
           Authorization: token,
         },
-        body: JSON.stringify({
-          secuencial_orden_movilizacion: secuencialOrden,
-          fecha_viaje: fechaViaje,
-          hora_ida: horaIda,
-          hora_regreso: horaRegreso,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -38,65 +46,86 @@ const SolicitarMovilizacion = () => {
 
       const data = await response.json();
       navigate('/lista-solicitudes'); // Redirigir a la lista de solicitudes después de crear una nueva solicitud
+      notification.success({
+        message: "Éxito",
+        description: "Solicitud creada exitosamente",
+      });
     } catch (error) {
       setError(error.message);
+      notification.error({
+        message: "Error",
+        description: `Error al crear la solicitud: ${error.message}`,
+      });
     }
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Secuencial de Orden:</label>
-          <input
-            type="text"
-            value={secuencialOrden}
-            onChange={(e) => setSecuencialOrden(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
-          <input
-            type="date"
-            value={fechaViaje}
-            onChange={(e) => setFechaViaje(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
-          <input
-            type="time"
-            value={horaIda}
-            onChange={(e) => setHoraIda(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
-          <input
-            type="time"
-            value={horaRegreso}
-            onChange={(e) => setHoraRegreso(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="flex justify-center mt-6">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Crear Solicitud
-          </button>
-        </div>
-      </form>
+    <div className="w-full flex justify-center">
+      <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
+        <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+        <form id="solicitudForm" onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Secuencial de Orden:</label>
+            <input
+              type="text"
+              name="secuencial_orden_movilizacion"
+              value={formData.secuencial_orden_movilizacion}
+              onChange={handleInputChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
+            <input
+              type="date"
+              name="fecha_viaje"
+              value={formData.fecha_viaje}
+              onChange={handleInputChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
+            <input
+              type="time"
+              name="hora_ida"
+              value={formData.hora_ida}
+              onChange={handleInputChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
+            <input
+              type="time"
+              name="hora_regreso"
+              value={formData.hora_regreso}
+              onChange={handleInputChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
+            >
+              <FontAwesomeIcon icon={faTimes} /> Cancelar
+            </button>
+            <button
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded"
+            >
+              <FontAwesomeIcon icon={faSave} /> Crear Solicitud
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

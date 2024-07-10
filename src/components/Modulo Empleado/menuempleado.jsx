@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LeftMenu from './lateralizquierdoEmpleado';
 import ListarSolicitudes from './ListaSolicitude';
 import ListarMovilizacion from './ListarMovilizacion';
+import SolicitarMovilizacion from './SolicitarMovilizacion';
 import Navbar from '../Login/navbar';
 import ChangePasswordModal from '../Login/changepasswordmodal';  // Asegúrate de importar el modal
 import API_URL from '../../Config';
