@@ -1,7 +1,7 @@
 import React from "react";
 import { FaEdit } from "react-icons/fa";
 
-const TablaLicencias = ({ licencias, onEditLicencia, userId }) => {
+const TablaLicencias = ({ licencias, onEditLicencia }) => {
   const handleEditClick = (licencia) => {
     onEditLicencia(licencia);
   };
@@ -12,6 +12,7 @@ const TablaLicencias = ({ licencias, onEditLicencia, userId }) => {
         <table className="min-w-full bg-white border border-gray-200 table-auto">
           <thead>
             <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">ID Licencia</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Tipo de Licencia</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Observación</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Acciones</th>
@@ -20,6 +21,7 @@ const TablaLicencias = ({ licencias, onEditLicencia, userId }) => {
           <tbody>
             {licencias.map((licencia, index) => (
               <tr key={index} className="hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm text-gray-600">{licencia.id_tipo_licencia}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{licencia.tipo_licencia}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{licencia.observacion}</td>
                 <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
@@ -39,6 +41,8 @@ const TablaLicencias = ({ licencias, onEditLicencia, userId }) => {
       <div className="md:hidden space-y-4">
         {licencias.map((licencia, index) => (
           <div key={index} className="bg-white p-4 border rounded shadow-md">
+            <div className="text-sm font-medium text-gray-700">ID Licencia:</div>
+            <div className="text-sm text-gray-600">{licencia.id_tipo_licencia}</div>
             <div className="text-sm font-medium text-gray-700">Tipo de Licencia:</div>
             <div className="text-sm text-gray-600">{licencia.tipo_licencia}</div>
             <div className="text-sm font-medium text-gray-700">Observación:</div>

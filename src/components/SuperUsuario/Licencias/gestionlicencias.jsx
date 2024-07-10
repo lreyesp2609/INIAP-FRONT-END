@@ -4,6 +4,7 @@ import TablaLicencias from "./Tablas/tablalicencias";
 import AgregarLicencia from "./agregarlicencia";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import EditarLicencia from "./editarlicencia";
 
 const GestionLicencias = () => {
   const [licencias, setLicencias] = useState([]);
