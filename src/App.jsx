@@ -10,8 +10,8 @@ import GestionEmpleados from './components/SuperUsuario/Empleados/gestionemplead
 import GestionVehiculos from './components/SuperUsuario/Vehiculos/gestionvehiculos';
 import GestionCategorias from './components/SuperUsuario/CategoriasBienes/gestioncategoriasbienes';
 import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones';
-import SolicitarMovilizacion from './components/Modulo Empleado/SolicitarMovilizacion';
-import ListarMovilizacion from './components/Modulo Empleado/ListarMovilizacion';
+import SolicitarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/SolicitarMovilizacion';
+import ListarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/ListarMovilizacion';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
