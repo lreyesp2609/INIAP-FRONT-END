@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../../../Config';
-import { notification } from 'antd';
+import { notification, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { QuestionCircleOutlined} from '@ant-design/icons';
+
 
 const SolicitarMovilizacion = ({ onClose }) => {
   const navigate = useNavigate();
 
-  // Obtener el id_empleado desde localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const idEmpleado = storedUser?.usuario?.id_empleado;
   const idUsuario = storedUser?.usuario?.id_usuario;
 
   const [formData, setFormData] = useState({
     secuencial_orden_movilizacion: '0000', 
-    motivo_movilizacion: '',    
+    motivo_movilizacion: '',
     lugar_origen_destino_movilizacion: 'Mocache - Quevedo',
-    duracion_movilizacion: '00:00:00',
+    duracion_movilizacion: '00:30',
     id_conductor: '',
     id_vehiculo: '',
     fecha_viaje: '',
-    hora_ida: '',
+    hora_ida: new Date().toISOString().slice(11, 16), // Hora del sistema
     hora_regreso: '',
     estado_movilizacion: 'En Espera',
     id_empleado: idEmpleado,
@@ -35,6 +36,22 @@ const SolicitarMovilizacion = ({ onClose }) => {
     fetchVehiculos();
     fetchConductores();
   }, []);
+
+  useEffect(() => {
+    // Calcular hora de regreso cada vez que cambian la hora de ida o la duración
+    if (formData.hora_ida && formData.duracion_movilizacion) {
+      const [horaIdaHoras, horaIdaMinutos] = formData.hora_ida.split(':').map(Number);
+      const [duracionHoras, duracionMinutos] = formData.duracion_movilizacion.split(':').map(Number);
+      
+      const totalMinutos = horaIdaMinutos + duracionMinutos;
+      const totalHoras = horaIdaHoras + duracionHoras + Math.floor(totalMinutos / 60);
+      const minutosRegreso = totalMinutos % 60;
+      const horasRegreso = totalHoras % 24;
+
+      const horaRegreso = `${String(horasRegreso).padStart(2, '0')}:${String(minutosRegreso).padStart(2, '0')}`;
+      setFormData({ ...formData, hora_regreso: horaRegreso });
+    }
+  }, [formData.hora_ida, formData.duracion_movilizacion]);
 
   const fetchVehiculos = async () => {
     try {
@@ -135,8 +152,7 @@ const SolicitarMovilizacion = ({ onClose }) => {
             placement: 'topRight',
         });
     }
-};
-
+  };
 
   return (
     <div className="w-full flex justify-center">
@@ -144,38 +160,38 @@ const SolicitarMovilizacion = ({ onClose }) => {
         <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <form id="solicitudForm" onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
-            <input
-              type="date"
-              name="fecha_viaje"
-              value={formData.fecha_viaje}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
-            <input
-              type="time"
-              name="hora_ida"
-              value={formData.hora_ida}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
-            <input
-              type="time"
-              name="hora_regreso"
-              value={formData.hora_regreso}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-2 gap-4">
+
+            <div className="mb-4 relative">
+              <label className="block text-sm font-medium text-gray-700">Lugar Origen - Destino:</label>
+                <div className="flex items-center">
+                  <Tooltip title="Una Orden de movilización solo puede ser de Mocache a Quevedo">
+                    <QuestionCircleOutlined className="text-gray-500 cursor-pointer absolute right-0 mr-2" />
+                    </Tooltip>
+                  <input
+                    type="text"
+                    name="lugar_origen_destino_movilizacion"
+                    value={formData.lugar_origen_destino_movilizacion}
+                    onChange={handleInputChange}
+                    required
+                    readOnly // Bloquea la edición del campo
+                    className="w-full p-2 pl-8 pr-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+            </div>
+          
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
+              <input
+                type="date"
+                name="fecha_viaje"
+                value={formData.fecha_viaje}
+                min={new Date().toISOString().split('T')[0]} // Permite ingresar solo desde la fecha actual en adelante
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Motivo de Movilización:</label>
@@ -188,62 +204,77 @@ const SolicitarMovilizacion = ({ onClose }) => {
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Lugar Origen / Destino:</label>
-            <input
-              type="text"
-              name="lugar_origen_destino_movilizacion"
-              value={formData.lugar_origen_destino_movilizacion}
-              onChange={handleInputChange}
-              required
-              readOnly  // Bloquea la edición del campo
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Duración de la Movilización:</label>
+              <input
+                type="time"
+                name="duracion_movilizacion"
+                value={formData.duracion_movilizacion}
+                min="00:30"
+                max="02:00"
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
+              <input
+                type="time"
+                name="hora_ida"
+                value={formData.hora_ida}
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
+              <input
+                type="time"
+                name="hora_regreso"
+                value={formData.hora_regreso}
+                readOnly  // Campo no editable
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Duración de la Movilización:</label>
-            <input
-              type="time"
-              name="duracion_movilizacion"
-              value={formData.duracion_movilizacion}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Conductor:</label>
-            <select
-              name="id_conductor"
-              value={formData.id_conductor}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecciona un conductor</option>
-              {conductores.map((conductor) => (
-                <option key={conductor.id_empleado} value={conductor.id_empleado}>
-                  {conductor.nombres} {conductor.apellidos}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Vehículo:</label>
-            <select
-              name="id_vehiculo"
-              value={formData.id_vehiculo}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecciona un vehículo</option>
-              {vehiculos.map((vehiculo) => (
-                <option key={vehiculo.id_vehiculo} value={vehiculo.id_vehiculo}>
-                  {vehiculo.placa}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Conductor:</label>
+              <select
+                name="id_conductor"
+                value={formData.id_conductor}
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecciona un conductor</option>
+                {conductores.map((conductor) => (
+                  <option key={conductor.id_empleado} value={conductor.id_empleado}>
+                    {conductor.nombres} {conductor.apellidos}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Vehículo:</label>
+              <select
+                name="id_vehiculo"
+                value={formData.id_vehiculo}
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecciona un vehículo</option>
+                {vehiculos.map((vehiculo) => (
+                  <option key={vehiculo.id_vehiculo} value={vehiculo.id_vehiculo}>
+                    {vehiculo.placa}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <input type="hidden" name="estado_movilizacion" value={formData.estado_movilizacion} />
           <input type="hidden" name="id_empleado" value={idEmpleado} />
