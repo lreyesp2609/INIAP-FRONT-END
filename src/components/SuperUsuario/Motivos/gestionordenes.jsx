@@ -1,41 +1,38 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
-import TablaVehiculos from "./Tablas/tablavehiculos";
-import AgregarVehiculo from "./agregarvehiculo";
-import HabilitarVehiculo from "./habilitarvehiculo";
-import EditarVehiculo from "./editarvehiculo";
+import TablaOrdenes from "./Tablas/tablaordenes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
+import AgregarMotivo from "./agregarmotivo";
 
-const GestionVehiculos = () => {
-  const [vehiculos, setVehiculos] = useState([]);
-  const [filteredVehiculos, setFilteredVehiculos] = useState([]);
+const GestionOrdenes = () => {
+  const [ordenes, setOrdenes] = useState([]);
+  const [filteredOrdenes, setFilteredOrdenes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isAdding, setIsAdding] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [selectedVehiculo, setSelectedVehiculo] = useState(null);
+  const [selectedOrden, setSelectedOrden] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isHabilitarVehiculoVisible, setIsHabilitarVehiculoVisible] =
-    useState(false);
+  const [isHabilitarOrdenVisible, setIsHabilitarOrdenVisible] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const id_usuario = JSON.parse(atob(token.split(".")[1])).id_usuario;
       setUserId(id_usuario);
-      fetchVehiculos(id_usuario);
+      fetchOrdenes(id_usuario);
     }
   }, []);
 
-  const fetchVehiculos = async (id_usuario) => {
+  const fetchOrdenes = async (id_usuario) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
       const response = await fetch(
-        `${API_URL}/Vehiculos/vehiculos/${id_usuario}/`,
+        `${API_URL}/MotivosOrdenes/listar-motivos/${id_usuario}/`,
         {
           headers: {
             Authorization: `${token}`,
@@ -44,121 +41,120 @@ const GestionVehiculos = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setVehiculos(data.vehiculos);
-        setFilteredVehiculos(data.vehiculos);
+        setOrdenes(data.motivos);
+        setFilteredOrdenes(data.motivos);
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error);
-        console.error("Error al obtener vehículos:", response.statusText);
+        console.error("Error al obtener órdenes:", response.statusText);
       }
     } catch (error) {
-      console.error("Error al obtener vehículos:", error);
+      console.error("Error al obtener órdenes:", error);
     }
   };
 
-  const handleAddVehiculo = () => {
+  const handleAddOrden = () => {
     setIsAdding(true);
   };
 
   const handleCloseForm = () => {
     setIsAdding(false);
-    setSelectedVehiculo(null);
+    setSelectedOrden(null);
   };
 
-  const handleVehiculoAdded = () => {
-    fetchVehiculos(userId);
+  const handleMotivoAdded = () => {
+    fetchOrdenes(userId);
     setIsAdding(false);
   };
 
-  const handleEditVehiculo = (vehiculo) => {
-    setSelectedVehiculo(vehiculo);
+  const handleEditOrden = (orden) => {
+    setSelectedOrden(orden);
   };
 
-  const handleVehiculoUpdated = () => {
-    fetchVehiculos(userId);
-    setSelectedVehiculo(null);
+  const handleOrdenUpdated = () => {
+    fetchOrdenes(userId);
+    setSelectedOrden(null);
   };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    const filtered = vehiculos.filter((vehiculo) =>
-      vehiculo.placa.toLowerCase().includes(event.target.value.toLowerCase())
+    const filtered = ordenes.filter((orden) =>
+      orden.nombre_motivo.toLowerCase().includes(event.target.value.toLowerCase())
     );
-    setFilteredVehiculos(filtered);
+    setFilteredOrdenes(filtered);
     setCurrentPage(1);
   };
 
-  const handleHabilitarVehiculos = () => {
-    setIsHabilitarVehiculoVisible(true);
+  const handleHabilitarOrdenes = () => {
+    setIsHabilitarOrdenVisible(true);
   };
 
   const handleVolver = () => {
-    setIsHabilitarVehiculoVisible(false);
+    setIsHabilitarOrdenVisible(false);
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredVehiculos.slice(
+  const currentItems = filteredOrdenes.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(filteredVehiculos.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredOrdenes.length / itemsPerPage);
 
   return (
     <div className="p-4">
-      {selectedVehiculo ? (
+      {selectedOrden ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <EditarVehiculo
-            vehiculo={selectedVehiculo}
+          <EditarOrden
+            orden={selectedOrden}
             onClose={handleCloseForm}
-            onVehiculoUpdated={handleVehiculoUpdated}
+            onOrdenUpdated={handleOrdenUpdated}
             userId={userId}
           />
         </div>
       ) : isAdding ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <AgregarVehiculo
+          <AgregarMotivo
             onClose={handleCloseForm}
-            onVehiculoAdded={handleVehiculoAdded}
+            onMotivoAdded={handleMotivoAdded}
             userId={userId}
           />
         </div>
-      ) : isHabilitarVehiculoVisible ? (
+      ) : isHabilitarOrdenVisible ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <HabilitarVehiculo
+          <HabilitarOrden
             userId={userId}
-            fetchVehiculos={() => fetchVehiculos(userId)}
+            fetchOrdenes={() => fetchOrdenes(userId)}
             onVolver={handleVolver}
           />
         </div>
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-            <h1 className="text-2xl font-light">Gestión de Vehículos</h1>
+            <h1 className="text-2xl font-light">Gestión de Órdenes</h1>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
-                onClick={handleHabilitarVehiculos}
-                className="
-                bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 
+                onClick={handleHabilitarOrdenes}
+                className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 
                 border-yellow-700 hover:border-yellow-300 rounded"
               >
                 <FontAwesomeIcon icon={faEye} className="mr-2" />
-                Ver Vehículos Deshabilitados
+                Ver Órdenes Deshabilitadas
               </button>
               <button
-                onClick={handleAddVehiculo}
+                onClick={handleAddOrden}
                 className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 
                 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                Agregar Vehículo
+                Agregar Orden
               </button>
             </div>
           </div>
           <div className="mb-4">
             <input
               type="text"
-              placeholder="Buscar por placa"
+              placeholder="Buscar por motivo"
               value={searchTerm}
               onChange={handleSearch}
               className="w-full px-4 py-2 border rounded"
@@ -167,11 +163,11 @@ const GestionVehiculos = () => {
           {errorMessage && (
             <div className="mb-4 text-red-500">{errorMessage}</div>
           )}
-          <TablaVehiculos
-            vehiculos={currentItems}
-            onEditVehiculo={handleEditVehiculo}
+          <TablaOrdenes
+            ordenes={currentItems}
+            onEditOrden={handleEditOrden}
             userId={userId}
-            fetchVehiculos={fetchVehiculos}
+            fetchOrdenes={fetchOrdenes}
           />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
@@ -194,4 +190,4 @@ const GestionVehiculos = () => {
   );
 };
 
-export default GestionVehiculos;
+export default GestionOrdenes;

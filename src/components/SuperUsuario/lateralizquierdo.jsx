@@ -72,6 +72,16 @@ const LeftMenu = ({ user, onNavigate }) => {
               <FaClipboardList className="w-8 h-8 text-white mx-4" />
               <span className="text-white text-sm">Gestión de Licencias</span>
             </button>
+            <button 
+              onClick={() => {
+                onNavigate('gestion-motivos-ordenes');
+                setIsOpen(false);
+              }} 
+              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            >
+              <FiList className="w-8 h-8 text-white mx-4" />
+              <span className="text-white text-sm">Gestión de Motivos para las Órdenes</span>
+            </button>
           </div>
         </div>
 
@@ -119,6 +129,13 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <FaClipboardList className="w-8 h-8 text-white mx-4" />
             <span className="text-white text-sm hidden md:inline">Gestión de Licencias</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-motivos-ordenes')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+          >
+            <FiList className="w-8 h-8 text-white mx-4" />
+            <span className="text-white text-sm hidden md:inline">Gestión de Motivos para las Órdenes</span>
           </button>
         </div>
       </div>

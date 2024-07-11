@@ -1,6 +1,7 @@
 import React from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaKey } from "react-icons/fa";
 import DeshabilitarEmpleado from "../deshabilitarempleado";
+import ResetPasswordEmpleado from "../resetpasswordempleado";
 
 const TablaEmpleados = ({
   empleados,
@@ -8,6 +9,7 @@ const TablaEmpleados = ({
   user,
   fetchEmpleados,
 }) => {
+  
   const handleDeshabilitar = () => {
     fetchEmpleados(user.usuario.id_usuario);
   };
@@ -83,6 +85,13 @@ const TablaEmpleados = ({
                     >
                       <FaEdit />
                     </button>
+                    <ResetPasswordEmpleado
+                      empleadoId={empleado.id_empleado}
+                      userId={user.usuario.id_usuario}
+                      onResetPassword={fetchEmpleados}
+                      empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
+                      empleadoCedula={empleado.cedula}
+                    />
                     <DeshabilitarEmpleado
                       empleadoId={empleado.id_empleado}
                       userId={user.usuario.id_usuario}
@@ -142,6 +151,13 @@ const TablaEmpleados = ({
                 >
                   <FaEdit />
                 </button>
+                <ResetPasswordEmpleado
+                  empleadoId={empleado.id_empleado}
+                  userId={user.usuario.id_usuario}
+                  onResetPassword={fetchEmpleados}
+                  empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
+                  empleadoCedula={empleado.cedula}
+                />
                 <DeshabilitarEmpleado
                   empleadoId={empleado.id_empleado}
                   userId={user.usuario.id_usuario}
