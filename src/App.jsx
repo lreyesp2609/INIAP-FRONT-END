@@ -12,6 +12,7 @@ import GestionCategorias from './components/SuperUsuario/CategoriasBienes/gestio
 import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestaciones';
 import SolicitarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/SolicitarMovilizacion';
 import ListarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/ListarMovilizacion';
+import GestionOrdenes from './components/SuperUsuario/Motivos/gestionordenes';
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
@@ -69,6 +70,7 @@ const AppContent = () => {
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
         <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
         <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
+        <Route path="/gestion-motivos-ordenes" element={<GestionOrdenes />} />
         <Route path="/solicitar-movilizacion" element={<SolicitarMovilizacion />} />
         <Route path="/listar-movilizacion" element={<ListarMovilizacion />} /> 
       </Routes>

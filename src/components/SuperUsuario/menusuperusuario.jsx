@@ -7,6 +7,7 @@ import GestionVehiculos from "./Vehiculos/gestionvehiculos";
 import GestionCategorias from "./CategoriasBienes/gestioncategoriasbienes";
 import GestionEstaciones from "./Estaciones/gestionestaciones";
 import GestionLicencias from "./Licencias/gestionlicencias";
+import GestionOrdenes from "./Motivos/gestionordenes";
 import ChangePasswordModal from "../Login/changepasswordmodal";
 import API_URL from "../../Config";
 import { notification } from "antd";
@@ -20,7 +21,6 @@ const MenuSuperUsuario = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtener los datos almacenados en localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
@@ -112,6 +112,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-categorias-bienes" && <GestionCategorias />}
         {view === "gestion-estaciones" && <GestionEstaciones />}
         {view === "gestion-licencias" && <GestionLicencias />}
+        {view === "gestion-motivos-ordenes" && <GestionOrdenes />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}

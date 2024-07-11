@@ -4,6 +4,7 @@ const FormularioEstacion = ({ formData, handleInputChange }) => {
   return (
     <form className="space-y-4">
       <div>
+      <h3 className="text-xl font-semibold mb-4">Datos de la Estación</h3>
         <label className="block text-sm font-medium text-gray-700">
           Nombre de la Estación
         </label>
