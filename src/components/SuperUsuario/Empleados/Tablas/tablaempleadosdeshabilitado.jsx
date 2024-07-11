@@ -13,10 +13,6 @@ const TablaEmpleadosDeshabilitados = ({
     empleado.cedula.includes(searchTerm)
   );
 
-  const handleHabilitar = () => {
-    fetchEmpleados(user.usuario.id_usuario);
-  };
-
   return (
     <div className="w-full">
       <div className="p-4 bg-white shadow-sm rounded-md mb-4">

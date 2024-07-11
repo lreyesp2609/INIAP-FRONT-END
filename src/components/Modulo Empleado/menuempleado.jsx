@@ -19,11 +19,12 @@ const MenuEmpleados = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const storedToken = localStorage.getItem('token');
+    const storedUserId = localStorage.getItem('userId');  // Obtén el ID del usuario de localStorage
     const needsPasswordChange = localStorage.getItem('needs_password_change') === 'true';
 
     if (storedUser) {
       setUser(storedUser.usuario);
-      setUserId(storedUser.usuario.id);
+      setUserId(storedUserId);  // Usa el ID del usuario desde localStorage
     } else {
       navigate('/');
     }
@@ -43,6 +44,7 @@ const MenuEmpleados = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('needs_password_change');
+    localStorage.removeItem('userId');  // Asegúrate de eliminar el ID del usuario también
     navigate('/');
   };
 
@@ -51,6 +53,9 @@ const MenuEmpleados = () => {
   };
 
   const handlePasswordChange = async (newPassword) => {
+    console.log('userId:', userId);  // Verifica que userId no sea undefined
+    console.log('token:', token);    // Verifica que token sea válido
+
     try {
       const formData = new FormData();
       formData.append('nueva_contrasenia', newPassword);

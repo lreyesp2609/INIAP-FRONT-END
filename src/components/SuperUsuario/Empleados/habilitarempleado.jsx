@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
 import { notification, Modal, Input, Button } from "antd";
 import TablaEmpleadosDeshabilitados from "./Tablas/tablaempleadosdeshabilitado";
-import { MdPersonAdd } from "react-icons/md";
 
 const HabilitarEmpleado = ({ user, fetchEmpleados, onVolver }) => {
   const [empleadosDeshabilitados, setEmpleadosDeshabilitados] = useState([]);
