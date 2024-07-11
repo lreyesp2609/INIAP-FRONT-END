@@ -11,9 +11,14 @@ const ListarMovilizacion = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [showSolicitar, setShowSolicitar] = useState(false);
+  const [conductores, setConductores] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
+
 
   useEffect(() => {
     fetchSolicitudes();
+    fetchConductores();
+    fetchVehiculos();
   }, []);
 
   const fetchSolicitudes = async () => {
@@ -43,15 +48,60 @@ const ListarMovilizacion = () => {
     }
   };
 
+  const fetchConductores = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/Empleados/lista-empleados/${idUsuario}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Error al obtener conductores');
+      }
+      const data = await response.json();
+      setConductores(data);
+    } catch (error) {
+      setError('Error al obtener conductores');
+      console.error('Error fetching conductores:', error);
+    }
+  };
+
+  const fetchVehiculos = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+  
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/Vehiculos/vehiculos/${idUsuario}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Error al obtener vehículos');
+      }
+      const { vehiculos } = await response.json();
+      if (!Array.isArray(vehiculos)) {
+        throw new Error('Datos de vehículos no válidos');
+      }
+      setVehiculos(vehiculos);
+    } catch (error) {
+      setError('Error al obtener vehículos');
+      console.error('Error fetching vehiculos:', error);
+    }
+  };
+
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
 
     const filtered = solicitudes.filter(
       (solicitud) =>
-        solicitud.secuencial_orden_movilizacion.toLowerCase().includes(searchValue) ||
-        solicitud.motivo_movilizacion.toLowerCase().includes(searchValue) ||
-        solicitud.estado_movilizacion.toLowerCase().includes(searchValue)
+        solicitud.lugar_origen_destino_movilizacion.toLowerCase().includes(searchValue) ||
+        solicitud.motivo_movilizacion.toLowerCase().includes(searchValue)
     );
 
     setFilteredSolicitudes(filtered);
@@ -78,6 +128,19 @@ const ListarMovilizacion = () => {
     fetchSolicitudes(); 
   };
 
+  const getConductorName = (id) => {
+    const conductor = conductores.find((conductor) => conductor.id_empleado === id);
+    return conductor ? `${conductor.nombres} ${conductor.apellidos}` : 'Desconocido';
+  };
+  
+  const getVehiculoPlaca = (id) => {
+    if (!Array.isArray(vehiculos)) return 'Desconocido';
+    const vehiculo = vehiculos.find((vehiculo) => vehiculo.id_vehiculo === id);
+    return vehiculo ? vehiculo.placa : 'Desconocido';
+  };
+  
+  
+
   if (showSolicitar) {
     return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
   }
@@ -98,7 +161,7 @@ const ListarMovilizacion = () => {
         <div className="flex">
           <input
             type="text"
-            placeholder="Buscar por número, motivo o estado"
+            placeholder="Buscar por origen-destino, motivo o fecha"
             value={searchTerm}
             onChange={handleSearch}
             className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -116,25 +179,29 @@ const ListarMovilizacion = () => {
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Secuencial de Orden</th>
-              <th className="py-3 px-6 text-left">Fecha Viaje</th>
-              <th className="py-3 px-6 text-left">Hora Ida</th>
-              <th className="py-3 px-6 text-left">Hora Regreso</th>
+              <th className="py-3 px-6 text-left">Origen - Destino</th>
+              <th className="py-3 px-6 text-left">Motivo</th>
+              <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
+              <th className="py-3 px-6 text-left">Duración</th>
+              <th className="py-3 px-6 text-left">Conductor</th>
+              <th className="py-3 px-6 text-left">Placa de Vehículo</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
             {currentItems.length > 0 ? (
               currentItems.map((solicitud, index) => (
                 <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
-                  <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.secuencial_orden_movilizacion}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.fecha_viaje}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.hora_ida}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.hora_regreso}</td>
+                  <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
+                  <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
+                  <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
+                  <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
+                  <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
+                  <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
+                <td colSpan="6" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
               </tr>
             )}
           </tbody>

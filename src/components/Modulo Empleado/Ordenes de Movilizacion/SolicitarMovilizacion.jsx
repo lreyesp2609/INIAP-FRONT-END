@@ -5,6 +5,7 @@ import { notification, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { QuestionCircleOutlined} from '@ant-design/icons';
+import moment from 'moment-timezone';
 
 
 const SolicitarMovilizacion = ({ onClose }) => {
@@ -14,6 +15,10 @@ const SolicitarMovilizacion = ({ onClose }) => {
   const idEmpleado = storedUser?.usuario?.id_empleado;
   const idUsuario = storedUser?.usuario?.id_usuario;
 
+  const nowInQuevedo = moment.tz('America/Guayaquil');
+  const currentDate = nowInQuevedo.format('YYYY-MM-DD');
+  const currentTime = nowInQuevedo.format('HH:mm');
+
   const [formData, setFormData] = useState({
     secuencial_orden_movilizacion: '0000', 
     motivo_movilizacion: '',
@@ -21,8 +26,8 @@ const SolicitarMovilizacion = ({ onClose }) => {
     duracion_movilizacion: '00:30',
     id_conductor: '',
     id_vehiculo: '',
-    fecha_viaje: '',
-    hora_ida: new Date().toISOString().slice(11, 16), // Hora del sistema
+    fecha_viaje: currentDate,
+    hora_ida: currentTime, 
     hora_regreso: '',
     estado_movilizacion: 'En Espera',
     id_empleado: idEmpleado,
