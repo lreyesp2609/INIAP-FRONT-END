@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../../../Config';
 
@@ -10,13 +10,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [horaLlegada, setHoraLlegada] = useState('');
   const [actividades, setActividades] = useState('');
   const [listadoEmpleados, setListadoEmpleados] = useState('');
-  const [estado, setEstado] = useState('pendiente');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Puedes realizar operaciones de inicialización aquí si es necesario
-  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,7 +24,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/Informes/crear-solicitud/`, {
+      const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idEmpleado}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +38,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           hora_llegada_solicitud: horaLlegada,
           descripcion_actividades: actividades,
           listado_empleado: listadoEmpleados,
-          estado_solicitud: estado,
           id_empleado: idEmpleado,
         }),
       });
@@ -51,7 +45,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       if (response.ok) {
         const responseData = await response.json();
         onClose();
-        // Aquí podrías manejar la respuesta como necesites, por ejemplo, navegar a otra página
         navigate(`/solicitudes/${responseData.id_solicitud}`);
       } else {
         const errorData = await response.json();
@@ -136,18 +129,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             rows="4"
             required
           ></textarea>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Estado Solicitud</label>
-          <select
-            value={estado}
-            onChange={(e) => setEstado(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="pendiente">Pendiente</option>
-            <option value="aprobado">Aprobado</option>
-            <option value="rechazado">Rechazado</option>
-          </select>
         </div>
         <div className="flex justify-between">
           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
