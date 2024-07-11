@@ -69,8 +69,7 @@ const AppContent = () => {
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
         <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
         <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
-        <Route path="/solicitar-movilizacion" element={<SolicitarMovilizacion />} />
-        <Route path="/listar-movilizacion" element={<ListarMovilizacion />} /> 
+        
       </Routes>
     </div>
   );
