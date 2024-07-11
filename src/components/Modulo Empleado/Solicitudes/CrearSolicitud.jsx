@@ -16,36 +16,42 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
-
+  
+    // Validar y ajustar las fechas
+    const formattedFechaSalida = fechaSalida ? fechaSalida : null; // O ajusta según tu lógica
+    const formattedFechaLlegada = fechaLlegada ? fechaLlegada : null; // O ajusta según tu lógica
+  
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const idUsuario = storedUser.usuario.id_usuario;
+    
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado');
       return;
     }
-
+  
     try {
-      const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idEmpleado}/`, {
+      const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idUsuario}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
         body: JSON.stringify({
           motivo_movilizacion: motivo,
-          fecha_salida_solicitud: fechaSalida,
+          fecha_salida_solicitud: formattedFechaSalida, // Enviar la fecha formateada
           hora_salida_solicitud: horaSalida,
-          fecha_llegada_solicitud: fechaLlegada,
+          fecha_llegada_solicitud: formattedFechaLlegada, // Enviar la fecha formateada
           hora_llegada_solicitud: horaLlegada,
           descripcion_actividades: actividades,
           listado_empleado: listadoEmpleados,
           id_empleado: idEmpleado,
         }),
       });
-
+  
       if (response.ok) {
-        const responseData = await response.json();
         onClose();
-        navigate(`/solicitudes/${responseData.id_solicitud}`);
+        navigate('/menu-empleados'); // Redirigir a la lista de solicitudes
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Error al crear la solicitud');
@@ -54,6 +60,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       setError('Error al crear la solicitud: ' + error.message);
     }
   };
+  
+  
 
   return (
     <div className="p-4">
