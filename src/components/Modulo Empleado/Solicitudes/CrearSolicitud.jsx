@@ -13,7 +13,68 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [codigoSolicitud, setCodigoSolicitud] = useState('');
   const [fechaHoraPrevisualizacion, setFechaHoraPrevisualizacion] = useState('');
   const [error, setError] = useState(null);
+  const [datosPersonales, setDatosPersonales] = useState(null);
   const navigate = useNavigate();
+
+  // Función para obtener la previsualización del código de solicitud y datos personales
+  const fetchPrevisualizacion = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser.usuario.id_usuario;
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      // Obtener previsualización del código de solicitud
+      const responseCodigo = await fetch(`${API_URL}/Informes/previsualizar-codigo-solicitud/${idUsuario}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (responseCodigo.ok) {
+        const dataCodigo = await responseCodigo.json();
+        if (dataCodigo.previsualizacion) {
+          setCodigoSolicitud(dataCodigo.previsualizacion['Codigo de Solicitud'] || '');
+          setFechaHoraPrevisualizacion(dataCodigo.previsualizacion['Fecha y Hora de Previsualización'] || '');
+        } else {
+          setError('Datos de previsualización no encontrados');
+        }
+      } else {
+        const errorCodigo = await responseCodigo.json();
+        setError(errorCodigo.error || 'Error al obtener la previsualización del código de solicitud');
+      }
+
+      // Obtener datos personales
+      const responseDatos = await fetch(`${API_URL}/Informes/listar-datos-personales/${idUsuario}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (responseDatos.ok) {
+        const dataDatos = await responseDatos.json();
+        if (dataDatos.datos_personales) {
+          setDatosPersonales(dataDatos.datos_personales);
+        } else {
+          setError('Datos personales no encontrados');
+        }
+      } else {
+        const errorDatos = await responseDatos.json();
+        setError(errorDatos.error || 'Error al obtener datos personales');
+      }
+
+    } catch (error) {
+      setError('Error al obtener datos: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchPrevisualizacion();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -62,52 +123,20 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     }
   };
 
-  const fetchPrevisualizacion = async () => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      const idUsuario = storedUser.usuario.id_usuario;
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        setError('Token no encontrado');
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/Informes/previsualizar-codigo-solicitud/${idUsuario}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.previsualizacion) {
-          setCodigoSolicitud(data.previsualizacion['Codigo de Solicitud'] || '');
-          setFechaHoraPrevisualizacion(data.previsualizacion['Fecha y Hora de Previsualización'] || '');
-        } else {
-          setError('Datos de previsualización no encontrados');
-        }
-      } else {
-        setError('Error al obtener la previsualización');
-      }
-    } catch (error) {
-      setError('Error al obtener la previsualización: ' + error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchPrevisualizacion();
-  }, []);
-
   return (
     <div className="p-4">
-      <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</h2>
+      <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
+        SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+      </h2>
+      <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
       <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
       {error && <div className="mb-4 text-red-500">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4 flex">
           <div className="mr-4 w-1/2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+            </label>
             <input
               type="text"
               value={codigoSolicitud}
@@ -116,8 +145,10 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA DE SOLICITUD (dd-mmm-aaa)</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              FECHA DE SOLICITUD (dd-mmm-aaa)
+            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
             <input
               type="text"
               value={fechaHoraPrevisualizacion}
@@ -136,6 +167,38 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           />
         </div>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
+        DATOS GENERALES
+      </h2>
+      <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        {datosPersonales && (
+          <div className="mb-4 flex">
+          <div className="mr-4 w-1/2">
+          <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+            <input
+              type="text"
+              value={`${datosPersonales.Nombre}`}
+              readOnly
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+            />
+            <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
+            <input
+              type="text"
+              value={`${datosPersonales.Cargo}`}
+              readOnly
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+            />
+            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+            <input
+              type="text"
+              value={`${datosPersonales.Unidad}`}
+              readOnly
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          </div>
+        )}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
           <input
