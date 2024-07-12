@@ -4,6 +4,7 @@ import API_URL from '../../../Config';
 
 const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [motivo, setMotivo] = useState('');
+  const [motivos, setMotivos] = useState([]);
   const [fechaSalida, setFechaSalida] = useState('');
   const [horaSalida, setHoraSalida] = useState('');
   const [fechaLlegada, setFechaLlegada] = useState('');
@@ -15,6 +16,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [error, setError] = useState(null);
   const [datosPersonales, setDatosPersonales] = useState(null);
   const navigate = useNavigate();
+
 
   // Función para obtener la previsualización del código de solicitud y datos personales
   const fetchPrevisualizacion = async () => {
@@ -74,6 +76,36 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
 
   useEffect(() => {
     fetchPrevisualizacion();
+  }, []);
+
+  const fetchMotivos = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Informes/listar-motivos/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMotivos(data.motivos || []);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al obtener los motivos');
+      }
+    } catch (error) {
+      setError('Error al obtener motivos: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchMotivos(); // Cargar los motivos al montar el componente
   }, []);
 
   const handleSubmit = async (event) => {
@@ -157,16 +189,22 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Motivo Movilización</label>
-          <input
-            type="text"
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
+        <select
+          value={motivo}
+          onChange={(e) => setMotivo(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Selecciona un motivo...</option>
+          {motivos.map((motivo, index) => (
+            <option key={index} value={motivo}>
+              {motivo}
+            </option>
+          ))}
+        </select>
+      </div>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
         DATOS GENERALES
