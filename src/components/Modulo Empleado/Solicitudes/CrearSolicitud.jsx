@@ -101,7 +101,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Crear Nueva Solicitud</h2>
+      <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</h2>
       <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
       {error && <div className="mb-4 text-red-500">{error}</div>}
       <form onSubmit={handleSubmit}>
