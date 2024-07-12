@@ -237,45 +237,47 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </div>
           </div>
         )}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
-          <input
-            type="date"
-            value={fechaSalida}
-            onChange={(e) => setFechaSalida(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Hora Salida</label>
-          <input
-            type="time"
-            value={horaSalida}
-            onChange={(e) => setHoraSalida(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Llegada</label>
-          <input
-            type="date"
-            value={fechaLlegada}
-            onChange={(e) => setFechaLlegada(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Hora Llegada</label>
-          <input
-            type="time"
-            value={horaLlegada}
-            onChange={(e) => setHoraLlegada(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+                <div className="mb-4 flex">
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
+            <input
+              type="date"
+              value={fechaSalida}
+              onChange={(e) => setFechaSalida(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Salida</label>
+            <input
+              type="time"
+              value={horaSalida}
+              onChange={(e) => setHoraSalida(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Llegada</label>
+            <input
+              type="date"
+              value={fechaLlegada}
+              onChange={(e) => setFechaLlegada(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Llegada</label>
+            <input
+              type="time"
+              value={horaLlegada}
+              onChange={(e) => setHoraLlegada(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Descripción Actividades</label>
