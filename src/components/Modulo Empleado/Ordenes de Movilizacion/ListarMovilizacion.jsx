@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
+import { FaEdit, FaBan, FaEye } from 'react-icons/fa';
 import SolicitarMovilizacion from './SolicitarMovilizacion';
 
 const ListarMovilizacion = () => {
@@ -13,6 +14,7 @@ const ListarMovilizacion = () => {
   const [showSolicitar, setShowSolicitar] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
+  const [showCancelled, setShowCancelled] = useState(false);
 
 
   useEffect(() => {
@@ -20,6 +22,12 @@ const ListarMovilizacion = () => {
     fetchConductores();
     fetchVehiculos();
   }, []);
+
+  const handleShowCancelled = () => {
+  setShowCancelled(!showCancelled);
+  const cancelledSolicitudes = solicitudes.filter(solicitud => solicitud.habilitado === 0);
+  setFilteredSolicitudes(showCancelled ? solicitudes : cancelledSolicitudes);
+};
 
   const fetchSolicitudes = async () => {
     try {
@@ -140,15 +148,44 @@ const ListarMovilizacion = () => {
   };
   
   
-
   if (showSolicitar) {
     return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
   }
+
+  const handleEditClick = (ordenId) => {
+    console.log('Editar orden con ID:', ordenId);
+  };
+
+  const handleCancelClick = async (ordenId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/CancelarOrdenMovilizacion/${ordenId}/`, {
+        method: 'PUT',
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Error al cancelar orden de movilización');
+      }
+      fetchSolicitudes();
+    } catch (error) {
+      console.error('Error al cancelar orden:', error);
+    }
+  };
 
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-center">Lista de Solicitudes de Movilización</h2>
+        <button
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
+          onClick={handleShowCancelled}
+        >
+          {showCancelled ? "Ocultar Canceladas" : "Ver Solicitudes Canceladas"}
+        </button>
+
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={handleClickSolicitarMovilizacion}
@@ -181,10 +218,12 @@ const ListarMovilizacion = () => {
             <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
               <th className="py-3 px-6 text-left">Origen - Destino</th>
               <th className="py-3 px-6 text-left">Motivo</th>
+              <th className="py-3 px-6 text-left">Estado</th>
               <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
               <th className="py-3 px-6 text-left">Duración</th>
               <th className="py-3 px-6 text-left">Conductor</th>
               <th className="py-3 px-6 text-left">Placa de Vehículo</th>
+              <th className="py-3 px-6 text-left">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
@@ -193,10 +232,36 @@ const ListarMovilizacion = () => {
                 <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
                   <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
+                  <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
                   <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                   <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
+                  <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
+                  <button
+                    className="p-2 bg-blue-500 text-white rounded-full"
+                    title="Editar Solicitud de Movilización"
+                    onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
+                  >
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    className="p-2 bg-blue-500 text-white rounded-full"
+                    title="Ver Solicitud de Movilización"
+                  >
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    className="p-2 bg-blue-500 text-white rounded-full"
+                    title="Cancelar Solicitud de Movilización"
+                    onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
+                  >
+                    <FaEdit />
+                  </button>
+                  
+                </td>
                 </tr>
               ))
             ) : (
