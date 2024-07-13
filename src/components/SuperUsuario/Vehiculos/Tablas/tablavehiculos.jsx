@@ -4,7 +4,7 @@ import DeshabilitarVehiculo from "../deshabilitarvehiculo";
 
 const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) => {
   const handleDeshabilitar = async () => {
-    await fetchVehiculos(userId); // Asegúrate de que fetchVehiculos actualice la lista de vehículos
+    await fetchVehiculos(userId);
   };
 
   const handleEditClick = (vehiculo, userId) => {

@@ -295,21 +295,15 @@ const handleModeloChange = (event) => {
         <label className="block text-sm font-medium text-gray-700">
           Año de Fabricación
         </label>
-        <select
+        <input
+          id="anio_fabricacion"
           name="anio_fabricacion"
+          type="number"
           value={formData.anio_fabricacion}
           onChange={handleAnioFabricacionChange}
-          className={`w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4 ${
-            errors.anio_fabricacion ? "border-red-500" : ""
-          }`}
-        >
-          <option value="">Selecciona un Año</option>
-          {años.map((anio) => (
-            <option key={anio} value={anio}>
-              {anio}
-            </option>
-          ))}
-        </select>
+          className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
+          placeholder="Año de Fabricación"
+        />
         {errors.anio_fabricacion && (
           <p className="text-red-500 text-sm">{errors.anio_fabricacion}</p>
         )}

@@ -4,7 +4,7 @@ import TablaOrdenes from "./Tablas/tablaordenes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 import AgregarMotivo from "./agregarmotivo";
-
+import EditarMotivo from "./editarmotivo";
 const GestionOrdenes = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [filteredOrdenes, setFilteredOrdenes] = useState([]);
@@ -105,11 +105,11 @@ const GestionOrdenes = () => {
     <div className="p-4">
       {selectedOrden ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <EditarOrden
+          <EditarMotivo
             orden={selectedOrden}
             onClose={handleCloseForm}
             onOrdenUpdated={handleOrdenUpdated}
-            userId={userId}
+            userId={userId} // Asegúrate de pasar el userId
           />
         </div>
       ) : isAdding ? (

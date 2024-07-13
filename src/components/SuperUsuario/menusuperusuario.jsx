@@ -57,9 +57,6 @@ const MenuSuperUsuario = () => {
   };
 
   const handlePasswordChange = async (newPassword) => {
-    console.log('userId:', userId);  // Verifica que userId no sea undefined
-    console.log('token:', token);    // Verifica que token sea válido
-
     try {
       const formData = new FormData();
       formData.append("nueva_contrasenia", newPassword);

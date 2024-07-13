@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import FormularioEditarVehiculo from "./Formularios/formularioeditarvehiculo";
 
-
 const EditarVehiculo = ({ vehiculo, onClose, onVehiculoUpdated, userId }) => {
   const [formData, setFormData] = useState({ ...vehiculo });
   const [categorias, setCategorias] = useState([]);
@@ -148,20 +147,40 @@ const EditarVehiculo = ({ vehiculo, onClose, onVehiculoUpdated, userId }) => {
   
       const formDataToSend = new FormData();
   
-      // Asegúrate de que id_subcategoria_bien esté definido y sea un número
-      formDataToSend.append("id_subcategoria_bien", formData.id_subcategoria_bien || '');
-  
-      // Agrega los demás campos
-      formDataToSend.append("placa", formData.placa);
-      formDataToSend.append("codigo_inventario", formData.codigo_inventario);
-      formDataToSend.append("modelo", formData.modelo);
-      formDataToSend.append("marca", formData.marca);
-      formDataToSend.append("color_primario", formData.color_primario);
-      formDataToSend.append("color_secundario", formData.color_secundario);
-      formDataToSend.append("anio_fabricacion", formData.anio_fabricacion);
-      formDataToSend.append("numero_motor", formData.numero_motor);
-      formDataToSend.append("numero_chasis", formData.numero_chasis);
-      formDataToSend.append("numero_matricula", formData.numero_matricula);
+      // Solo agrega campos que tengan un valor
+      if (formData.id_subcategoria_bien) {
+        formDataToSend.append("id_subcategoria_bien", formData.id_subcategoria_bien);
+      }
+      if (formData.placa) {
+        formDataToSend.append("placa", formData.placa);
+      }
+      if (formData.codigo_inventario) {
+        formDataToSend.append("codigo_inventario", formData.codigo_inventario);
+      }
+      if (formData.modelo) {
+        formDataToSend.append("modelo", formData.modelo);
+      }
+      if (formData.marca) {
+        formDataToSend.append("marca", formData.marca);
+      }
+      if (formData.color_primario) {
+        formDataToSend.append("color_primario", formData.color_primario);
+      }
+      if (formData.color_secundario) {
+        formDataToSend.append("color_secundario", formData.color_secundario);
+      }
+      if (formData.anio_fabricacion) {
+        formDataToSend.append("anio_fabricacion", formData.anio_fabricacion);
+      }
+      if (formData.numero_motor) {
+        formDataToSend.append("numero_motor", formData.numero_motor);
+      }
+      if (formData.numero_chasis) {
+        formDataToSend.append("numero_chasis", formData.numero_chasis);
+      }
+      if (formData.numero_matricula) {
+        formDataToSend.append("numero_matricula", formData.numero_matricula);
+      }
   
       const response = await fetch(
         `${API_URL}/Vehiculos/editar-vehiculo/${userId}/${formData.id_vehiculo}/`,
