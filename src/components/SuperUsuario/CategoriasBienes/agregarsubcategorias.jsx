@@ -3,7 +3,7 @@ import { notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import API_URL from "../../../Config";
-import FormularioSubcategorias from "./formulariosubcategorias";
+import FormularioSubcategorias from "./Formularios/formulariosubcategorias";
 
 const AgregarSubCategoriasBienes = ({
   onClose,

@@ -35,23 +35,24 @@ const FormularioVehiculo = ({
   };
 
   // Función para validar Modelo
-  const handleModeloChange = (event) => {
-    const { value } = event.target;
-    if (value === "" || /^[A-Za-z0-9]+$/.test(value)) {
-      handleInputChange(event); // Llamar a la función para manejar el cambio de datos
-      setErrors((prevErrors) => ({ ...prevErrors, modelo: "" })); // Limpiar el error si es válido
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        modelo: "El modelo debe contener solo letras y números",
-      }));
-    }
-  };
+const handleModeloChange = (event) => {
+  const { value } = event.target;
+  // Expresión regular actualizada para aceptar letras, números, espacios, guiones y paréntesis
+  if (value === "" || /^[A-Za-z0-9\s\-()]+$/.test(value)) {
+    handleInputChange(event); // Llamar a la función para manejar el cambio de datos
+    setErrors((prevErrors) => ({ ...prevErrors, modelo: "" })); // Limpiar el error si es válido
+  } else {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      modelo: "El modelo debe contener solo letras, números, espacios, guiones y paréntesis",
+    }));
+  }
+};
 
   // Función para validar Marca
   const handleMarcaChange = (event) => {
     const { value } = event.target;
-    if (value === "" || /^[A-Za-z\s]+$/.test(value)) {
+    if (value === "" || /^[A-Za-z0-9\s\-()]+$/.test(value)) {
       handleInputChange(event); // Llamar a la función para manejar el cambio de datos
       setErrors((prevErrors) => ({ ...prevErrors, marca: "" })); // Limpiar el error si es válido
     } else {
