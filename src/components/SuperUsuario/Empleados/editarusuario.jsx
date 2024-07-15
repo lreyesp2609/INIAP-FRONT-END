@@ -142,14 +142,14 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       fetchCargos();
     }
   }, [formData.estacion, formData.unidad]);
-
+  
   useEffect(() => {
     const fetchLicencias = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
         return;
       }
-
+  
       try {
         const response = await fetch(`${API_URL}/Licencias/listar-tipos-editar/${user.usuario.id_usuario}/`, {
           method: "GET",
@@ -157,10 +157,10 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
             Authorization: token,
           },
         });
-
+  
         if (response.ok) {
           const data = await response.json();
-          setLicencias(data);
+          setLicencias(data.tipos_licencias); // Extrae la lista de la propiedad tipos_licencias
         } else {
           console.error("Error al obtener las licencias:", response.statusText);
         }
@@ -168,9 +168,10 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         console.error("Error al obtener licencias:", error);
       }
     };
-
+  
     fetchLicencias();
   }, []);
+  
 
   useEffect(() => {
     const fetchUnidades = async () => {
