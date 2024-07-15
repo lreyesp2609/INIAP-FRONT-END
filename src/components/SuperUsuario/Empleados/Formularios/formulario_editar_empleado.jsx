@@ -7,6 +7,7 @@ const FormularioEditarEmpleado = ({
   roles = [],
   estaciones = [],
   unidades = [],
+  licencias = [],
 }) => {
   return (
     <form id="employeeForm" className="space-y-8">
@@ -224,8 +225,29 @@ const FormularioEditarEmpleado = ({
           onChange={handleInputChange}
           className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
+        
       </div>
-      <div className="col-span-1 md:col-span-2">
+      <div >
+        
+      <label className="block text-sm font-medium text-gray-700">
+              Tipo de Licencia
+            </label>
+            <select
+              name="licencia"
+              value={formData.id_licencia}
+              onChange={handleInputChange}
+              className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
+            >
+              <option value="">Seleccione licencia</option>
+              {licencias &&
+              licencias.map((licencia) => (
+                <option key={licencia.id_tipo_licencia} value={licencia.id_tipo_licencia}>
+                  {licencia.tipo_licencia}
+                </option>
+              ))}
+            </select>
+        </div>
+        <div >
         <label className="block text-sm font-medium text-gray-700">
           Rol
         </label>
@@ -242,6 +264,7 @@ const FormularioEditarEmpleado = ({
               </option>
             ))}
         </select>
+       
       </div>
     </div>
   </div>

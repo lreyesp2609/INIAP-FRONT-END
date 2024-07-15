@@ -27,9 +27,12 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     id_cargo: empleado.id_cargo,
     usuario: empleado.usuario,
     distintivo: empleado.distintivo,
+    licencias: empleado.licencias ? empleado.licencias.id_tipo_licencia : "",
+    id_licencia: empleado.id_tipo_licencia,
   });
 
   const [cargos, setCargos] = useState([]);
+  const [licencias, setLicencias] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [estaciones, setEstaciones] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -139,6 +142,35 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       fetchCargos();
     }
   }, [formData.estacion, formData.unidad]);
+
+  useEffect(() => {
+    const fetchLicencias = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/Licencias/listar-tipos-editar/${user.usuario.id_usuario}/`, {
+          method: "GET",
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setLicencias(data);
+        } else {
+          console.error("Error al obtener las licencias:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener licencias:", error);
+      }
+    };
+
+    fetchLicencias();
+  }, []);
 
   useEffect(() => {
     const fetchUnidades = async () => {
@@ -314,6 +346,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         handleInputChange={handleInputChange}
         cargos={cargos}
         roles={roles}
+        licencias={licencias}
         unidades={unidades}
         estaciones={estaciones}
         handleSave={handleSave}
