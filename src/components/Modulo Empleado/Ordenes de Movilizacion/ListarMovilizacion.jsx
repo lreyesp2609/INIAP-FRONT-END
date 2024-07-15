@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
 import { FaEdit, FaBan, FaEye } from 'react-icons/fa';
 import SolicitarMovilizacion from './SolicitarMovilizacion';
+import EditarSolicitudMovilizacion from './EditarSolicitudMovilizacion';
 
 const ListarMovilizacion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -15,7 +16,17 @@ const ListarMovilizacion = () => {
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [showEditar, setShowEditar] = useState(false);
 
+
+  useEffect(() => {
+    if (solicitudes.length > 0) {
+      const initialFiltered = solicitudes.filter(
+        (solicitud) => solicitud.estado_movilizacion === "En Espera" && solicitud.habilitado === 1
+      );
+      setFilteredSolicitudes(initialFiltered);
+    }
+  }, [solicitudes]);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -24,10 +35,14 @@ const ListarMovilizacion = () => {
   }, []);
 
   const handleShowCancelled = () => {
-  setShowCancelled(!showCancelled);
-  const cancelledSolicitudes = solicitudes.filter(solicitud => solicitud.habilitado === 0);
-  setFilteredSolicitudes(showCancelled ? solicitudes : cancelledSolicitudes);
-};
+    setShowCancelled(!showCancelled);
+    const filtered = showCancelled
+      ? solicitudes.filter(
+          (solicitud) => solicitud.estado_movilizacion === "En Espera" && solicitud.habilitado === 1
+        )
+      : solicitudes.filter((solicitud) => solicitud.habilitado === 0);
+    setFilteredSolicitudes(filtered);
+  };
 
   const fetchSolicitudes = async () => {
     try {
@@ -147,31 +162,45 @@ const ListarMovilizacion = () => {
     return vehiculo ? vehiculo.placa : 'Desconocido';
   };
   
-  
   if (showSolicitar) {
     return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
   }
 
   const handleEditClick = (ordenId) => {
-    console.log('Editar orden con ID:', ordenId);
+    setShowEditar(true);
   };
+
+  if (showEditar) {
+    return <EditarSolicitudMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
+  }
 
   const handleCancelClick = async (ordenId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/CancelarOrdenMovilizacion/${ordenId}/`, {
+      if (!token) {
+        throw new Error('Token no encontrado');
+      }
+  
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/cancelar-orden/${ordenId}/`, {
         method: 'PUT',
         headers: {
-          Authorization: token,
+          Authorization: `${token}`, 
           'Content-Type': 'application/json',
         },
       });
+  
       if (!response.ok) {
-        throw new Error('Error al cancelar orden de movilización');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al cancelar orden de movilización');
       }
-      fetchSolicitudes();
+  
+      const data = await response.json();
+      console.log(data.mensaje); 
+  
+      fetchSolicitudes(); 
     } catch (error) {
-      console.error('Error al cancelar orden:', error);
+      console.error('Error al cancelar orden:', error.message);
+      setError(error.message);
     }
   };
 
@@ -238,30 +267,27 @@ const ListarMovilizacion = () => {
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                   <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                  <button
-                    className="p-2 bg-blue-500 text-white rounded-full"
-                    title="Editar Solicitud de Movilización"
-                    onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
-                  >
-                    <FaEdit />
-                  </button>
-
-                  <button
-                    className="p-2 bg-blue-500 text-white rounded-full"
-                    title="Ver Solicitud de Movilización"
-                  >
-                    <FaEdit />
-                  </button>
-
-                  <button
-                    className="p-2 bg-blue-500 text-white rounded-full"
-                    title="Cancelar Solicitud de Movilización"
-                    onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
-                  >
-                    <FaEdit />
-                  </button>
-                  
-                </td>
+                    <button
+                      className="p-2 bg-blue-500 text-white rounded-full"
+                      title="Editar Solicitud de Movilización"
+                      onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="p-2 bg-green-500 text-white rounded-full"
+                      title="Ver Solicitud de Movilización"
+                    >
+                      <FaEye />
+                    </button>
+                    <button
+                      className="p-2 bg-red-500 text-white rounded-full"
+                      title="Cancelar Solicitud de Movilización"
+                      onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
+                    >
+                      <FaBan />
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
@@ -276,6 +302,7 @@ const ListarMovilizacion = () => {
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+          disabled={currentPage === 1}
         >
           Anterior
         </button>
@@ -283,6 +310,7 @@ const ListarMovilizacion = () => {
         <button
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+          disabled={currentPage === totalPages}
         >
           Siguiente
         </button>
