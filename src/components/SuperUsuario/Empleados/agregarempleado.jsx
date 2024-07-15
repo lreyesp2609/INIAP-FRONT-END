@@ -26,6 +26,7 @@ const AgregarEmpleados = (props) => {
     id_cargo: "",
     distintivo: "",
     id_rol: "",
+    id_tipo_licencia: "",
   });
 
   useEffect(() => {
@@ -270,6 +271,7 @@ const AgregarEmpleados = (props) => {
       });
     }
   };
+
   const fetchTiposLicencia = async (userId) => {
     try {
       const token = localStorage.getItem("token");
@@ -278,35 +280,52 @@ const AgregarEmpleados = (props) => {
         return;
       }
   
-      const response = await fetch(
-        `${API_URL}/Licencias/listar-tipos/${userId}/`,
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-  
+      const response = await fetch(`${API_URL}/Licencias/listar-tipos/${user.usuario.id_usuario}/`, {
+        method: "GET",
+        headers: {
+          Authorization: token,
+        },
+      });
+
       if (response.ok) {
         const data = await response.json();
-        setLicencias(data);  // Asegúrate de que data sea un array
-        console.log("Licencias:", data);
+        setLicencias(data.tipos_licencias); // Extrae la lista de la propiedad tipos_licencias
       } else {
-        console.error("Error:", response.statusText);
-        notification.error({
-          message: "Error",
-          description: "Error al obtener los tipos de licencia",
-        });
+        console.error("Error al obtener las licencias:", response.statusText);
       }
     } catch (error) {
-      console.error("Error:", error);
-      notification.error({
-        message: "Error",
-        description: "Error al obtener los tipos de licencia",
-      });
+      console.error("Error al obtener licencias:", error);
     }
   };
   
+  useEffect(() => {
+    const fetchLicencias = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${API_URL}/Licencias/listar-tipos/${user.usuario.id_usuario}/`, {
+          method: "GET",
+          headers: {
+            Authorization: token,
+          },
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          setLicencias(data.tipos_licencias); // Extrae la lista de la propiedad tipos_licencias
+        } else {
+          console.error("Error al obtener las licencias:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener licencias:", error);
+      }
+    };
+  
+    fetchLicencias();
+  }, []);
 
   const handleSave = async () => {
     try {
