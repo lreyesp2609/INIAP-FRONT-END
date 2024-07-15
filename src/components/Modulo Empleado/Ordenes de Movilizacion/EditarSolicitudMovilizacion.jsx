@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import API_URL from '../../../Config';
-import { notification } from 'antd';
+import { notification, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment-timezone';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Tooltip } from 'react-bootstrap';
+import moment from 'moment-timezone';
 
-const EditarSolicitudMovilizacion = ({ onClose }) => {
+const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
   const navigate = useNavigate();
-  const { idUsuario, idOrden } = useParams(); // Obtener los parámetros de la URL
-
+  
   const [formData, setFormData] = useState({
     secuencial_orden_movilizacion: '',
     motivo_movilizacion: '',
@@ -34,12 +32,18 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
     fetchDetallesOrden();
     fetchConductores();
     fetchVehiculos();
-  }, []);
+  }, [orderId]);
 
   const fetchDetallesOrden = async () => {
     try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/detalle-orden/${idUsuario}/${idOrden}/`, {
+      if (!token) throw new Error('Token no encontrado');
+      if (!idUsuario) throw new Error('ID de usuario no encontrado');
+
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/detalle-orden/${idUsuario}/${orderId}/`, {
         headers: {
           Authorization: `${token}`,
         },
@@ -57,7 +61,7 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
         duracion_movilizacion: data.duracion_movilizacion,
         id_conductor: data.id_conductor,
         id_vehiculo: data.id_vehiculo,
-        fecha_viaje: moment(data.fecha_viaje).format('YYYY-MM-DD'), // Formatear fecha según necesidad
+        fecha_viaje: moment(data.fecha_viaje).format('YYYY-MM-DD'), 
         hora_ida: data.hora_ida,
         hora_regreso: data.hora_regreso,
         estado_movilizacion: data.estado_movilizacion,
@@ -71,7 +75,13 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
 
   const fetchConductores = async () => {
     try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+
       const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+      if (!idUsuario) throw new Error('ID de usuario no encontrado');
+
       const response = await fetch(`${API_URL}/Empleados/lista-empleados/${idUsuario}/`, {
         headers: {
           Authorization: `${token}`,
@@ -92,7 +102,13 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
 
   const fetchVehiculos = async () => {
     try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+
       const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+      if (!idUsuario) throw new Error('ID de usuario no encontrado');
+
       const response = await fetch(`${API_URL}/Vehiculos/vehiculos/${idUsuario}/`, {
         headers: {
           Authorization: `${token}`,
@@ -121,23 +137,35 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
     const token = localStorage.getItem('token');
-
+    
     if (!token) {
       setError('Token no encontrado');
       return;
     }
-
+    
     try {
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-orden/${idOrden}/`, {
+      const formDataToSend = {
+        motivo_movilizacion: formData.motivo_movilizacion,
+        duracion_movilizacion: formData.duracion_movilizacion,
+        id_conductor: formData.id_conductor,
+        id_vehiculo: formData.id_vehiculo,
+        fecha_viaje: formData.fecha_viaje,
+        hora_ida: formData.hora_ida,
+        hora_regreso: formData.hora_regreso,
+      };
+    
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-orden/${idUsuario}/${orderId}/`, {
         method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `${token}`,
-          'Content-Type': 'application/json', // Asegúrate de que el servidor espere JSON
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataToSend),
       });
-
+    
       if (response.ok) {
         const data = await response.json();
         notification.success({
@@ -145,7 +173,7 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
           description: data.mensaje || 'Orden de movilización actualizada exitosamente.',
           placement: 'topRight',
         });
-        navigate('/ruta-a-lista-de-solicitudes'); // Reemplazar con la ruta adecuada
+        onClose();
       } else {
         const errorMessage = await response.text();
         throw new Error(`Error al editar la solicitud: ${errorMessage}`);
@@ -158,10 +186,7 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
       });
     }
   };
-
-  const handleCancel = () => {
-    navigate('/ruta-a-lista-de-solicitudes'); // Reemplazar con la ruta adecuada
-  };
+  
 
   return (
     <div className="w-full flex justify-center">
@@ -182,7 +207,7 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
                   value={formData.lugar_origen_destino_movilizacion}
                   onChange={handleInputChange}
                   required
-                  readOnly // Bloquea la edición del campo
+                  readOnly 
                   className="w-full p-2 pl-8 pr-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -243,11 +268,13 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
                 type="time"
                 name="hora_regreso"
                 value={formData.hora_regreso}
-                readOnly // Campo no editable
+                onChange={handleInputChange}
+                readOnly
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">Conductor:</label>
@@ -285,9 +312,11 @@ const EditarSolicitudMovilizacion = ({ onClose }) => {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end">
+          
+          <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
             <button
               type="button"
+              onClick={onClose}
               className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
             >
               <FontAwesomeIcon icon={faTimes} className="mr-2" />

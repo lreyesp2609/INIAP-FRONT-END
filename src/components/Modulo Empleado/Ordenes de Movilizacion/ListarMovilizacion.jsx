@@ -17,6 +17,8 @@ const ListarMovilizacion = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [showCancelled, setShowCancelled] = useState(false);
   const [showEditar, setShowEditar] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+
 
 
   useEffect(() => {
@@ -166,12 +168,20 @@ const ListarMovilizacion = () => {
     return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
   }
 
+
   const handleEditClick = (ordenId) => {
+    setSelectedOrderId(ordenId);
     setShowEditar(true);
   };
 
+
+  const handleCloseEditarMovilizacion = () => {
+    setShowEditar(false);
+    fetchSolicitudes(); 
+  };
+
   if (showEditar) {
-    return <EditarSolicitudMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
+    return <EditarSolicitudMovilizacion orderId={selectedOrderId} onClose={handleCloseEditarMovilizacion} />;
   }
 
   const handleCancelClick = async (ordenId) => {
