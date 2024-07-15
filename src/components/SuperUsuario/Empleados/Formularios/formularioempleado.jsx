@@ -333,6 +333,28 @@ const FormularioEmpleado = ({
             )}
           </div>
         </div>
+        <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Tipo de Licencia
+            </label>
+            <select
+              name="id_tipo_licencia"
+              value={formData.id_tipo_licencia}
+              onChange={handleInputChange}
+              className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
+            >
+              <option value="">Seleccione licencia</option>
+              {licencias &&
+                licencias.map((licencia) => (
+                  <option
+                    key={licencia.id_tipo_licencia}
+                    value={licencia.id_tipo_licencia}
+                  >
+                    {licencia.tipo_licencia}
+                  </option>
+                ))}
+            </select>
+          </div>
       </div>
       <div>
         <h3 className="text-xl font-semibold mb-4">Datos de la Empresa</h3>
