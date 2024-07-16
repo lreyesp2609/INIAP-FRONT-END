@@ -3,6 +3,8 @@ import API_URL from '../../../Config';
 import { FaEdit, FaBan, FaEye } from 'react-icons/fa';
 import SolicitarMovilizacion from './SolicitarMovilizacion';
 import EditarSolicitudMovilizacion from './EditarSolicitudMovilizacion';
+import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
+
 
 const ListarMovilizacion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -13,22 +15,12 @@ const ListarMovilizacion = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [showSolicitar, setShowSolicitar] = useState(false);
+  const [showEditar, setShowEditar] = useState(false);
+  const [showVer, setShowVer] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
-  const [showCancelled, setShowCancelled] = useState(false);
-  const [showEditar, setShowEditar] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-
-
-
-  useEffect(() => {
-    if (solicitudes.length > 0) {
-      const initialFiltered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === "En Espera" && solicitud.habilitado === 1
-      );
-      setFilteredSolicitudes(initialFiltered);
-    }
-  }, [solicitudes]);
+  const [viewMode, setViewMode] = useState('pendientes');
 
   useEffect(() => {
     fetchSolicitudes();
@@ -36,13 +28,27 @@ const ListarMovilizacion = () => {
     fetchVehiculos();
   }, []);
 
-  const handleShowCancelled = () => {
-    setShowCancelled(!showCancelled);
-    const filtered = showCancelled
-      ? solicitudes.filter(
-          (solicitud) => solicitud.estado_movilizacion === "En Espera" && solicitud.habilitado === 1
-        )
-      : solicitudes.filter((solicitud) => solicitud.habilitado === 0);
+  useEffect(() => {
+    applyFilters();
+  }, [solicitudes, viewMode]);
+
+  const applyFilters = () => {
+    let filtered = [];
+    if (viewMode === 'pendientes') {
+      filtered = solicitudes.filter(
+        (solicitud) => solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1
+      );
+    } else if (viewMode === 'canceladas') {
+      filtered = solicitudes.filter((solicitud) => solicitud.habilitado === 0);
+    } else if (viewMode === 'historial') {
+      filtered = solicitudes;
+    } else if (viewMode === 'historialMovilizaciones') {
+      filtered = solicitudes.filter(
+        (solicitud) => solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Finalizado'
+      );
+    }
+
+    filtered.sort((b, a) => new Date(a.fecha_viaje + ' ' + a.hora_ida) - new Date(b.fecha_viaje + ' ' + b.hora_ida));
     setFilteredSolicitudes(filtered);
   };
 
@@ -65,7 +71,6 @@ const ListarMovilizacion = () => {
 
       const data = await response.json();
       setSolicitudes(data);
-      setFilteredSolicitudes(data);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -126,7 +131,11 @@ const ListarMovilizacion = () => {
     const filtered = solicitudes.filter(
       (solicitud) =>
         solicitud.lugar_origen_destino_movilizacion.toLowerCase().includes(searchValue) ||
-        solicitud.motivo_movilizacion.toLowerCase().includes(searchValue)
+        solicitud.motivo_movilizacion.toLowerCase().includes(searchValue) || 
+        vehiculos.placa.toLowerCase().includes(searchValue) || 
+        conductores.nombres.toLowerCase().includes(searchValue)  || 
+        conductores.apellidos.toLowerCase().includes(searchValue)
+
     );
 
     setFilteredSolicitudes(filtered);
@@ -135,7 +144,7 @@ const ListarMovilizacion = () => {
 
   const handleClear = () => {
     setSearchTerm('');
-    setFilteredSolicitudes(solicitudes);
+    applyFilters();
     setCurrentPage(1);
   };
 
@@ -168,6 +177,19 @@ const ListarMovilizacion = () => {
     return <SolicitarMovilizacion onClose={handleCloseSolicitarMovilizacion} />;
   }
 
+  const handleVerClick = (ordenId) => {
+    setSelectedOrderId(ordenId);
+    setShowVer(true);
+  };
+
+  const handleCloseVer = () => {
+    setShowVer(false);
+    fetchSolicitudes(); 
+  };
+
+  if (showVer) {
+    return <VerSolicitudMovilizacion orderId={selectedOrderId} onClose={handleCloseVer} />;
+  }
 
   const handleEditClick = (ordenId) => {
     setSelectedOrderId(ordenId);
@@ -214,15 +236,53 @@ const ListarMovilizacion = () => {
     }
   };
 
+  const handleShowPending = () => {
+    setViewMode('pendientes');
+  };
+
+  const handleShowCancelled = () => {
+    setViewMode('canceladas');
+  };
+
+  const handleShowHistorial = () => {
+    setViewMode('historial');
+  };
+
+  const handleShowHistorialMovilizaciones = () => {
+    setViewMode('historialMovilizaciones');
+  };
+
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-center">Lista de Solicitudes de Movilización</h2>
+        
+        <button
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4"
+          onClick={handleShowPending}
+        >
+          Solicitudes Pendientes
+        </button>
+
         <button
           className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
+          onClick={handleShowHistorial}
+        >
+          Historial de Solicitudes
+        </button>
+
+        <button
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
+          onClick={handleShowHistorialMovilizaciones}
+        >
+          Historial de Movilizaciones
+        </button>
+
+        <button
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-4"
           onClick={handleShowCancelled}
         >
-          {showCancelled ? "Ocultar Canceladas" : "Ver Solicitudes Canceladas"}
+          Solicitudes Canceladas
         </button>
 
         <button
@@ -237,7 +297,7 @@ const ListarMovilizacion = () => {
         <div className="flex">
           <input
             type="text"
-            placeholder="Buscar por origen-destino, motivo o fecha"
+            placeholder="Buscar"
             value={searchTerm}
             onChange={handleSearch}
             className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -277,26 +337,58 @@ const ListarMovilizacion = () => {
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                   <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                    <button
-                      className="p-2 bg-blue-500 text-white rounded-full"
-                      title="Editar Solicitud de Movilización"
-                      onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="p-2 bg-green-500 text-white rounded-full"
-                      title="Ver Solicitud de Movilización"
-                    >
-                      <FaEye />
-                    </button>
-                    <button
-                      className="p-2 bg-red-500 text-white rounded-full"
-                      title="Cancelar Solicitud de Movilización"
-                      onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
-                    >
-                      <FaBan />
-                    </button>
+                    {solicitud.estado_movilizacion === 'En Espera'  && (
+                      <>
+                        <button
+                          className="p-2 bg-blue-500 text-white rounded-full"
+                          title="Editar Solicitud de Movilización"
+                          onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          className="p-2 bg-green-500 text-white rounded-full"
+                          title="Ver Solicitud de Movilización"
+                          onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                        >
+                          <FaEye />
+                        </button>
+                        <button
+                          className="p-2 bg-red-500 text-white rounded-full"
+                          title="Cancelar Solicitud de Movilización"
+                          onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
+                        >
+                          <FaBan />
+                        </button>
+                      </>
+                    )}
+                    {solicitud.estado_movilizacion === 'Cancelado' && (
+                      <button
+                        className="p-2 bg-green-500 text-white rounded-full"
+                        title="Habilitar Solicitud de Movilización"
+                        onClick={() => handleEnableClick(solicitud.id_orden_movilizacion)}
+                      >
+                        Habilitar
+                      </button>
+                    )}
+                    {solicitud.estado_movilizacion === 'Aprobado' && (
+                      <button
+                        className="p-2 bg-green-500 text-white rounded-full"
+                        title="Ver Solicitud de Movilización"
+                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                        >
+                          <FaEye />
+                        </button>
+                    )}
+                    {solicitud.estado_movilizacion === 'Finalizado' && (
+                      <button
+                        className="p-2 bg-green-500 text-white rounded-full"
+                        title="Ver Solicitud de Movilización"
+                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                        >
+                          <FaEye />
+                        </button>
+                    )}
                   </td>
                 </tr>
               ))

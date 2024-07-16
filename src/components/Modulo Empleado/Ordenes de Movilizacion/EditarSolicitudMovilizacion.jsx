@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API_URL from '../../../Config';
 import { notification, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,8 +7,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 
 const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
-  const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     secuencial_orden_movilizacion: '',
     motivo_movilizacion: '',
@@ -33,6 +31,22 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
     fetchConductores();
     fetchVehiculos();
   }, [orderId]);
+
+  useEffect(() => {
+    // Calcular hora de regreso cada vez que cambian la hora de ida o la duración
+    if (formData.hora_ida && formData.duracion_movilizacion) {
+      const [horaIdaHoras, horaIdaMinutos] = formData.hora_ida.split(':').map(Number);
+      const [duracionHoras, duracionMinutos] = formData.duracion_movilizacion.split(':').map(Number);
+      
+      const totalMinutos = horaIdaMinutos + duracionMinutos;
+      const totalHoras = horaIdaHoras + duracionHoras + Math.floor(totalMinutos / 60);
+      const minutosRegreso = totalMinutos % 60;
+      const horasRegreso = totalHoras % 24;
+
+      const horaRegreso = `${String(horasRegreso).padStart(2, '0')}:${String(minutosRegreso).padStart(2, '0')}`;
+      setFormData({ ...formData, hora_regreso: horaRegreso });
+    }
+  }, [formData.hora_ida, formData.duracion_movilizacion]);
 
   const fetchDetallesOrden = async () => {
     try {
@@ -137,35 +151,34 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-      const idUsuario = storedUser?.usuario?.id_usuario;
     const token = localStorage.getItem('token');
-    
+  
     if (!token) {
       setError('Token no encontrado');
       return;
     }
-    
+  
     try {
-      const formDataToSend = {
-        motivo_movilizacion: formData.motivo_movilizacion,
-        duracion_movilizacion: formData.duracion_movilizacion,
-        id_conductor: formData.id_conductor,
-        id_vehiculo: formData.id_vehiculo,
-        fecha_viaje: formData.fecha_viaje,
-        hora_ida: formData.hora_ida,
-        hora_regreso: formData.hora_regreso,
-      };
-    
+      const formDataToSend = new FormData();
+      formDataToSend.append('motivo_movilizacion', formData.motivo_movilizacion);
+      formDataToSend.append('duracion_movilizacion', formData.duracion_movilizacion);
+      formDataToSend.append('id_conductor', formData.id_conductor);
+      formDataToSend.append('id_vehiculo', formData.id_vehiculo);
+      formDataToSend.append('fecha_viaje', formData.fecha_viaje);
+      formDataToSend.append('hora_ida', formData.hora_ida);
+      formDataToSend.append('hora_regreso', formData.hora_regreso);
+  
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+  
       const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-orden/${idUsuario}/${orderId}/`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `${token}`,
         },
-        body: JSON.stringify(formDataToSend),
+        body: formDataToSend,
       });
-    
+  
       if (response.ok) {
         const data = await response.json();
         notification.success({
@@ -186,8 +199,8 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
       });
     }
   };
-  
 
+  
   return (
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
