@@ -21,6 +21,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [selectedCiudad, setSelectedCiudad] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [empleados, setEmpleados] = useState([]);
+const [empleadoInput, setEmpleadoInput] = useState('');
+const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
+const [empleadoManual, setEmpleadoManual] = useState('');
+const [mostrarInputManual, setMostrarInputManual] = useState(false);
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -152,6 +157,52 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     setSelectedCiudad('');
   };
 
+  const fetchEmpleados = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+  
+      const response = await fetch(`${API_URL}/Informes/listar-empleados/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setEmpleados(data.empleados || []);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al obtener los empleados');
+      }
+    } catch (error) {
+      setError('Error al obtener empleados: ' + error.message);
+    }
+  };
+  
+  useEffect(() => {
+    fetchEmpleados();
+  }, []);
+
+  const handleAddEmpleado = () => {
+    if (empleadoInput) {
+      setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoInput]);
+      setEmpleadoInput('');
+    }
+  };
+  
+  const handleAddEmpleadoManual = () => {
+    if (empleadoManual) {
+      setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoManual]);
+      setEmpleadoManual('');
+      setMostrarInputManual(false);
+    }
+  };
+  
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -183,7 +234,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           fecha_llegada_solicitud: formattedFechaLlegada,
           hora_llegada_solicitud: horaLlegada,
           descripcion_actividades: actividades,
-          listado_empleado: listadoEmpleados,
+          listado_empleado: empleadosSeleccionados.join(', '),
           lugar_servicio: `${selectedCiudad}-${selectedProvincia}`, // Guardar Ciudad-Provincia
           id_empleado: idEmpleado,
         }),
@@ -375,15 +426,51 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       </div>
     </div>
     <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
-      <textarea
-        value={listadoEmpleados}
-        onChange={(e) => setListadoEmpleados(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        rows="4"
-        required
-      ></textarea>
-    </div>
+  <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
+  <div className="flex mb-2">
+    <input
+      type="text"
+      value={empleadoInput}
+      onChange={(e) => setEmpleadoInput(e.target.value)}
+      placeholder="Buscar empleados..."
+      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      list="empleados-list"
+    />
+    <datalist id="empleados-list">
+      {empleados.filter(emp => emp.nombres.toLowerCase().includes(empleadoInput.toLowerCase()) || emp.apellidos.toLowerCase().includes(empleadoInput.toLowerCase())).map((emp, index) => (
+        <option key={index} value={`${emp.nombres} ${emp.apellidos}`} />
+      ))}
+    </datalist>
+    <button type="button" onClick={handleAddEmpleado} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+      +
+    </button>
+  </div>
+  <div className="flex mb-2">
+    {empleadosSeleccionados.map((empleado, index) => (
+      <span key={index} className="mr-2 p-2 bg-gray-200 rounded">{empleado}</span>
+    ))}
+  </div>
+  <div className="flex mb-2">
+    {mostrarInputManual ? (
+      <>
+        <input
+          type="text"
+          value={empleadoManual}
+          onChange={(e) => setEmpleadoManual(e.target.value)}
+          placeholder="Otro empleado..."
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button type="button" onClick={handleAddEmpleadoManual} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          +
+        </button>
+      </>
+    ) : (
+      <button type="button" onClick={() => setMostrarInputManual(true)} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        Otro...
+      </button>
+    )}
+  </div>
+</div>
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
       <textarea
