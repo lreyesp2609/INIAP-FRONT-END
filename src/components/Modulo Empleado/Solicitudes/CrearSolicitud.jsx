@@ -13,10 +13,14 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [listadoEmpleados, setListadoEmpleados] = useState('');
   const [codigoSolicitud, setCodigoSolicitud] = useState('');
   const [fechaHoraPrevisualizacion, setFechaHoraPrevisualizacion] = useState('');
-  const [error, setError] = useState(null);
   const [datosPersonales, setDatosPersonales] = useState(null);
-  const navigate = useNavigate();
   const [lugarServicio, setLugarServicio] = useState('');
+  const [provincias, setProvincias] = useState([]);
+  const [ciudades, setCiudades] = useState([]);
+  const [selectedProvincia, setSelectedProvincia] = useState('');
+  const [selectedCiudad, setSelectedCiudad] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -79,6 +83,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     fetchPrevisualizacion();
   }, []);
 
+
   const fetchMotivos = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -108,6 +113,45 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   useEffect(() => {
     fetchMotivos(); // Cargar los motivos al montar el componente
   }, []);
+
+  const fetchProvinciasYCiudades = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Informes/listar-provincias-ciudades/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProvincias(data.provincias_ciudades || []);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al obtener provincias y ciudades');
+      }
+    } catch (error) {
+      setError('Error al obtener provincias y ciudades: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchProvinciasYCiudades(); // Cargar provincias y ciudades al montar el componente
+  }, []);
+
+  const handleProvinciaChange = (e) => {
+    const provincia = e.target.value;
+    setSelectedProvincia(provincia);
+    const selectedProvinciaData = provincias.find(p => p.Provincia === provincia);
+    setCiudades(selectedProvinciaData ? selectedProvinciaData.Ciudades : []);
+    setSelectedCiudad('');
+  };
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -140,7 +184,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           hora_llegada_solicitud: horaLlegada,
           descripcion_actividades: actividades,
           listado_empleado: listadoEmpleados,
-          lugar_servicio: lugarServicio,  // Agregar lugar_servicio al cuerpo del request
+          lugar_servicio: `${selectedCiudad}-${selectedProvincia}`, // Guardar Ciudad-Provincia
           id_empleado: idEmpleado,
         }),
       });
@@ -229,15 +273,37 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                 readOnly
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
               />
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">LUGAR DE SERVICIO</label>
-                <input
-                  type="text"
-                  value={lugarServicio}
-                  onChange={(e) => setLugarServicio(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+              <div className="mb-4 flex">
+                <div className="mr-4 w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Provincia</label>
+                  <select
+                    value={selectedProvincia}
+                    onChange={handleProvinciaChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Seleccionar Provincia</option>
+                    {provincias.map((p) => (
+                      <option key={p.Provincia} value={p.Provincia}>
+                        {p.Provincia}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Ciudad</label>
+                  <select
+                    value={selectedCiudad}
+                    onChange={(e) => setSelectedCiudad(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Seleccionar Ciudad</option>
+                    {ciudades.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
               <input
