@@ -436,8 +436,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </div>
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
           {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+          <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
           <div className="flex mb-2">
             <select
               value={empleadoInput}
@@ -446,8 +446,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             >
               <option value="" disabled>Buscar empleados...</option>
               {empleados.map((emp, index) => (
-                <option key={index} value={`${emp.nombres} ${emp.apellidos}`}>
-                  {`${emp.nombres} ${emp.apellidos}`}
+                <option key={index} value={`${emp.distintivo} ${emp.nombres} ${emp.apellidos}`}>
+                  {`${emp.distintivo} ${emp.nombres} ${emp.apellidos}`}
                 </option>
               ))}
             </select>
@@ -486,6 +486,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             )}
           </div>
         </div>
+
 
 
         <div className="mb-4">
