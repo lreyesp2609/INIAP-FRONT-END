@@ -16,6 +16,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [error, setError] = useState(null);
   const [datosPersonales, setDatosPersonales] = useState(null);
   const navigate = useNavigate();
+  const [lugarServicio, setLugarServicio] = useState('');
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -139,6 +140,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           hora_llegada_solicitud: horaLlegada,
           descripcion_actividades: actividades,
           listado_empleado: listadoEmpleados,
+          lugar_servicio: lugarServicio,  // Agregar lugar_servicio al cuerpo del request
           id_empleado: idEmpleado,
         }),
       });
@@ -189,55 +191,65 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
         </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
-        <select
-          value={motivo}
-          onChange={(e) => setMotivo(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        >
-          <option value="">Selecciona un motivo...</option>
-          {motivos.map((motivo, index) => (
-            <option key={index} value={motivo}>
-              {motivo}
-            </option>
-          ))}
-        </select>
-      </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
+          <select
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Selecciona un motivo...</option>
+            {motivos.map((motivo, index) => (
+              <option key={index} value={motivo}>
+                {motivo}
+              </option>
+            ))}
+          </select>
+        </div>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
-        DATOS GENERALES
-      </h2>
-      <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+          DATOS GENERALES
+        </h2>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         {datosPersonales && (
           <div className="mb-4 flex">
-          <div className="mr-4 w-1/2">
-          <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
-            <input
-              type="text"
-              value={`${datosPersonales.Nombre}`}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-            />
-            <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
-            <input
-              type="text"
-              value={`${datosPersonales.Cargo}`}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-            />
-            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
-            <input
-              type="text"
-              value={`${datosPersonales.Unidad}`}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            <div className="mr-4 w-1/2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+              <input
+                type="text"
+                value={`${datosPersonales.Nombre}`}
+                readOnly
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+              />
+              <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
+              <input
+                type="text"
+                value={`${datosPersonales.Cargo}`}
+                readOnly
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+              />
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">LUGAR DE SERVICIO</label>
+                <input
+                  type="text"
+                  value={lugarServicio}
+                  onChange={(e) => setLugarServicio(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+              <input
+                type="text"
+                value={`${datosPersonales.Unidad}`}
+                readOnly
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
         )}
-                <div className="mb-4 flex">
+        <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
             <input
