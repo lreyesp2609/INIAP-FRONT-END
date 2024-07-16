@@ -4,7 +4,8 @@ import { FaEdit, FaBan, FaEye } from 'react-icons/fa';
 import SolicitarMovilizacion from './SolicitarMovilizacion';
 import EditarSolicitudMovilizacion from './EditarSolicitudMovilizacion';
 import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
-
+import CancelarSolicitudMovilizacionModal from './CancelarSolicitudMovilizacion';
+import HabilitarSolicitudMovilizacionModal from './HabilitarSolicitudMovilizacion';
 
 const ListarMovilizacion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -21,6 +22,10 @@ const ListarMovilizacion = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [viewMode, setViewMode] = useState('pendientes');
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [habilitarModalVisible, setHabilitarModalVisible] = useState(false);
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const userId = storedUser?.usuario?.id_usuario;  
 
   useEffect(() => {
     fetchSolicitudes();
@@ -206,35 +211,33 @@ const ListarMovilizacion = () => {
     return <EditarSolicitudMovilizacion orderId={selectedOrderId} onClose={handleCloseEditarMovilizacion} />;
   }
 
-  const handleCancelClick = async (ordenId) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token no encontrado');
-      }
-  
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/cancelar-orden/${ordenId}/`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `${token}`, 
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al cancelar orden de movilización');
-      }
-  
-      const data = await response.json();
-      console.log(data.mensaje); 
-  
-      fetchSolicitudes(); 
-    } catch (error) {
-      console.error('Error al cancelar orden:', error.message);
-      setError(error.message);
-    }
+
+  const openCancelModal = (ordenId) => {
+    setSelectedOrderId(ordenId);
+    setCancelModalVisible(true);
   };
+
+  const openHabilitarModal = (ordenId) => {
+    setSelectedOrderId(ordenId);
+    setHabilitarModalVisible(true);
+  };
+
+  const closeCancelModal = () => {
+    setCancelModalVisible(false);
+  };
+
+  const closeHabilitarModal = () => {
+    setHabilitarModalVisible(false);
+  };
+
+  const handleCancelarOrden = () => {
+    fetchSolicitudes();
+  };
+
+  const handleHabilitarOrden = () => {
+    fetchSolicitudes();
+  };
+
 
   const handleShowPending = () => {
     setViewMode('pendientes');
@@ -356,7 +359,8 @@ const ListarMovilizacion = () => {
                         <button
                           className="p-2 bg-red-500 text-white rounded-full"
                           title="Cancelar Solicitud de Movilización"
-                          onClick={() => handleCancelClick(solicitud.id_orden_movilizacion)}
+                          onClick={() => openCancelModal(solicitud.id_orden_movilizacion)}
+                          disabled={solicitud.habilitado === 0}
                         >
                           <FaBan />
                         </button>
@@ -366,7 +370,8 @@ const ListarMovilizacion = () => {
                       <button
                         className="p-2 bg-green-500 text-white rounded-full"
                         title="Habilitar Solicitud de Movilización"
-                        onClick={() => handleEnableClick(solicitud.id_orden_movilizacion)}
+                        onClick={() => openHabilitarModal(solicitud.id_orden_movilizacion)}
+                        disabled={solicitud.habilitado === 1}
                       >
                         Habilitar
                       </button>
@@ -417,6 +422,20 @@ const ListarMovilizacion = () => {
           Siguiente
         </button>
       </div>
+      <CancelarSolicitudMovilizacionModal
+        ordenId={selectedOrderId}
+        userId={userId}
+        onCancel={handleCancelarOrden}
+        visible={cancelModalVisible}
+        onClose={closeCancelModal}
+      />
+      <HabilitarSolicitudMovilizacionModal
+        ordenId={selectedOrderId}
+        userId={userId}
+        onHabilitar={handleHabilitarOrden}
+        visible={habilitarModalVisible}
+        onClose={closeHabilitarModal}
+      />
     </div>
   );
 };
