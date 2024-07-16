@@ -22,10 +22,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [empleados, setEmpleados] = useState([]);
-const [empleadoInput, setEmpleadoInput] = useState('');
-const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
-const [empleadoManual, setEmpleadoManual] = useState('');
-const [mostrarInputManual, setMostrarInputManual] = useState(false);
+  const [empleadoInput, setEmpleadoInput] = useState('');
+  const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
+  const [empleadoManual, setEmpleadoManual] = useState('');
+  const [mostrarInputManual, setMostrarInputManual] = useState(false);
+
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -164,13 +165,13 @@ const [mostrarInputManual, setMostrarInputManual] = useState(false);
         setError('Token no encontrado');
         return;
       }
-  
+
       const response = await fetch(`${API_URL}/Informes/listar-empleados/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         setEmpleados(data.empleados || []);
@@ -182,27 +183,36 @@ const [mostrarInputManual, setMostrarInputManual] = useState(false);
       setError('Error al obtener empleados: ' + error.message);
     }
   };
-  
+
   useEffect(() => {
     fetchEmpleados();
   }, []);
 
   const handleAddEmpleado = () => {
-    if (empleadoInput) {
+    if (empleadoInput && !empleadosSeleccionados.includes(empleadoInput)) {
       setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoInput]);
       setEmpleadoInput('');
+      setError('');
+    } else if (empleadosSeleccionados.includes(empleadoInput)) {
+      setError('El empleado ya está agregado.');
     }
   };
-  
+
   const handleAddEmpleadoManual = () => {
-    if (empleadoManual) {
+    if (empleadoManual && !empleadosSeleccionados.includes(empleadoManual)) {
       setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoManual]);
       setEmpleadoManual('');
       setMostrarInputManual(false);
+      setError('');
+    } else if (empleadosSeleccionados.includes(empleadoManual)) {
+      setError('El empleado ya está agregado.');
     }
   };
-  
 
+  const handleRemoveEmpleado = (index) => {
+    const nuevosEmpleadosSeleccionados = empleadosSeleccionados.filter((_, i) => i !== index);
+    setEmpleadosSeleccionados(nuevosEmpleadosSeleccionados);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -254,243 +264,250 @@ const [mostrarInputManual, setMostrarInputManual] = useState(false);
 
   return (
     <div className="p-4">
-  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
-    SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
-  </h2>
-  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-  <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
-  {error && <div className="mb-4 text-red-500">{error}</div>}
-  <form onSubmit={handleSubmit}>
-    <div className="mb-4 flex">
-      <div className="mr-4 w-1/2">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
-        </label>
-        <input
-          type="text"
-          value={codigoSolicitud}
-          readOnly
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="w-1/2">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          FECHA DE SOLICITUD (dd-mmm-aaa)
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-        <input
-          type="text"
-          value={fechaHoraPrevisualizacion}
-          readOnly
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-    </div>
-    <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
-      <select
-        value={motivo}
-        onChange={(e) => setMotivo(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      >
-        <option value="">Selecciona un motivo...</option>
-        {motivos.map((motivo, index) => (
-          <option key={index} value={motivo}>
-            {motivo}
-          </option>
-        ))}
-      </select>
-    </div>
-    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-    <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
-      DATOS GENERALES
-    </h2>
-    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-    {datosPersonales && (
-      <div className="mb-4 flex">
-      <div className="w-10/2 mr-4">
-        <div className="flex mb-4">
-          <div className="w-10/2 mr-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
-            <input
-              type="text"
-              value={`${datosPersonales.Nombre}`}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
-            <input
-              type="text"
-              value={`${datosPersonales.Cargo}`}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
+      <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
+        SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+      </h2>
+      <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+      <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
+      {error && <div className="mb-4 text-red-500">{error}</div>}
+      <form onSubmit={handleSubmit}>
         <div className="mb-4 flex">
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-          <div className="w-1/2 mr-4">
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-2">PROVINCIA:</label>
-            <select
-              value={selectedProvincia}
-              onChange={handleProvinciaChange}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccionar Provincia</option>
-              {provincias.map((p) => (
-                <option key={p.Provincia} value={p.Provincia}>
-                  {p.Provincia}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2 mr-4">
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD:</label>
-            <select
-              value={selectedCiudad}
-              onChange={(e) => setSelectedCiudad(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccionar Ciudad</option>
-              {ciudades.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2">
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-          <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+          <div className="mr-4 w-1/2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+            </label>
             <input
               type="text"
-              value={`${datosPersonales.Unidad}`}
+              value={codigoSolicitud}
+              readOnly
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="w-1/2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              FECHA DE SOLICITUD (dd-mmm-aaa)
+            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <input
+              type="text"
+              value={fechaHoraPrevisualizacion}
               readOnly
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
-      </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
+          <select
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Selecciona un motivo...</option>
+            {motivos.map((motivo, index) => (
+              <option key={index} value={motivo}>
+                {motivo}
+              </option>
+            ))}
+          </select>
+        </div>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
+          DATOS GENERALES
+        </h2>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        {datosPersonales && (
+          <div className="mb-4 flex">
+            <div className="w-10/2 mr-4">
+              <div className="flex mb-4">
+                <div className="w-10/2 mr-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+                  <input
+                    type="text"
+                    value={`${datosPersonales.Nombre}`}
+                    readOnly
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
+                  <input
+                    type="text"
+                    value={`${datosPersonales.Cargo}`}
+                    readOnly
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="mb-4 flex">
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <div className="w-1/2 mr-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">PROVINCIA:</label>
+                  <select
+                    value={selectedProvincia}
+                    onChange={handleProvinciaChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Seleccionar Provincia</option>
+                    {provincias.map((p) => (
+                      <option key={p.Provincia} value={p.Provincia}>
+                        {p.Provincia}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2 mr-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD:</label>
+                  <select
+                    value={selectedCiudad}
+                    onChange={(e) => setSelectedCiudad(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Seleccionar Ciudad</option>
+                    {ciudades.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+                  <input
+                    type="text"
+                    value={`${datosPersonales.Unidad}`}
+                    readOnly
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        )}
+        <div className="mb-4 flex">
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
+            <input
+              type="date"
+              value={fechaSalida}
+              onChange={(e) => setFechaSalida(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Salida</label>
+            <input
+              type="time"
+              value={horaSalida}
+              onChange={(e) => setHoraSalida(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Llegada</label>
+            <input
+              type="date"
+              value={fechaLlegada}
+              onChange={(e) => setFechaLlegada(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Llegada</label>
+            <input
+              type="time"
+              value={horaLlegada}
+              onChange={(e) => setHoraLlegada(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+          <div className="flex mb-2">
+            <select
+              value={empleadoInput}
+              onChange={(e) => setEmpleadoInput(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>Buscar empleados...</option>
+              {empleados.map((emp, index) => (
+                <option key={index} value={`${emp.nombres} ${emp.apellidos}`}>
+                  {`${emp.nombres} ${emp.apellidos}`}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={handleAddEmpleado} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              +
+            </button>
+          </div>
+          <div className="flex flex-wrap mb-2">
+            {empleadosSeleccionados.map((empleado, index) => (
+              <span key={index} className="mr-2 p-2 bg-gray-200 rounded flex items-center">
+                {empleado}
+                <button type="button" onClick={() => handleRemoveEmpleado(index)} className="ml-2 px-2 text-red-500 hover:text-red-700">
+                  &times;
+                </button>
+              </span>
+            ))}
+          </div>
+          <div className="flex mb-2">
+            {mostrarInputManual ? (
+              <>
+                <input
+                  type="text"
+                  value={empleadoManual}
+                  onChange={(e) => setEmpleadoManual(e.target.value)}
+                  placeholder="Otro empleado..."
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button type="button" onClick={handleAddEmpleadoManual} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  +
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={() => setMostrarInputManual(true)} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Otro...
+              </button>
+            )}
+          </div>
+        </div>
+
+
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
+          <textarea
+            value={actividades}
+            onChange={(e) => setActividades(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <div className="flex justify-between">
+          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Enviar
+          </button>
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+            Cancelar
+          </button>
+        </div>
+      </form>
     </div>
-    
-    )}
-    <div className="mb-4 flex">
-      <div className="mr-4 w-1/4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
-        <input
-          type="date"
-          value={fechaSalida}
-          onChange={(e) => setFechaSalida(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      <div className="mr-4 w-1/4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Hora Salida</label>
-        <input
-          type="time"
-          value={horaSalida}
-          onChange={(e) => setHoraSalida(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      <div className="mr-4 w-1/4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Llegada</label>
-        <input
-          type="date"
-          value={fechaLlegada}
-          onChange={(e) => setFechaLlegada(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-      <div className="w-1/4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Hora Llegada</label>
-        <input
-          type="time"
-          value={horaLlegada}
-          onChange={(e) => setHoraLlegada(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
-    </div>
-    <div className="mb-4">
-  <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
-  <div className="flex mb-2">
-    <input
-      type="text"
-      value={empleadoInput}
-      onChange={(e) => setEmpleadoInput(e.target.value)}
-      placeholder="Buscar empleados..."
-      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      list="empleados-list"
-    />
-    <datalist id="empleados-list">
-      {empleados.filter(emp => emp.nombres.toLowerCase().includes(empleadoInput.toLowerCase()) || emp.apellidos.toLowerCase().includes(empleadoInput.toLowerCase())).map((emp, index) => (
-        <option key={index} value={`${emp.nombres} ${emp.apellidos}`} />
-      ))}
-    </datalist>
-    <button type="button" onClick={handleAddEmpleado} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-      +
-    </button>
-  </div>
-  <div className="flex mb-2">
-    {empleadosSeleccionados.map((empleado, index) => (
-      <span key={index} className="mr-2 p-2 bg-gray-200 rounded">{empleado}</span>
-    ))}
-  </div>
-  <div className="flex mb-2">
-    {mostrarInputManual ? (
-      <>
-        <input
-          type="text"
-          value={empleadoManual}
-          onChange={(e) => setEmpleadoManual(e.target.value)}
-          placeholder="Otro empleado..."
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button type="button" onClick={handleAddEmpleadoManual} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          +
-        </button>
-      </>
-    ) : (
-      <button type="button" onClick={() => setMostrarInputManual(true)} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-        Otro...
-      </button>
-    )}
-  </div>
-</div>
-    <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
-      <textarea
-        value={actividades}
-        onChange={(e) => setActividades(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        rows="4"
-        required
-      ></textarea>
-    </div>
-    <div className="flex justify-between">
-      <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-        Enviar
-      </button>
-      <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-        Cancelar
-      </button>
-    </div>
-  </form>
-</div>
   );
 };
 
