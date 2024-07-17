@@ -4,6 +4,7 @@ import Navbar from "../Login/navbar";
 import LeftMenu from "./lateralizquierdo";
 import GestionEmpleados from "../Modulo Administrador/Empleados/gestionempleados";
 import ChangePasswordModal from "../Login/changepasswordmodal";
+import ListarMovilizaciones from "./Ordenes de Movilizacion/ListarMovilizaciones";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -100,6 +101,7 @@ const MenuAdministrador = () => {
           </div>
         )}
         {view === "gestion-empleados" && <GestionEmpleados />}
+        {view === 'gestion-movilizaciones' && <ListarMovilizaciones />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
