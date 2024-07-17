@@ -90,6 +90,46 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   }, []);
 
 
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let day = now.getDate();
+    month = month < 10 ? '0' + month : month;
+    day = day < 10 ? '0' + day : day;
+    const currentDate = `${year}-${month}-${day}`;
+
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    const currentTime = `${hours}:${minutes}`;
+
+    return {
+      currentDate,
+      currentTime,
+    };
+  };
+
+  // Validar que la fecha y hora de salida no puedan ser menores que la actual
+  const validateFechaHoraSalida = () => {
+    const { currentDate, currentTime } = getCurrentDateTime();
+    if (fechaSalida < currentDate || (fechaSalida === currentDate && horaSalida < currentTime)) {
+      setError('La fecha y hora de salida no pueden ser menores que la actual del sistema.');
+      return false;
+    }
+    return true;
+  };
+
+  // Validar que la fecha y hora de llegada no sean menores que la fecha y hora de salida
+  const validateFechaHoraLlegada = () => {
+    if (fechaLlegada < fechaSalida || (fechaLlegada === fechaSalida && horaLlegada <= horaSalida)) {
+      setError('La fecha y hora de llegada deben ser posteriores a la fecha y hora de salida.');
+      return false;
+    }
+    return true;
+  };
+
   const fetchMotivos = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -217,19 +257,34 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
-
+  
     const formattedFechaSalida = fechaSalida ? fechaSalida : null;
     const formattedFechaLlegada = fechaLlegada ? fechaLlegada : null;
-
+  
+    // Validación de fechas y horas
+    const currentDateTime = new Date();
+    const selectedFechaSalida = new Date(`${formattedFechaSalida}T${horaSalida}`);
+    const selectedFechaLlegada = new Date(`${formattedFechaLlegada}T${horaLlegada}`);
+  
+    if (selectedFechaSalida < currentDateTime) {
+      setError('La Fecha Salida y Hora Salida no pueden ser menores que la fecha y hora actual.');
+      return;
+    }
+  
+    if (selectedFechaLlegada < selectedFechaSalida) {
+      setError('La Fecha Llegada y Hora Llegada no pueden ser menores que la Fecha Salida y Hora Salida.');
+      return;
+    }
+  
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const idUsuario = storedUser.usuario.id_usuario;
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado');
       return;
     }
-
+  
     try {
       const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idUsuario}/`, {
         method: 'POST',
@@ -249,7 +304,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           id_empleado: idEmpleado,
         }),
       });
-
+  
       if (response.ok) {
         onClose();
         navigate('/menu-empleados');
@@ -261,7 +316,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       setError('Error al crear la solicitud: ' + error.message);
     }
   };
-
+  
   return (
     <div className="p-4">
       <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
@@ -313,9 +368,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </select>
         </div>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
-          DATOS GENERALES
-        </h2>
+        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS GENERALES</h2>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         {datosPersonales && (
           <div className="mb-4 flex">
@@ -345,11 +398,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                 <div className="w-1/2 mr-4">
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">PROVINCIA:</label>
                   <select
                     value={selectedProvincia}
                     onChange={handleProvinciaChange}
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   >
                     <option value="">Seleccionar Provincia</option>
                     {provincias.map((p) => (
@@ -363,11 +416,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD:</label>
                   <select
                     value={selectedCiudad}
                     onChange={(e) => setSelectedCiudad(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   >
                     <option value="">Seleccionar Ciudad</option>
                     {ciudades.map((c) => (
@@ -378,9 +431,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                   </select>
                 </div>
                 <div className="w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
                   <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
                   <input
                     type="text"
                     value={`${datosPersonales.Unidad}`}
@@ -395,7 +447,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         )}
         <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Salida</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA (dd-mmm-aaaa)</label>
             <input
               type="date"
               value={fechaSalida}
@@ -405,7 +457,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
           <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Salida</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA (hh:mm)</label>
             <input
               type="time"
               value={horaSalida}
@@ -415,7 +467,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
           <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Fecha Llegada</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA (dd-mmm-aaaa)</label>
             <input
               type="date"
               value={fechaLlegada}
@@ -425,7 +477,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
           <div className="w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Hora Llegada</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA (hh:mm)</label>
             <input
               type="time"
               value={horaLlegada}
@@ -486,9 +538,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             )}
           </div>
         </div>
-
-
-
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
           <textarea
