@@ -97,7 +97,7 @@ const MenuAdministrador = () => {
       <div className="w-3/4 p-4 ml-auto mt-16">
         {view === "home" && (
           <div className="flex justify-center items-center">
-            <h1 className="text-3xl">Bienvenido Super Usuario</h1>
+            <h1 className="text-3xl">Bienvenido Administrador</h1>
           </div>
         )}
         {view === "gestion-empleados" && <GestionEmpleados />}

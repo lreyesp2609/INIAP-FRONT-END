@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { FaBan, FaEye } from 'react-icons/fa';
+import { FaBan, FaEye, FaCheck } from 'react-icons/fa';
 import API_URL from '../../../Config';
 import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
-
+import AprobarSolicitudesModal from './AprobarSolicitudMovilizacion';
+import RechazarSolicitudesModal from './RechazarSolicitudMovilizacion';
 
 const ListarMovilizaciones = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [showVer, setShowVer] = useState(false);
+  const [showAprobarModal, setShowAprobarModal] = useState(false);
+  const [showRechazarModal, setShowRechazarModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
@@ -17,6 +20,8 @@ const ListarMovilizaciones = () => {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const userId = storedUser?.usuario?.id_usuario;  
 
   useEffect(() => {
     fetchSolicitudes();
@@ -182,13 +187,32 @@ const ListarMovilizaciones = () => {
   }
 
   const handleAccept = (idOrden) => {
-    // Lógica para aceptar la solicitud (por ejemplo, enviar una solicitud al backend)
-    console.log(`Solicitud ${idOrden} aceptada`);
+    setSelectedOrderId(idOrden);
+    setShowAprobarModal(true);
   };
-
+  
   const handleReject = (idOrden) => {
-    // Lógica para rechazar la solicitud (por ejemplo, enviar una solicitud al backend)
-    console.log(`Solicitud ${idOrden} rechazada`);
+    setSelectedOrderId(idOrden);
+    setShowRechazarModal(true);
+  };
+  
+  const handleConfirmAprobar = async (motivo) => {
+    // Lógica para aprobar la solicitud con el motivo
+    console.log(`Solicitud ${selectedOrderId} aceptada con motivo: ${motivo}`);
+    setShowAprobarModal(false);
+    fetchSolicitudes();
+  };
+  
+  const handleConfirmRechazar = async (motivo) => {
+    // Lógica para rechazar la solicitud con el motivo
+    console.log(`Solicitud ${selectedOrderId} rechazada con motivo: ${motivo}`);
+    setShowRechazarModal(false);
+    fetchSolicitudes();
+  };
+  
+  const handleCancelModal = () => {
+    setShowAprobarModal(false);
+    setShowRechazarModal(false);
   };
 
   return (
@@ -245,15 +269,15 @@ const ListarMovilizaciones = () => {
                 <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
                   <button
                     className="p-2 bg-green-500 text-white rounded-full"
-                    title="Ver"
-                    onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                    title="Aceptar"
+                    onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
                   >
-                    <FaEye />
+                    <FaCheck />
                   </button>
                   <button
                     className="p-2 bg-yellow-500 text-white rounded-full"
-                    title="Aceptar"
-                    onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
+                    title="Ver"
+                    onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
                   >
                     <FaEye />
                   </button>
@@ -287,6 +311,22 @@ const ListarMovilizaciones = () => {
           Siguiente
         </button>
       </div>
+
+      <AprobarSolicitudesModal
+        ordenId={selectedOrderId}
+        userId={userId}
+        visible={showAprobarModal}
+        onAprobar={handleConfirmAprobar}
+        onClose={handleCancelModal}
+      />
+      <RechazarSolicitudesModal
+        ordenId={selectedOrderId}
+        userId={userId}
+        visible={showRechazarModal}
+        onRechazar={handleConfirmRechazar}
+        onClose={handleCancelModal}
+      />
+
     </div>
   );
 };
