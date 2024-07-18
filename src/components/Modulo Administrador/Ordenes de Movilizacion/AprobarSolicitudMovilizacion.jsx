@@ -4,6 +4,7 @@ import { Modal, Input, notification } from 'antd';
 
 const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onAprobar }) => {
   const [motivo, setMotivo] = useState('');
+  const [secuencial, setSecuencial] = useState('');
 
   const handleOk = async () => {
     const token = localStorage.getItem('token');
@@ -18,6 +19,7 @@ const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onApr
     try {
       const formData = new FormData();
       formData.append('motivo', motivo);
+      formData.append('secuencial_orden_movilizacion', secuencial)
 
       const response = await fetch(
         `${API_URL}/OrdenesMovilizacion/aprobar-orden/${userId}/${ordenId}/`,
@@ -66,6 +68,12 @@ const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onApr
         onChange={(e) => setMotivo(e.target.value)}
         placeholder="Motivo (opcional)"
         rows={4}
+      />
+      <Input.TextArea
+        value={secuencial}
+        onChange={(e) => setSecuencial(e.target.value)}
+        placeholder="Ingrese el Secuelcial del Preimpreso"
+        rows={1}
       />
     </Modal>
   );
