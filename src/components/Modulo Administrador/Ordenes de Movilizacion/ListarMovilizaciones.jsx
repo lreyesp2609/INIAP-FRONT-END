@@ -9,6 +9,7 @@ const ListarMovilizaciones = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
+  const [motivos, setMotivos] = useState([]);
   const [showVer, setShowVer] = useState(false);
   const [showAprobarModal, setShowAprobarModal] = useState(false);
   const [showRechazarModal, setShowRechazarModal] = useState(false);
@@ -24,14 +25,23 @@ const ListarMovilizaciones = () => {
   const userId = storedUser?.usuario?.id_usuario;  
 
   useEffect(() => {
-    fetchSolicitudes();
-    fetchConductores();
-    fetchVehiculos();
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const idUsuario = storedUser?.usuario?.id_usuario;
+  
+    if (idUsuario) {
+      fetchSolicitudes();
+      fetchConductores();
+      fetchVehiculos();
+      fetchMotivos(idUsuario);
+    }
   }, []);
-
+  
   useEffect(() => {
-    applyFilters();
+    if (solicitudes.length > 0) {
+      applyFilters();
+    }
   }, [solicitudes, viewMode]);
+  
 
   const applyFilters = () => {
     let filtered = [];
@@ -41,11 +51,11 @@ const ListarMovilizaciones = () => {
       );
     } else if (viewMode === 'aprobadas') {
       filtered = solicitudes.filter((solicitud) => solicitud.estado_movilizacion === 'Aprobado');
+    } else if (viewMode === 'rechazadas') {
+      filtered = solicitudes.filter((solicitud) => solicitud.estado_movilizacion === 'Denegado');
     } else if (viewMode === 'historial') {
-      filtered = solicitudes;
-    } else if (viewMode === 'historialMovilizaciones') {
       filtered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Finalizado'
+        (solicitud) => solicitud.estado_movilizacion === 'Denegado' || solicitud.estado_movilizacion === 'Aprobado'
       );
     }
 
@@ -125,29 +135,47 @@ const ListarMovilizaciones = () => {
     }
   };
 
+  const fetchMotivos = async (idUsuario) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${idUsuario}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+  
+      if (!response.ok) throw new Error('Error al obtener motivos');
+  
+      const motivos = await response.json();
+      if (!Array.isArray(motivos)) {
+        throw new Error('Datos de motivos no válidos');
+      }
+      setMotivos(motivos);
+    } catch (error) {
+      setError('Error al obtener motivos');
+      console.error('Error fetching motivos:', error);
+    }
+  };
+  
+  
+  
+
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
   
-    const filtered = solicitudes.filter((solicitud) => {
-      const lugarOrigenDestino = solicitud.lugar_origen_destino_movilizacion?.toLowerCase() || '';
-      const motivo = solicitud.motivo_movilizacion?.toLowerCase() || '';
-      const placa = vehiculos.find(vehiculo => vehiculo.id_vehiculo === solicitud.id_vehiculo)?.placa?.toLowerCase() || '';
-      const conductorNombre = conductores.find(conductor => conductor.id_empleado === solicitud.id_empleado)?.nombres?.toLowerCase() || '';
-      const conductorApellido = conductores.find(conductor => conductor.id_empleado === solicitud.id_empleado)?.apellidos?.toLowerCase() || '';
-  
-      return (
-        lugarOrigenDestino.includes(searchValue) ||
-        motivo.includes(searchValue) ||
-        placa.includes(searchValue) ||
-        conductorNombre.includes(searchValue) ||
-        conductorApellido.includes(searchValue)
-      );
-    });
+    const filtered = solicitudes.filter(
+      (solicitud) =>
+        solicitud.lugar_origen_destino_movilizacion.toLowerCase().includes(searchValue) ||
+        solicitud.motivo_movilizacion.toLowerCase().includes(searchValue) ||
+        getVehiculoPlaca(solicitud.id_vehiculo).toLowerCase().includes(searchValue) ||
+        getConductorName(solicitud.id_conductor).toLowerCase().includes(searchValue)
+    );
   
     setFilteredSolicitudes(filtered);
     setCurrentPage(1);
   };
+  
   
 
   const handleClear = () => {
@@ -186,6 +214,12 @@ const ListarMovilizaciones = () => {
     return <VerSolicitudMovilizacion orderId={selectedOrderId} onClose={handleCloseVer} />;
   }
 
+
+  const getMotivos = (idOrden) => {
+    return motivos.find((m) => m.id_orden_movilizacion === idOrden) || {};
+  };  
+  
+
   const handleAccept = (idOrden) => {
     setSelectedOrderId(idOrden);
     setShowAprobarModal(true);
@@ -197,17 +231,17 @@ const ListarMovilizaciones = () => {
   };
   
   const handleConfirmAprobar = async (motivo) => {
-    // Lógica para aprobar la solicitud con el motivo
-    console.log(`Solicitud ${selectedOrderId} aceptada con motivo: ${motivo}`);
     setShowAprobarModal(false);
     fetchSolicitudes();
+    await fetchSolicitudes();
+    await fetchMotivos(userId);
   };
   
   const handleConfirmRechazar = async (motivo) => {
-    // Lógica para rechazar la solicitud con el motivo
-    console.log(`Solicitud ${selectedOrderId} rechazada con motivo: ${motivo}`);
     setShowRechazarModal(false);
     fetchSolicitudes();
+    await fetchSolicitudes();
+    await fetchMotivos(userId);
   };
   
   const handleCancelModal = () => {
@@ -215,10 +249,52 @@ const ListarMovilizaciones = () => {
     setShowRechazarModal(false);
   };
 
+  const handleShowPending = () => {
+    setViewMode('pendientes');
+  };
+
+  const handleShowAproved = () => {
+    setViewMode('aprobadas');
+  };
+
+  const handleShowReject = () => {
+    setViewMode('rechazadas');
+  };
+
+  const handleShowHistory = () => {
+    setViewMode('historial');
+  };
+
   return (
     <div className="p-4 sm:p-6">
-      <h2 className="text-2xl font-bold text-center mb-4">Lista de Movilizaciones</h2>
-
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-center mb-4">Lista de Movilizaciones</h2>
+        <button
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4"
+          onClick={handleShowPending}
+        >
+          Solicitudes Pendientes
+        </button>
+        <button
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
+          onClick={handleShowAproved}
+        >
+          Solicitudes Aprobadas
+        </button>
+        <button
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-4"
+          onClick={handleShowReject}
+        >
+          Solicitudes Rechazadas
+        </button>
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ml-4"
+          onClick={handleShowHistory}
+        >
+          Historial de Acciones
+        </button>
+      </div>
+  
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <div className="mb-4">
         <div className="flex">
@@ -238,80 +314,105 @@ const ListarMovilizaciones = () => {
           </button>
         </div>
       </div>
-
-
+  
       <div className="overflow-x-auto mb-4">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            {(viewMode !== 'pendientes') && (
+                <>
+                  <th className="py-3 px-6 text-left">Fecha</th>
+                  <th className="py-3 px-6 text-left">Administrador</th>
+                  <th className="py-3 px-6 text-left">Observación</th>
+                </>
+              )}
+              <th className="py-3 px-6 text-left">Estado</th>
               <th className="py-3 px-6 text-left">Origen - Destino</th>
               <th className="py-3 px-6 text-left">Motivo</th>
-              <th className="py-3 px-6 text-left">Estado</th>
-              <th className="py-3 px-6 text-left">Funcionario</th>
               <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
-              <th className="py-3 px-6 text-left">Duración</th>
+              <th className="py-3 px-6 text-left">Funcionario</th>
               <th className="py-3 px-6 text-left">Conductor</th>
               <th className="py-3 px-6 text-left">Placa de Vehículo</th>
               <th className="py-3 px-6 text-left">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {solicitudes.map((solicitud, index) => (
-              <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
-                <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
-                <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
-                <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_empleado)}</td>
-                <td className="py-3 px-6 text-left">{solicitud.fecha_hora_emision}</td>
-                <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
-                <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
-                <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
-                <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                  <button
-                    className="p-2 bg-green-500 text-white rounded-full"
-                    title="Aceptar"
-                    onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
-                  >
-                    <FaCheck />
-                  </button>
-                  <button
-                    className="p-2 bg-yellow-500 text-white rounded-full"
-                    title="Ver"
-                    onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                  >
-                    <FaEye />
-                  </button>
-                  <button
-                    className="p-2 bg-red-500 text-white rounded-full"
-                    title="Rechazar"
-                    onClick={() => handleReject(solicitud.id_orden_movilizacion)}
-                  >
-                    <FaBan />
-                  </button>
-                </td>
+            {filteredSolicitudes.length > 0 ? (
+              filteredSolicitudes.map((solicitud, index) => {
+            
+                const motivosOrden = getMotivos(solicitud.id_orden_movilizacion);
+                return (
+                  <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
+                    {(viewMode !== 'pendientes') && (
+                      <>
+                        <td className="py-3 px-6 text-left">{motivosOrden.fecha}</td>
+                        <td className="py-3 px-6 text-left">{getConductorName(motivosOrden.id_empleado)}</td>
+                        <td className="py-3 px-6 text-left">{motivosOrden.motivo}</td>
+                      </>
+                    )}
+                    <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
+                    <td className="py-3 px-6 text-left">{solicitud.lugar_origen_destino_movilizacion}</td>
+                    <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
+                    <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
+                    <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_empleado)}</td>
+                    <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
+                    <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
+                    <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
+                      <button
+                        className="p-2 bg-green-500 text-white rounded-full"
+                        title="Aceptar"
+                        onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaCheck />
+                      </button>
+                      <button
+                        className="p-2 bg-yellow-500 text-white rounded-full"
+                        title="Ver"
+                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaEye />
+                      </button>
+                      <button
+                        className="p-2 bg-red-500 text-white rounded-full"
+                        title="Rechazar"
+                        onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaBan />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="10" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        <span>{`Página ${currentPage} de ${totalPages}`}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-          disabled={currentPage === totalPages}
-        >
-          Siguiente
-        </button>
+      <div>
+        {filteredSolicitudes.length > 0 && (
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
-
+  
       <AprobarSolicitudesModal
         ordenId={selectedOrderId}
         userId={userId}
@@ -326,9 +427,9 @@ const ListarMovilizaciones = () => {
         onRechazar={handleConfirmRechazar}
         onClose={handleCancelModal}
       />
-
     </div>
   );
+  
 };
 
 export default ListarMovilizaciones;
