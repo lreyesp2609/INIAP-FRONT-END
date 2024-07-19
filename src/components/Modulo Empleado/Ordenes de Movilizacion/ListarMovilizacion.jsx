@@ -405,22 +405,26 @@ const ListarMovilizacion = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        <span>{`Página ${currentPage} de ${totalPages}`}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-          disabled={currentPage === totalPages}
-        >
-          Siguiente
-        </button>
+      <div >
+      {filteredSolicitudes.length > 0 && (
+            <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
+          )}
       </div>
       <CancelarSolicitudMovilizacionModal
         ordenId={selectedOrderId}

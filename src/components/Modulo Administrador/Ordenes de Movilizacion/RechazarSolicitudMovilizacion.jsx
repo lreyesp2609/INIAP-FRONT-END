@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import API_URL from '../../../Config';
 import { Modal, Input, notification } from 'antd';
 
-const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onAprobar }) => {
+const RechazarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onRechazar }) => {
   const [motivo, setMotivo] = useState('');
-  const [secuencial, setSecuencial] = useState('');
 
   const handleOk = async () => {
     const token = localStorage.getItem('token');
@@ -19,10 +18,9 @@ const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onApr
     try {
       const formData = new FormData();
       formData.append('motivo', motivo);
-      formData.append('secuencial_orden_movilizacion', secuencial)
 
       const response = await fetch(
-        `${API_URL}/OrdenesMovilizacion/aprobar-orden/${userId}/${ordenId}/`,
+        `${API_URL}/OrdenesMovilizacion/rechazar-orden/${userId}/${ordenId}/`,
         {
           method: 'POST',
           headers: {
@@ -35,48 +33,42 @@ const AprobarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onApr
       if (response.ok) {
         notification.success({
           message: 'Éxito',
-          description: 'Solicitud aprobada exitosamente',
+          description: 'Solicitud rechazada exitosamente',
         });
-        onAprobar();
+        onRechazar();
         onClose();
       } else {
         const errorData = await response.json();
         notification.error({
           message: 'Error',
-          description: errorData.error || 'Error al aprobar solicitud',
+          description: errorData.error || 'Error al rechazar solicitud',
         });
       }
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: 'Error al aprobar solicitud',
+        description: 'Error al rechazar solicitud',
       });
     }
   };
 
   return (
     <Modal
-      title="Aprobar Solicitud"
+      title="Rechazar Solicitud"
       visible={visible}
       onOk={handleOk}
       onCancel={onClose}
-      okText="Aprobar"
+      okText="Rechazar"
       cancelText="Cancelar"
     >
       <Input.TextArea
         value={motivo}
         onChange={(e) => setMotivo(e.target.value)}
-        placeholder="Motivo (opcional)"
+        placeholder="Motivo (requerido)"
         rows={4}
-      />
-      <Input.TextArea
-        value={secuencial}
-        onChange={(e) => setSecuencial(e.target.value)}
-        placeholder="Ingrese el Secuelcial del Preimpreso"
-        rows={1}
       />
     </Modal>
   );
 };
 
-export default AprobarSolicitudMovilizacion;
+export default RechazarSolicitudMovilizacion;
