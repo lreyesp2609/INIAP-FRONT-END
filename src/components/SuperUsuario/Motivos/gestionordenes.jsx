@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 import AgregarMotivo from "./agregarmotivo";
 import EditarMotivo from "./editarmotivo";
+import HabilitarOrden from "./habilitarorden";
+
 const GestionOrdenes = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [filteredOrdenes, setFilteredOrdenes] = useState([]);
@@ -95,10 +97,7 @@ const GestionOrdenes = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredOrdenes.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredOrdenes.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredOrdenes.length / itemsPerPage);
 
   return (
@@ -135,16 +134,14 @@ const GestionOrdenes = () => {
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
                 onClick={handleHabilitarOrdenes}
-                className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 
-                border-yellow-700 hover:border-yellow-300 rounded"
+                className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-300 rounded"
               >
                 <FontAwesomeIcon icon={faEye} className="mr-2" />
                 Ver Órdenes Deshabilitadas
               </button>
               <button
                 onClick={handleAddOrden}
-                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 
-                border-b-4 border-green-900 hover:border-green-300 rounded"
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Agregar Orden
@@ -167,7 +164,7 @@ const GestionOrdenes = () => {
             ordenes={currentItems}
             onEditOrden={handleEditOrden}
             userId={userId}
-            fetchOrdenes={fetchOrdenes}
+            fetchOrdenes={() => fetchOrdenes(userId)}
           />
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, index) => (
