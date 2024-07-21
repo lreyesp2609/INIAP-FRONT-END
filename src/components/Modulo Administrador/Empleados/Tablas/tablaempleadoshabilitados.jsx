@@ -1,19 +1,8 @@
 import React from "react";
-import { FaEdit, FaKey } from "react-icons/fa";
-import DeshabilitarEmpleado from "../deshabilitarempleado";
-import ResetPasswordEmpleado from "../resetpasswordempleado";
+import { FaKey } from "react-icons/fa";
+import ResetPasswordEmpleado from "../../../SuperUsuario/Empleados/resetpasswordempleado";
 
-const TablaEmpleados = ({
-  empleados,
-  handleEditEmpleado,
-  user,
-  fetchEmpleados,
-}) => {
-  
-  const handleDeshabilitar = () => {
-    fetchEmpleados(user.usuario.id_usuario);
-  };
-
+const TablaEmpleados = ({ empleados, user, fetchEmpleados }) => {
   return (
     <div className="w-full">
       <div className="overflow-x-auto">
@@ -78,24 +67,10 @@ const TablaEmpleados = ({
                     {empleado.nombre_estacion}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                    <button
-                      className="p-2 bg-blue-500 text-white rounded-full"
-                      title="Editar empleado"
-                      onClick={() => handleEditEmpleado(empleado)}
-                    >
-                      <FaEdit />
-                    </button>
                     <ResetPasswordEmpleado
                       empleadoId={empleado.id_empleado}
                       userId={user.usuario.id_usuario}
                       onResetPassword={fetchEmpleados}
-                      empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
-                      empleadoCedula={empleado.cedula}
-                    />
-                    <DeshabilitarEmpleado
-                      empleadoId={empleado.id_empleado}
-                      userId={user.usuario.id_usuario}
-                      onDeshabilitar={handleDeshabilitar}
                       empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
                       empleadoCedula={empleado.cedula}
                     />
@@ -144,24 +119,10 @@ const TablaEmpleados = ({
                 {empleado.nombre_estacion}
               </div>
               <div className="flex space-x-2">
-                <button
-                  className="p-2 bg-blue-500 text-white rounded-full"
-                  title="Editar empleado"
-                  onClick={() => handleEditEmpleado(empleado)}
-                >
-                  <FaEdit />
-                </button>
                 <ResetPasswordEmpleado
                   empleadoId={empleado.id_empleado}
                   userId={user.usuario.id_usuario}
                   onResetPassword={fetchEmpleados}
-                  empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
-                  empleadoCedula={empleado.cedula}
-                />
-                <DeshabilitarEmpleado
-                  empleadoId={empleado.id_empleado}
-                  userId={user.usuario.id_usuario}
-                  onDeshabilitar={handleDeshabilitar}
                   empleadoNombre={`${empleado.nombres} ${empleado.apellidos}`}
                   empleadoCedula={empleado.cedula}
                 />
