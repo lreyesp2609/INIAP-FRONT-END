@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBan, FaEye, FaCheck } from 'react-icons/fa';
+import { FaBan, FaEye, FaCheck, FaEdit, FaFilePdf } from 'react-icons/fa';
 import API_URL from '../../../Config';
 import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
 import AprobarSolicitudesModal from './AprobarSolicitudMovilizacion';
@@ -268,31 +268,22 @@ const ListarMovilizaciones = () => {
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-center mb-4">Lista de Movilizaciones</h2>
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4"
-          onClick={handleShowPending}
-        >
-          Solicitudes Pendientes
-        </button>
-        <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
-          onClick={handleShowAproved}
-        >
-          Solicitudes Aprobadas
-        </button>
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-4"
-          onClick={handleShowReject}
-        >
-          Solicitudes Rechazadas
-        </button>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ml-4"
-          onClick={handleShowHistory}
-        >
-          Historial de Acciones
-        </button>
+        <h2 className="text-2xl font-bold">Lista de Movilizaciones</h2>
+        
+        <div className="flex items-center">
+          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
+          <select
+            id="viewModeSelect"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="p-2 border rounded"
+          >
+            <option value="pendientes">Solicitudes Pendientes</option>
+            <option value="aprobadas">Solicitudes Aprobadas</option>
+            <option value="rechazadas">Solicitudes Rechazadas</option>
+            <option value="historial">Historial de Acciones</option>
+          </select>
+        </div>
       </div>
   
       {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -358,27 +349,49 @@ const ListarMovilizaciones = () => {
                     <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                     <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                     <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                      <button
-                        className="p-2 bg-green-500 text-white rounded-full"
-                        title="Aceptar"
-                        onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaCheck />
-                      </button>
-                      <button
-                        className="p-2 bg-yellow-500 text-white rounded-full"
-                        title="Ver"
-                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                      <button 
+                      className="p-2 bg-yellow-500 text-white rounded-full"
+                      title="Ver"
+                      onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
                       >
                         <FaEye />
                       </button>
-                      <button
-                        className="p-2 bg-red-500 text-white rounded-full"
-                        title="Rechazar"
-                        onClick={() => handleReject(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaBan />
-                      </button>
+                      {solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1 && (
+                        <>
+                          <button 
+                          className="p-2 bg-green-500 text-white rounded-full"
+                          title="Aceptar"
+                          onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaCheck />
+                          </button>
+                          <button 
+                          className="p-2 bg-red-500 text-white rounded-full"
+                          title="Rechazar"
+                          onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaBan />
+                          </button>
+                        </>
+                      )}
+                      {solicitud.estado_movilizacion === 'Aprobado' && (
+                        <>
+                          <button
+                          className="p-2 bg-blue-500 text-white rounded-full"
+                          title="Editar Motivo"
+                          onClick={() => handleEdit(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                          className="p-2 bg-red-500 text-white rounded-full"
+                          title="Exportar PDF"
+                          onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaFilePdf />
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 );
