@@ -26,6 +26,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
   const [empleadoManual, setEmpleadoManual] = useState('');
   const [mostrarInputManual, setMostrarInputManual] = useState(false);
+  const [empleadoSesion, setEmpleadoSesion] = useState(null);
 
 
 
@@ -206,23 +207,45 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/Informes/listar-empleados/`, {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser.usuario.id_usuario;
+
+      // Obtener todos los empleados
+      const responseEmpleados = await fetch(`${API_URL}/Informes/listar-empleados/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setEmpleados(data.empleados || []);
+      // Obtener el empleado de la sesión actual
+      const responseEmpleadoSesion = await fetch(`${API_URL}/Informes/listar-empleado-sesion/${idUsuario}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (responseEmpleados.ok && responseEmpleadoSesion.ok) {
+        const dataEmpleados = await responseEmpleados.json();
+        const dataEmpleadoSesion = await responseEmpleadoSesion.json();
+        setEmpleados(dataEmpleados.empleados || []);
+        setEmpleadoSesion(dataEmpleadoSesion.empleado || null);
+
+        // Añadir automáticamente el empleado de la sesión a la lista de seleccionados
+        if (dataEmpleadoSesion.empleado) {
+          const empleadoSesionNombre = `${dataEmpleadoSesion.empleado.distintivo} ${dataEmpleadoSesion.empleado.nombres} ${dataEmpleadoSesion.empleado.apellidos}`;
+          setEmpleadosSeleccionados([empleadoSesionNombre]);
+        }
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al obtener los empleados');
+        const errorEmpleados = await responseEmpleados.json();
+        const errorEmpleadoSesion = await responseEmpleadoSesion.json();
+        setError(errorEmpleados.error || errorEmpleadoSesion.error || 'Error al obtener los empleados');
       }
     } catch (error) {
       setError('Error al obtener empleados: ' + error.message);
     }
   };
+
+
 
   useEffect(() => {
     fetchEmpleados();
@@ -230,9 +253,16 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
 
   const handleAddEmpleado = () => {
     if (empleadoInput && !empleadosSeleccionados.includes(empleadoInput)) {
-      setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoInput]);
-      setEmpleadoInput('');
-      setError('');
+      const empleadoSeleccionado = empleados.find(emp =>
+        `${emp.distintivo} ${emp.nombres} ${emp.apellidos}` === empleadoInput
+      );
+      if (empleadoSeleccionado) {
+        setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoInput]);
+        setEmpleadoInput('');
+        setError('');
+      } else {
+        setError('Empleado no encontrado en la lista.');
+      }
     } else if (empleadosSeleccionados.includes(empleadoInput)) {
       setError('El empleado ya está agregado.');
     }
@@ -257,34 +287,34 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
-  
+
     const formattedFechaSalida = fechaSalida ? fechaSalida : null;
     const formattedFechaLlegada = fechaLlegada ? fechaLlegada : null;
-  
+
     // Validación de fechas y horas
     const currentDateTime = new Date();
     const selectedFechaSalida = new Date(`${formattedFechaSalida}T${horaSalida}`);
     const selectedFechaLlegada = new Date(`${formattedFechaLlegada}T${horaLlegada}`);
-  
+
     if (selectedFechaSalida < currentDateTime) {
       setError('La Fecha Salida y Hora Salida no pueden ser menores que la fecha y hora actual.');
       return;
     }
-  
+
     if (selectedFechaLlegada < selectedFechaSalida) {
       setError('La Fecha Llegada y Hora Llegada no pueden ser menores que la Fecha Salida y Hora Salida.');
       return;
     }
-  
+
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const idUsuario = storedUser.usuario.id_usuario;
-  
+
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Token no encontrado');
       return;
     }
-  
+
     try {
       const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idUsuario}/`, {
         method: 'POST',
@@ -304,7 +334,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           id_empleado: idEmpleado,
         }),
       });
-  
+
       if (response.ok) {
         onClose();
         navigate('/menu-empleados');
@@ -316,7 +346,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       setError('Error al crear la solicitud: ' + error.message);
     }
   };
-  
+
   return (
     <div className="p-4">
       <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
@@ -511,9 +541,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             {empleadosSeleccionados.map((empleado, index) => (
               <span key={index} className="mr-2 p-2 bg-gray-200 rounded flex items-center">
                 {empleado}
-                <button type="button" onClick={() => handleRemoveEmpleado(index)} className="ml-2 px-2 text-red-500 hover:text-red-700">
-                  &times;
-                </button>
+                {empleado !== `${empleadoSesion.distintivo} ${empleadoSesion.nombres} ${empleadoSesion.apellidos}` && (
+                  <button type="button" onClick={() => handleRemoveEmpleado(index)} className="ml-2 px-2 text-red-500 hover:text-red-700">
+                    &times;
+                  </button>
+                )}
               </span>
             ))}
           </div>
