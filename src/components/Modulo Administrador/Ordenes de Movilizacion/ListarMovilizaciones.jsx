@@ -49,7 +49,7 @@ const ListarMovilizaciones = () => {
     let filtered = [];
     if (viewMode === 'pendientes') {
       filtered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1
+        (solicitud) => solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1
       );
     } else if (viewMode === 'aprobadas') {
       filtered = solicitudes.filter((solicitud) => solicitud.estado_movilizacion === 'Aprobado');
@@ -358,7 +358,7 @@ const ListarMovilizaciones = () => {
                       >
                         <FaEye />
                       </button>
-                      {solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1 && (
+                      {solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1 && (
                         <>
                           <button 
                           className="p-2 bg-green-500 text-white rounded-full"

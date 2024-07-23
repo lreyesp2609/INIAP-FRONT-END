@@ -41,7 +41,7 @@ const ListarMovilizacion = () => {
     let filtered = [];
     if (viewMode === 'pendientes') {
       filtered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1
+        (solicitud) => solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1
       );
     } else if (viewMode === 'canceladas') {
       filtered = solicitudes.filter((solicitud) => solicitud.habilitado === 0);
@@ -331,7 +331,7 @@ const ListarMovilizacion = () => {
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                   <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                    {solicitud.estado_movilizacion === 'En Espera'  && (
+                    {solicitud.estado_movilizacion === 'Pendiente'  && (
                       <>
                         <button
                           className="p-2 bg-blue-500 text-white rounded-full"
