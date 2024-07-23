@@ -16,6 +16,7 @@ const ListarMovilizaciones = () => {
   const [showRechazarModal, setShowRechazarModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [selectedMotivoId, setSelectedMotivoId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [viewMode, setViewMode] = useState('pendientes');
@@ -228,11 +229,13 @@ const ListarMovilizaciones = () => {
 
   const handleAccept = (idOrden) => {
     setSelectedOrderId(idOrden);
+    fetchMotivos(userId);
     setShowAprobarModal(true);
   };
   
   const handleReject = (idOrden) => {
     setSelectedOrderId(idOrden);
+    fetchMotivos(userId);
     setShowRechazarModal(true);
   };
   
@@ -250,20 +253,24 @@ const ListarMovilizaciones = () => {
     await fetchMotivos(userId);
   };
 
-  const handleEdit = (ordenId) => {
+  const handleEdit = (ordenId, motivoId) => {
     setSelectedOrderId(ordenId);
+    setSelectedMotivoId(motivoId);
+    fetchMotivos(userId);
     setShowEditarModal(true);
   };
 
   const handleCloseEditarModal = () => {
     setShowEditarModal(false);
     setSelectedOrderId(null);
+    fetchMotivos(userId);
     fetchSolicitudes();
   };
 
   const handleCancelModal = () => {
     setShowAprobarModal(false);
     setShowRechazarModal(false);
+    fetchMotivos(userId);
     setShowEditarModal(false);
   };
 
@@ -381,7 +388,7 @@ const ListarMovilizaciones = () => {
                           <button
                           className="p-2 bg-blue-500 text-white rounded-full"
                           title="Editar Motivo"
-                          onClick={() => handleEdit(solicitud.id_orden_movilizacion)}
+                          onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
                           >
                             <FaEdit />
                           </button>
@@ -446,6 +453,7 @@ const ListarMovilizaciones = () => {
       <EditarSolicitudMovilizacion
         ordenId={selectedOrderId}
         userId={userId}
+        motivoId={selectedMotivoId}
         visible={showEditarModal}
         onClose={handleCloseEditarModal}
         onEditar={fetchSolicitudes}

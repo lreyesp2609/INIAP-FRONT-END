@@ -4,12 +4,13 @@ import API_URL from '../../../Config';
 
 const { Option } = Select;
 
-const EditarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onEditar }) => {
+const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClose, onEditar }) => {
   const [estado, setEstado] = useState('');
   const [motivo, setMotivo] = useState('');
   const [secuencial, setSecuencial] = useState('');
   const [motivos, setMotivos] = useState([]);
   const [motivosLoaded, setMotivosLoaded] = useState(false);
+  const [orden, setOrden] = useState({});
 
   useEffect(() => {
     if (visible) {
@@ -58,22 +59,23 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onEdit
       });
       return;
     }
-
+  
     try {
       const response = await fetch(`${API_URL}/OrdenesMovilizacion/detalle-orden/${userId}/${ordenId}/`, {
         headers: {
           Authorization: `${token}`,
         },
       });
-
+  
       if (!response.ok) throw new Error('Error al obtener detalles de la orden');
-
+  
       const data = await response.json();
+      setOrden(data);
       setEstado(data.estado_movilizacion);
       setSecuencial(data.secuencial_orden_movilizacion);
-
-      // Setear el motivo actual basado en la ID de orden
-      const motivoActual = motivos.find(motivo => motivo.id_orden_movilizacion === ordenId);
+  
+      // Encontrar el motivo actual
+      const motivoActual = motivos.find(motivo => motivo.id_motivo_orden === motivoId);
       setMotivo(motivoActual ? motivoActual.motivo : '');
     } catch (error) {
       notification.error({
@@ -82,8 +84,11 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onEdit
       });
     }
   };
-
+  
   const handleOk = async () => {
+    console.log('Estado:', estado);
+    console.log('Motivo:', motivo);
+    console.log('Secuencial:', secuencial);
     const token = localStorage.getItem('token');
     if (!token) {
       notification.error({
@@ -92,21 +97,33 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onEdit
       });
       return;
     }
-
+  
     try {
       const formData = new FormData();
       formData.append('estado', estado);
       formData.append('motivo', motivo);
-      formData.append('secuencial', secuencial);
-
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-motivo-orden/${userId}/${ordenId}/`, {
+      formData.append('id_motivo', motivoId);
+  
+      if (estado === 'Aprobado') {
+        if (orden.estado_movilizacion === 'Denegado') {
+          formData.append('secuencial', '0000');
+        } else if (orden.secuencial_orden_movilizacion !== secuencial) {
+          formData.append('secuencial', secuencial);
+        }
+      } else if (estado === 'Denegado') {
+        formData.append('secuencial', '0000');
+      }
+  
+      console.log('FormData to send:', formData);
+  
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-motivo/${userId}/${ordenId}/${motivoId}/`, {
         method: 'POST',
         headers: {
           Authorization: `${token}`,
         },
         body: formData,
       });
-
+  
       if (response.ok) {
         notification.success({
           message: 'Éxito',
@@ -128,7 +145,7 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, visible, onClose, onEdit
       });
     }
   };
-
+  
   return (
     <Modal
       title="Editar Motivo"
