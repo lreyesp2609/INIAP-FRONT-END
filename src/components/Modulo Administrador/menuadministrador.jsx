@@ -5,6 +5,7 @@ import LeftMenu from "./lateralizquierdo";
 import GestionEmpleados from "../Modulo Administrador/Empleados/gestionempleados";
 import ChangePasswordModal from "../Login/changepasswordmodal";
 import ListarMovilizaciones from "./Ordenes de Movilizacion/ListarMovilizaciones";
+import Calendario from "./Calendario/calendario";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -102,6 +103,7 @@ const MenuAdministrador = () => {
         )}
         {view === "gestion-empleados" && <GestionEmpleados />}
         {view === 'gestion-movilizaciones' && <ListarMovilizaciones />}
+        {view === 'calendario-ordenes-aprobadas' && <Calendario />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
