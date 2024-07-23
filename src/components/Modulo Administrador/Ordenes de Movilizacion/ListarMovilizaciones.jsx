@@ -4,6 +4,7 @@ import API_URL from '../../../Config';
 import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
 import AprobarSolicitudesModal from './AprobarSolicitudMovilizacion';
 import RechazarSolicitudesModal from './RechazarSolicitudMovilizacion';
+import EditarSolicitudMovilizacion from './EditarMotivoSolicitud';
 
 const ListarMovilizaciones = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -13,6 +14,7 @@ const ListarMovilizaciones = () => {
   const [showVer, setShowVer] = useState(false);
   const [showAprobarModal, setShowAprobarModal] = useState(false);
   const [showRechazarModal, setShowRechazarModal] = useState(false);
+  const [showEditarModal, setShowEditarModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
@@ -135,10 +137,10 @@ const ListarMovilizaciones = () => {
     }
   };
 
-  const fetchMotivos = async (idUsuario) => {
+  const fetchMotivos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${idUsuario}/`, {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${userId}/`, {
         headers: {
           Authorization: `${token}`,
         },
@@ -146,13 +148,17 @@ const ListarMovilizaciones = () => {
   
       if (!response.ok) throw new Error('Error al obtener motivos');
   
-      const motivos = await response.json();
-      if (!Array.isArray(motivos)) {
+      const motivosData = await response.json();
+      if (!Array.isArray(motivosData)) {
         throw new Error('Datos de motivos no válidos');
       }
-      setMotivos(motivos);
+      setMotivos(motivosData);
+      setMotivosLoaded(true);
     } catch (error) {
-      setError('Error al obtener motivos');
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener motivos',
+      });
       console.error('Error fetching motivos:', error);
     }
   };
@@ -243,26 +249,22 @@ const ListarMovilizaciones = () => {
     await fetchSolicitudes();
     await fetchMotivos(userId);
   };
-  
+
+  const handleEdit = (ordenId) => {
+    setSelectedOrderId(ordenId);
+    setShowEditarModal(true);
+  };
+
+  const handleCloseEditarModal = () => {
+    setShowEditarModal(false);
+    setSelectedOrderId(null);
+    fetchSolicitudes();
+  };
+
   const handleCancelModal = () => {
     setShowAprobarModal(false);
     setShowRechazarModal(false);
-  };
-
-  const handleShowPending = () => {
-    setViewMode('pendientes');
-  };
-
-  const handleShowAproved = () => {
-    setViewMode('aprobadas');
-  };
-
-  const handleShowReject = () => {
-    setViewMode('rechazadas');
-  };
-
-  const handleShowHistory = () => {
-    setViewMode('historial');
+    setShowEditarModal(false);
   };
 
   return (
@@ -440,6 +442,15 @@ const ListarMovilizaciones = () => {
         onRechazar={handleConfirmRechazar}
         onClose={handleCancelModal}
       />
+
+      <EditarSolicitudMovilizacion
+        ordenId={selectedOrderId}
+        userId={userId}
+        visible={showEditarModal}
+        onClose={handleCloseEditarModal}
+        onEditar={fetchSolicitudes}
+      />
+
     </div>
   );
   
