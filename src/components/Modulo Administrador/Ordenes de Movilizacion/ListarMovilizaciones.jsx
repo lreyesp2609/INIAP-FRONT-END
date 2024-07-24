@@ -274,6 +274,41 @@ const ListarMovilizaciones = () => {
     setShowEditarModal(false);
   };
 
+  const handlePDF = async (idOrden) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token no encontrado');
+
+        const response = await fetch(`${API_URL}/OrdenesMovilizacion/generar_pdf/${userId}/${idOrden}/pdf/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `${token}`,
+            },
+        });
+
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType || !contentType.includes('application/pdf')) {
+            throw new Error('Respuesta inesperada del servidor');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `orden_${idOrden}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error al generar o descargar el PDF:', error);
+        alert('Error al descargar el PDF. Revisa la consola para más detalles.');
+    }
+};
+
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -383,24 +418,24 @@ const ListarMovilizaciones = () => {
                           </button>
                         </>
                       )}
-                      {solicitud.estado_movilizacion === 'Aprobado' && (
-                        <>
-                          <button
-                          className="p-2 bg-blue-500 text-white rounded-full"
-                          title="Editar Motivo"
-                          onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                          className="p-2 bg-red-500 text-white rounded-full"
-                          title="Exportar PDF"
-                          onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
-                          >
-                            <FaFilePdf />
-                          </button>
-                        </>
-                      )}
+                      {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Denegado') && (
+                      <button
+                      className="p-2 bg-blue-500 text-white rounded-full"
+                      title="Editar Motivo"
+                      onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
+                      >
+                        <FaEdit />
+                      </button>
+                    )}
+                    {solicitud.estado_movilizacion === 'Aprobado' && (
+                      <button
+                      className="p-2 bg-red-500 text-white rounded-full"
+                      title="Exportar PDF"
+                      onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaFilePdf />
+                      </button>
+                    )}
                     </td>
                   </tr>
                 );
