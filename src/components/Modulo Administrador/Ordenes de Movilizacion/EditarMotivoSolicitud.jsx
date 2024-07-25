@@ -74,9 +74,13 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
       setEstado(data.estado_movilizacion);
       setSecuencial(data.secuencial_orden_movilizacion);
   
-      // Encontrar el motivo actual
       const motivoActual = motivos.find(motivo => motivo.id_motivo_orden === motivoId);
-      setMotivo(motivoActual ? motivoActual.motivo : '');
+      if (motivoActual) {
+        const motivoSinPrefijo = motivoActual.motivo.replace(/^Aprobado: |^Denegado: /, '');
+        setMotivo(motivoSinPrefijo);
+      } else {
+        setMotivo('');
+      }
     } catch (error) {
       notification.error({
         message: 'Error',
@@ -84,7 +88,7 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
       });
     }
   };
-  
+
   const handleOk = async () => {
     console.log('Estado:', estado);
     console.log('Motivo:', motivo);
@@ -97,13 +101,16 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
       });
       return;
     }
-  
+
     try {
       const formData = new FormData();
       formData.append('estado', estado);
-      formData.append('motivo', motivo);
+      
+      // Añadir prefijo adecuado al motivo antes de enviar
+      const motivoConPrefijo = `${estado}: ${motivo}`;
+      formData.append('motivo', motivoConPrefijo);
       formData.append('id_motivo', motivoId);
-  
+
       if (estado === 'Aprobado') {
         if (orden.estado_movilizacion === 'Denegado') {
           formData.append('secuencial', '0000');
@@ -113,9 +120,9 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
       } else if (estado === 'Denegado') {
         formData.append('secuencial', '0000');
       }
-  
+
       console.log('FormData to send:', formData);
-  
+
       const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-motivo/${userId}/${ordenId}/${motivoId}/`, {
         method: 'POST',
         headers: {
@@ -123,7 +130,7 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
         },
         body: formData,
       });
-  
+
       if (response.ok) {
         notification.success({
           message: 'Éxito',
@@ -145,7 +152,7 @@ const EditarSolicitudMovilizacion = ({ ordenId, userId, motivoId, visible, onClo
       });
     }
   };
-  
+
   return (
     <Modal
       title="Editar Motivo"
