@@ -669,6 +669,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </div>
           <div className="mr-3 w-1/3">
             <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
             <select
               value={nombreTransporte}
               onChange={(e) => setNombreTransporte(e.target.value)}
@@ -683,75 +684,77 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
               ))}
             </select>
           </div>
-          <div className="mr-3 w-full">
-            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
-            <div className="flex">
-              <div className="w-1/2 mr-2">
-                <select
-                  value={selectedProvinciaOrigen}
-                  onChange={handleProvinciaOrigenChange}
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Provincia Origen</option>
-                  {provincias.map((p) => (
-                    <option key={p.Provincia} value={p.Provincia}>
-                      {p.Provincia}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-1/2">
-                <select
-                  value={selectedCiudadOrigen}
-                  onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Ciudad Origen</option>
-                  {ciudadesOrigen.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex mt-2">
-              <div className="w-1/2 mr-2">
-                <select
-                  value={selectedProvinciaDestino}
-                  onChange={handleProvinciaDestinoChange}
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Provincia Destino</option>
-                  {provincias.map((p) => (
-                    <option key={p.Provincia} value={p.Provincia}>
-                      {p.Provincia}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-1/2">
-                <select
-                  value={selectedCiudadDestino}
-                  onChange={(e) => setSelectedCiudadDestino(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Ciudad Destino</option>
-                  {ciudadesDestino.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="w-1/2 mr-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL INICIO DE LA RUTA:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <select
+              value={selectedProvinciaOrigen}
+              onChange={handleProvinciaOrigenChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Provincia Inicio</option>
+              {provincias.map((p) => (
+                <option key={p.Provincia} value={p.Provincia}>
+                  {p.Provincia}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-1/2 mr-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <select
+              value={selectedCiudadOrigen}
+              onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Ciudad Inicio</option>
+              {ciudadesOrigen.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-1/2 mr-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL FINAL DE LA RUTA:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <select
+              value={selectedProvinciaDestino}
+              onChange={handleProvinciaDestinoChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Provincia Final</option>
+              {provincias.map((p) => (
+                <option key={p.Provincia} value={p.Provincia}>
+                  {p.Provincia}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-1/2 mr-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+            <select
+              value={selectedCiudadDestino}
+              onChange={(e) => setSelectedCiudadDestino(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Ciudad Final</option>
+              {ciudadesDestino.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-
         <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
@@ -763,7 +766,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
               required
             />
           </div>
-
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
             <input
