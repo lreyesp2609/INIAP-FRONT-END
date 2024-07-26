@@ -28,12 +28,13 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [mostrarInputManual, setMostrarInputManual] = useState(false);
   const [empleadoSesion, setEmpleadoSesion] = useState(null);
   const [tipoTransporte, setTipoTransporte] = useState('');
-  const [nombreTransporte, setNombreTransporte] = useState('');
   const [rutaTransporte, setRutaTransporte] = useState('');
   const [fechaSalidaTransporte, setFechaSalidaTransporte] = useState('');
   const [horaSalidaTransporte, setHoraSalidaTransporte] = useState('');
   const [fechaLlegadaTransporte, setFechaLlegadaTransporte] = useState('');
   const [horaLlegadaTransporte, setHoraLlegadaTransporte] = useState('');
+  const [nombreTransporte, setNombreTransporte] = useState('');
+  const [transportes, setTransportes] = useState([]);
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -289,6 +290,38 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     const nuevosEmpleadosSeleccionados = empleadosSeleccionados.filter((_, i) => i !== index);
     setEmpleadosSeleccionados(nuevosEmpleadosSeleccionados);
   };
+
+  // Función para obtener los transportes
+  const fetchTransportes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Informes/listar-vehiculos-habilitados/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTransportes([{ placa: 'OFICIAL', habilitado: 1 }, ...data.vehiculos]);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al obtener los transportes');
+      }
+    } catch (error) {
+      setError('Error al obtener transportes: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransportes();
+  }, []);
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -607,15 +640,21 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
           <div className="mr-3 w-1/3">
-            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
-            <input
-              type="text"
-              value={nombreTransporte}
-              onChange={(e) => setNombreTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+          <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+          <select
+            value={nombreTransporte}
+            onChange={(e) => setNombreTransporte(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Selecciona un transporte...</option>
+            {transportes.map((transporte, index) => (
+              <option key={index} value={transporte.placa}>
+                {transporte.placa}
+              </option>
+            ))}
+          </select>
+        </div>
           <div className="mr-3 w-1/3">
             <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
             <input
