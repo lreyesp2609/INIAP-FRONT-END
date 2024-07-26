@@ -27,7 +27,13 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [empleadoManual, setEmpleadoManual] = useState('');
   const [mostrarInputManual, setMostrarInputManual] = useState(false);
   const [empleadoSesion, setEmpleadoSesion] = useState(null);
-
+  const [tipoTransporte, setTipoTransporte] = useState('');
+  const [nombreTransporte, setNombreTransporte] = useState('');
+  const [rutaTransporte, setRutaTransporte] = useState('');
+  const [fechaSalidaTransporte, setFechaSalidaTransporte] = useState('');
+  const [horaSalidaTransporte, setHoraSalidaTransporte] = useState('');
+  const [fechaLlegadaTransporte, setFechaLlegadaTransporte] = useState('');
+  const [horaLlegadaTransporte, setHoraLlegadaTransporte] = useState('');
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -332,6 +338,13 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           listado_empleado: empleadosSeleccionados.join(', '),
           lugar_servicio: `${selectedCiudad}-${selectedProvincia}`, // Guardar Ciudad-Provincia
           id_empleado: idEmpleado,
+          tipo_transporte_soli: tipoTransporte,
+          nombre_transporte_soli: nombreTransporte,
+          ruta_soli: rutaTransporte,
+          fecha_salida_soli: formattedFechaSalida,
+          hora_salida_soli: horaSalida,
+          fecha_llegada_soli: formattedFechaLlegada,
+          hora_llegada_soli: horaLlegada
         }),
       });
 
@@ -579,6 +592,82 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             rows="4"
             required
           ></textarea>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
+          <select
+            value={tipoTransporte}
+            onChange={(e) => setTipoTransporte(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Selecciona un tipo de transporte...</option>
+            <option value="Terrestre">Terrestre</option>
+            <option value="Aéreo">Aéreo</option>
+            <option value="Marítimo">Marítimo</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+          <input
+            type="text"
+            value={nombreTransporte}
+            onChange={(e) => setNombreTransporte(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">RUTA DEL TRANSPORTE</label>
+          <input
+            type="text"
+            value={rutaTransporte}
+            onChange={(e) => setRutaTransporte(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div className="mb-4 flex">
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+            <input
+              type="date"
+              value={fechaSalidaTransporte}
+              onChange={(e) => setFechaSalidaTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+            <input
+              type="time"
+              value={horaSalidaTransporte}
+              onChange={(e) => setHoraSalidaTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+            <input
+              type="date"
+              value={fechaLlegadaTransporte}
+              onChange={(e) => setFechaLlegadaTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+            <input
+              type="time"
+              value={horaLlegadaTransporte}
+              onChange={(e) => setHoraLlegadaTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
         </div>
         <div className="flex justify-between">
           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
