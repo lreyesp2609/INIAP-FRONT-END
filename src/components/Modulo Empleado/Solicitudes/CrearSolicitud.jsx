@@ -595,22 +595,18 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">TRANSPORTE</h2>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-        <div className="mb-4 flex">
-          <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
-            <select
+        <div className="mb-3 flex">
+          <div className="mr-3 w-1/3">
+            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo,Terrestre,Marítimo, Otros)</label>
+            <input
+              type="text"
               value={tipoTransporte}
               onChange={(e) => setTipoTransporte(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
-            >
-              <option value="">Selecciona un tipo de transporte...</option>
-              <option value="Terrestre">Terrestre</option>
-              <option value="Aéreo">Aéreo</option>
-              <option value="Marítimo">Marítimo</option>
-            </select>
+            />
           </div>
-          <div className="mr-4 w-1/4">
+          <div className="mr-3 w-1/3">
             <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
             <input
               type="text"
@@ -620,8 +616,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
               required
             />
           </div>
-          <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA DEL TRANSPORTE</label>
+          <div className="mr-3 w-1/3">
+            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
             <input
               type="text"
               value={rutaTransporte}
@@ -630,6 +626,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
               required
             />
           </div>
+        </div>
+        <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
             <input
@@ -640,6 +638,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
               required
             />
           </div>
+
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
             <input
