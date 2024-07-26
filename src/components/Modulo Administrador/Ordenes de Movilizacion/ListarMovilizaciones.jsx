@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaBan, FaEye, FaCheck } from 'react-icons/fa';
+import { FaBan, FaEye, FaCheck, FaEdit, FaFilePdf } from 'react-icons/fa';
 import API_URL from '../../../Config';
 import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
 import AprobarSolicitudesModal from './AprobarSolicitudMovilizacion';
 import RechazarSolicitudesModal from './RechazarSolicitudMovilizacion';
+import EditarSolicitudMovilizacion from './EditarMotivoSolicitud';
 
 const ListarMovilizaciones = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -13,7 +14,9 @@ const ListarMovilizaciones = () => {
   const [showVer, setShowVer] = useState(false);
   const [showAprobarModal, setShowAprobarModal] = useState(false);
   const [showRechazarModal, setShowRechazarModal] = useState(false);
+  const [showEditarModal, setShowEditarModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [selectedMotivoId, setSelectedMotivoId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [viewMode, setViewMode] = useState('pendientes');
@@ -47,7 +50,7 @@ const ListarMovilizaciones = () => {
     let filtered = [];
     if (viewMode === 'pendientes') {
       filtered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1
+        (solicitud) => solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1
       );
     } else if (viewMode === 'aprobadas') {
       filtered = solicitudes.filter((solicitud) => solicitud.estado_movilizacion === 'Aprobado');
@@ -135,10 +138,10 @@ const ListarMovilizaciones = () => {
     }
   };
 
-  const fetchMotivos = async (idUsuario) => {
+  const fetchMotivos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${idUsuario}/`, {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${userId}/`, {
         headers: {
           Authorization: `${token}`,
         },
@@ -146,13 +149,17 @@ const ListarMovilizaciones = () => {
   
       if (!response.ok) throw new Error('Error al obtener motivos');
   
-      const motivos = await response.json();
-      if (!Array.isArray(motivos)) {
+      const motivosData = await response.json();
+      if (!Array.isArray(motivosData)) {
         throw new Error('Datos de motivos no válidos');
       }
-      setMotivos(motivos);
+      setMotivos(motivosData);
+      setMotivosLoaded(true);
     } catch (error) {
-      setError('Error al obtener motivos');
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener motivos',
+      });
       console.error('Error fetching motivos:', error);
     }
   };
@@ -222,11 +229,13 @@ const ListarMovilizaciones = () => {
 
   const handleAccept = (idOrden) => {
     setSelectedOrderId(idOrden);
+    fetchMotivos(userId);
     setShowAprobarModal(true);
   };
   
   const handleReject = (idOrden) => {
     setSelectedOrderId(idOrden);
+    fetchMotivos(userId);
     setShowRechazarModal(true);
   };
   
@@ -243,56 +252,82 @@ const ListarMovilizaciones = () => {
     await fetchSolicitudes();
     await fetchMotivos(userId);
   };
-  
+
+  const handleEdit = (ordenId, motivoId) => {
+    setSelectedOrderId(ordenId);
+    setSelectedMotivoId(motivoId);
+    fetchMotivos(userId);
+    setShowEditarModal(true);
+  };
+
+  const handleCloseEditarModal = () => {
+    setShowEditarModal(false);
+    setSelectedOrderId(null);
+    fetchMotivos(userId);
+    fetchSolicitudes();
+  };
+
   const handleCancelModal = () => {
     setShowAprobarModal(false);
     setShowRechazarModal(false);
+    fetchMotivos(userId);
+    setShowEditarModal(false);
   };
 
-  const handleShowPending = () => {
-    setViewMode('pendientes');
-  };
+  const handlePDF = async (idOrden) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token no encontrado');
 
-  const handleShowAproved = () => {
-    setViewMode('aprobadas');
-  };
+        const response = await fetch(`${API_URL}/OrdenesMovilizacion/generar_pdf/${userId}/${idOrden}/pdf/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `${token}`,
+            },
+        });
 
-  const handleShowReject = () => {
-    setViewMode('rechazadas');
-  };
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
 
-  const handleShowHistory = () => {
-    setViewMode('historial');
-  };
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType || !contentType.includes('application/pdf')) {
+            throw new Error('Respuesta inesperada del servidor');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `orden_${idOrden}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error al generar o descargar el PDF:', error);
+        alert('Error al descargar el PDF. Revisa la consola para más detalles.');
+    }
+};
 
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-center mb-4">Lista de Movilizaciones</h2>
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4"
-          onClick={handleShowPending}
-        >
-          Solicitudes Pendientes
-        </button>
-        <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
-          onClick={handleShowAproved}
-        >
-          Solicitudes Aprobadas
-        </button>
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-4"
-          onClick={handleShowReject}
-        >
-          Solicitudes Rechazadas
-        </button>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ml-4"
-          onClick={handleShowHistory}
-        >
-          Historial de Acciones
-        </button>
+        <h2 className="text-2xl font-bold">Lista de Movilizaciones</h2>
+        
+        <div className="flex items-center">
+          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
+          <select
+            id="viewModeSelect"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="p-2 border rounded"
+          >
+            <option value="pendientes">Solicitudes Pendientes</option>
+            <option value="aprobadas">Solicitudes Aprobadas</option>
+            <option value="rechazadas">Solicitudes Rechazadas</option>
+            <option value="historial">Historial de Acciones</option>
+          </select>
+        </div>
       </div>
   
       {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -358,27 +393,49 @@ const ListarMovilizaciones = () => {
                     <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                     <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                     <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                      <button
-                        className="p-2 bg-green-500 text-white rounded-full"
-                        title="Aceptar"
-                        onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaCheck />
-                      </button>
-                      <button
-                        className="p-2 bg-yellow-500 text-white rounded-full"
-                        title="Ver"
-                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                      <button 
+                      className="p-2 bg-yellow-500 text-white rounded-full"
+                      title="Ver"
+                      onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
                       >
                         <FaEye />
                       </button>
+                      {solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1 && (
+                        <>
+                          <button 
+                          className="p-2 bg-green-500 text-white rounded-full"
+                          title="Aceptar"
+                          onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaCheck />
+                          </button>
+                          <button 
+                          className="p-2 bg-red-500 text-white rounded-full"
+                          title="Rechazar"
+                          onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                          >
+                            <FaBan />
+                          </button>
+                        </>
+                      )}
+                      {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Denegado') && (
                       <button
-                        className="p-2 bg-red-500 text-white rounded-full"
-                        title="Rechazar"
-                        onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                      className="p-2 bg-blue-500 text-white rounded-full"
+                      title="Editar Motivo"
+                      onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
                       >
-                        <FaBan />
+                        <FaEdit />
                       </button>
+                    )}
+                    {solicitud.estado_movilizacion === 'Aprobado' && (
+                      <button
+                      className="p-2 bg-red-500 text-white rounded-full"
+                      title="Exportar PDF"
+                      onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaFilePdf />
+                      </button>
+                    )}
                     </td>
                   </tr>
                 );
@@ -427,6 +484,16 @@ const ListarMovilizaciones = () => {
         onRechazar={handleConfirmRechazar}
         onClose={handleCancelModal}
       />
+
+      <EditarSolicitudMovilizacion
+        ordenId={selectedOrderId}
+        userId={userId}
+        motivoId={selectedMotivoId}
+        visible={showEditarModal}
+        onClose={handleCloseEditarModal}
+        onEditar={fetchSolicitudes}
+      />
+
     </div>
   );
   

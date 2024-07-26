@@ -20,6 +20,7 @@ const ListarMovilizacion = () => {
   const [showVer, setShowVer] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
+  const [motivos, setMotivos] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [viewMode, setViewMode] = useState('pendientes');
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
@@ -31,17 +32,18 @@ const ListarMovilizacion = () => {
     fetchSolicitudes();
     fetchConductores();
     fetchVehiculos();
+    fetchMotivos();
   }, []);
 
   useEffect(() => {
     applyFilters();
-  }, [solicitudes, viewMode]);
+  }, [solicitudes, viewMode, motivos]);
 
   const applyFilters = () => {
     let filtered = [];
     if (viewMode === 'pendientes') {
       filtered = solicitudes.filter(
-        (solicitud) => solicitud.estado_movilizacion === 'En Espera' && solicitud.habilitado === 1
+        (solicitud) => solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1
       );
     } else if (viewMode === 'canceladas') {
       filtered = solicitudes.filter((solicitud) => solicitud.habilitado === 0);
@@ -129,6 +131,28 @@ const ListarMovilizacion = () => {
     }
   };
 
+  const fetchMotivos = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-motivos/${userId}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Error al obtener motivos');
+
+      const motivosData = await response.json();
+      if (!Array.isArray(motivosData)) {
+        throw new Error('Datos de motivos no válidos');
+      }
+      setMotivos(motivosData);
+    } catch (error) {
+      setError('Error al obtener motivos');
+      console.error('Error fetching motivos:', error);
+    }
+  };
+
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
@@ -176,6 +200,11 @@ const ListarMovilizacion = () => {
     if (!Array.isArray(vehiculos)) return 'Desconocido';
     const vehiculo = vehiculos.find((vehiculo) => vehiculo.id_vehiculo === id);
     return vehiculo ? vehiculo.placa : 'Desconocido';
+  };
+
+  const getMotivoByOrderId = (ordenId) => {
+    const motivo = motivos.find(m => m.id_orden_movilizacion === ordenId);
+    return motivo ? motivo.motivo : 'No disponible';
   };
   
   if (showSolicitar) {
@@ -258,43 +287,34 @@ const ListarMovilizacion = () => {
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-center">Lista de Solicitudes de Movilización</h2>
+        <h2 className="text-2xl font-bold">Lista de Solicitudes de Movilización</h2>
         
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4"
-          onClick={handleShowPending}
-        >
-          Solicitudes Pendientes
-        </button>
+        <div className="flex items-center">
+          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
+          <select
+            id="viewModeSelect"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="p-2 border rounded"
+          >
+            <option value="pendientes">Solicitudes Pendientes</option>
+            <option value="canceladas">Solicitudes Canceladas</option>
+            <option value="historial">Historial de Solicitudes</option>
+            <option value="historialMovilizaciones">Historial de Movilizaciones</option>
+          </select>
 
-        <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
-          onClick={handleShowHistorial}
-        >
-          Historial de Solicitudes
-        </button>
-
-        <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 ml-4"
-          onClick={handleShowHistorialMovilizaciones}
-        >
-          Historial de Movilizaciones
-        </button>
-
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-4"
-          onClick={handleShowCancelled}
-        >
-          Solicitudes Canceladas
-        </button>
-
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleClickSolicitarMovilizacion}
-        >
-          Solicitar Movilización
-        </button>
+        </div>
+        
+        <div className="flex items-center">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={handleClickSolicitarMovilizacion}
+            >
+              Solicitar Movilización
+            </button>
+          </div>
       </div>
+
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <div className="mb-4">
         <div className="flex">
@@ -340,60 +360,54 @@ const ListarMovilizacion = () => {
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
                   <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                    {solicitud.estado_movilizacion === 'En Espera'  && (
-                      <>
-                        <button
-                          className="p-2 bg-blue-500 text-white rounded-full"
-                          title="Editar Solicitud de Movilización"
-                          onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          className="p-2 bg-green-500 text-white rounded-full"
-                          title="Ver Solicitud de Movilización"
-                          onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                        >
-                          <FaEye />
-                        </button>
-                        <button
-                          className="p-2 bg-red-500 text-white rounded-full"
-                          title="Cancelar Solicitud de Movilización"
-                          onClick={() => openCancelModal(solicitud.id_orden_movilizacion)}
-                          disabled={solicitud.habilitado === 0}
-                        >
-                          <FaBan />
-                        </button>
-                      </>
-                    )}
-                    {solicitud.estado_movilizacion === 'Cancelado' && (
+                  {solicitud.estado_movilizacion === 'Pendiente' && (
+                    <>
                       <button
-                        className="p-2 bg-green-500 text-white rounded-full"
-                        title="Habilitar Solicitud de Movilización"
-                        onClick={() => openHabilitarModal(solicitud.id_orden_movilizacion)}
-                        disabled={solicitud.habilitado === 1}
+                        className="p-2 bg-blue-500 text-white rounded-full"
+                        title="Editar Solicitud de Movilización"
+                        onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
                       >
-                        Habilitar
+                        <FaEdit />
                       </button>
-                    )}
-                    {solicitud.estado_movilizacion === 'Aprobado' && (
                       <button
                         className="p-2 bg-green-500 text-white rounded-full"
                         title="Ver Solicitud de Movilización"
                         onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                        >
-                          <FaEye />
-                        </button>
-                    )}
-                    {solicitud.estado_movilizacion === 'Finalizado' && (
+                      >
+                        <FaEye />
+                      </button>
+                      <button
+                        className="p-2 bg-red-500 text-white rounded-full"
+                        title="Cancelar Solicitud de Movilización"
+                        onClick={() => openCancelModal(solicitud.id_orden_movilizacion)}
+                        disabled={solicitud.habilitado === 0}
+                      >
+                        <FaBan />
+                      </button>
+                    </>
+                  )}
+                  {solicitud.estado_movilizacion === 'Cancelado' && (
+                    <button
+                      className="p-2 bg-green-500 text-white rounded-full"
+                      title="Habilitar Solicitud de Movilización"
+                      onClick={() => openHabilitarModal(solicitud.id_orden_movilizacion)}
+                      disabled={solicitud.habilitado === 1}
+                    >
+                      Habilitar
+                    </button>
+                  )}
+                  {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Finalizado' || solicitud.estado_movilizacion === 'Denegado') && (
+                    <div className="flex flex-col items-start">
                       <button
                         className="p-2 bg-green-500 text-white rounded-full"
                         title="Ver Solicitud de Movilización"
                         onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                        >
-                          <FaEye />
-                        </button>
-                    )}
+                      >
+                        <FaEye />
+                      </button>
+                      <span className="mt-2 text-gray-600">{getMotivoByOrderId(solicitud.id_orden_movilizacion)}</span>
+                    </div>
+                  )}
                   </td>
                 </tr>
               ))

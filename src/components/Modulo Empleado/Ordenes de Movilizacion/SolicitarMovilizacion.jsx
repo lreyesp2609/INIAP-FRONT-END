@@ -29,7 +29,7 @@ const SolicitarMovilizacion = ({ onClose }) => {
     fecha_viaje: currentDate,
     hora_ida: currentTime, 
     hora_regreso: '',
-    estado_movilizacion: 'En Espera',
+    estado_movilizacion: 'Pendiente',
     id_empleado: idEmpleado,
   });
 

@@ -1,11 +1,8 @@
 import React from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaBan } from "react-icons/fa";
+import DeshabilitarMotivo from "../deshabilitarmotivo";
 
 const TablaOrdenes = ({ ordenes, userId, fetchOrdenes, onEditOrden }) => {
-  const handleDeshabilitar = async () => {
-    await fetchOrdenes(userId);
-  };
-
   const handleEditClick = (orden) => {
     onEditOrden(orden);
   };
@@ -36,6 +33,12 @@ const TablaOrdenes = ({ ordenes, userId, fetchOrdenes, onEditOrden }) => {
                   >
                     <FaEdit />
                   </button>
+                  <DeshabilitarMotivo
+                    motivoId={orden.id_motivo}
+                    userId={userId}
+                    fetchOrdenes={fetchOrdenes}
+                    motivoNombre={orden.nombre_motivo}
+                  />
                 </td>
               </tr>
             ))}
@@ -56,6 +59,12 @@ const TablaOrdenes = ({ ordenes, userId, fetchOrdenes, onEditOrden }) => {
               >
                 <FaEdit />
               </button>
+              <DeshabilitarMotivo
+                motivoId={orden.id_motivo}
+                userId={userId}
+                fetchOrdenes={fetchOrdenes}
+                motivoNombre={orden.nombre_motivo}
+              />
             </div>
           </div>
         ))}
