@@ -414,10 +414,9 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS GENERALES</h2>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         {datosPersonales && (
-          <div className="mb-4 flex">
-            <div className="w-10/2 mr-4">
+            <div className="w-full mr-4">
               <div className="flex mb-4">
-                <div className="w-10/2 mr-4">
+                <div className="mr-4 w-1/2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
                   <input
                     type="text"
@@ -426,7 +425,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                     className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="w-1/2">
+                <div className="mr-4 w-1/2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
                   <input
                     type="text"
@@ -485,8 +484,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
                 </div>
               </div>
             </div>
-          </div>
-
         )}
         <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
@@ -593,7 +590,8 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           ></textarea>
         </div>
-        <div className="mb-4">
+        <div className="mb-4 flex">
+        <div className="mr-4 w-1/4">
           <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
           <select
             value={tipoTransporte}
@@ -607,7 +605,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             <option value="Marítimo">Marítimo</option>
           </select>
         </div>
-        <div className="mb-4">
+        <div className="mr-4 w-1/4">
           <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
           <input
             type="text"
@@ -617,7 +615,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mr-4 w-1/4">
           <label className="block text-gray-700 text-sm font-bold mb-2">RUTA DEL TRANSPORTE</label>
           <input
             type="text"
@@ -627,7 +625,6 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           />
         </div>
-        <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
             <input
