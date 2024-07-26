@@ -413,77 +413,78 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS GENERALES</h2>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         {datosPersonales && (
-            <div className="w-full mr-4">
-              <div className="flex mb-4">
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
-                  <input
-                    type="text"
-                    value={`${datosPersonales.Nombre}`}
-                    readOnly
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
-                  <input
-                    type="text"
-                    value={`${datosPersonales.Cargo}`}
-                    readOnly
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+          <div className="w-full mr-2">
+            <div className="flex mb-2">
+              <div className="mr-2 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+                <input
+                  type="text"
+                  value={`${datosPersonales.Nombre}`}
+                  readOnly
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
-              <div className="mb-4 flex">
-                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                <div className="w-1/2 mr-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <select
-                    value={selectedProvincia}
-                    onChange={handleProvinciaChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Seleccionar Provincia</option>
-                    {provincias.map((p) => (
-                      <option key={p.Provincia} value={p.Provincia}>
-                        {p.Provincia}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-1/2 mr-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <select
-                    value={selectedCiudad}
-                    onChange={(e) => setSelectedCiudad(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Seleccionar Ciudad</option>
-                    {ciudades.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
-                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-                  <input
-                    type="text"
-                    value={`${datosPersonales.Unidad}`}
-                    readOnly
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+              <div className="mr-4 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
+                <input
+                  type="text"
+                  value={`${datosPersonales.Cargo}`}
+                  readOnly
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
+            <div className="mb-4 flex">
+              <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+              <div className="w-1/2 mr-4">
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <select
+                  value={selectedProvincia}
+                  onChange={handleProvinciaChange}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Seleccionar Provincia</option>
+                  {provincias.map((p) => (
+                    <option key={p.Provincia} value={p.Provincia}>
+                      {p.Provincia}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-1/2 mr-4">
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <select
+                  value={selectedCiudad}
+                  onChange={(e) => setSelectedCiudad(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Seleccionar Ciudad</option>
+                  {ciudades.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+                <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+                <input
+                  type="text"
+                  value={`${datosPersonales.Unidad}`}
+                  readOnly
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
         )}
         <div className="mb-4 flex">
           <div className="mr-4 w-1/4">
@@ -590,41 +591,45 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           ></textarea>
         </div>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">TRANSPORTE</h2>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <div className="mb-4 flex">
-        <div className="mr-4 w-1/4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
-          <select
-            value={tipoTransporte}
-            onChange={(e) => setTipoTransporte(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Selecciona un tipo de transporte...</option>
-            <option value="Terrestre">Terrestre</option>
-            <option value="Aéreo">Aéreo</option>
-            <option value="Marítimo">Marítimo</option>
-          </select>
-        </div>
-        <div className="mr-4 w-1/4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
-          <input
-            type="text"
-            value={nombreTransporte}
-            onChange={(e) => setNombreTransporte(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mr-4 w-1/4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">RUTA DEL TRANSPORTE</label>
-          <input
-            type="text"
-            value={rutaTransporte}
-            onChange={(e) => setRutaTransporte(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
+            <select
+              value={tipoTransporte}
+              onChange={(e) => setTipoTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Selecciona un tipo de transporte...</option>
+              <option value="Terrestre">Terrestre</option>
+              <option value="Aéreo">Aéreo</option>
+              <option value="Marítimo">Marítimo</option>
+            </select>
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+            <input
+              type="text"
+              value={nombreTransporte}
+              onChange={(e) => setNombreTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mr-4 w-1/4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA DEL TRANSPORTE</label>
+            <input
+              type="text"
+              value={rutaTransporte}
+              onChange={(e) => setRutaTransporte(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
           <div className="mr-4 w-1/4">
             <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
             <input
@@ -666,6 +671,10 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             />
           </div>
         </div>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS PARA TRANSFERENCIA</h2>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <div className="flex justify-between">
           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Enviar
