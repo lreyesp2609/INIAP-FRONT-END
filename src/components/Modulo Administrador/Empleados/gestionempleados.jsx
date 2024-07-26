@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
 import TablaEmpleados from "./Tablas/tablaempleadoshabilitados";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 
 const GestionEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
