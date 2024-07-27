@@ -376,7 +376,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     const [year, month, day] = dateString.split('-');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
-  
+
   const formatTime = (timeString) => {
     return timeString + ':00';  // Añadir segundos si no están incluidos
   };
@@ -448,7 +448,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       return;
     }
 
-    
+
 
     try {
       const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idUsuario}/`, {
@@ -497,9 +497,11 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
 
   return (
     <div className="p-4">
+      <hr className="my-6 border-t border-gray-300" />
       <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">
         SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
       </h2>
+      <hr className="my-6 border-t border-gray-300" />
       <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
       <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
       {error && <div className="mb-4 text-red-500">{error}</div>}
@@ -545,10 +547,9 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             ))}
           </select>
         </div>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <hr className="my-6 border-t border-gray-300" />
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS GENERALES</h2>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <hr className="my-6 border-t border-gray-300" />
         {datosPersonales && (
           <div className="w-full mr-2">
             <div className="flex mb-2">
@@ -726,193 +727,200 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             required
           ></textarea>
         </div>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <hr className="my-6 border-t border-gray-300" />
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">TRANSPORTE</h2>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-        <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
+        <hr className="my-6 border-t border-gray-300" />
         <div className="mb-3 flex">
-          {rutas.map((ruta, index) => (
-            <div key={index} className="mb-3">
-              <div className="mb-3 flex">
-                <div className="mr-3 w-1/3">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo,Terrestre,Marítimo, Otros)</label>
-                  <input
-                    type="text"
-                    value={ruta.tipoTransporte}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].tipoTransporte = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
+          <div className="mb-3">
+            {rutas.map((ruta, index) => (
+              <div key={index} className="mb-6 border-b pb-4">
+                <h3 className="text-lg font-bold mb-2">Ruta {index + 1}</h3>
+                <div className="mb-3 grid grid-cols-1 md:grid-cols-6 gap-3">
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
+                    <input
+                      type="text"
+                      value={ruta.tipoTransporte}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].tipoTransporte = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <select
+                      value={ruta.nombreTransporte}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].nombreTransporte = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Selecciona un transporte...</option>
+                      {transportes.map((transporte, idx) => (
+                        <option key={idx} value={transporte.placa}>
+                          {transporte.placa}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL INICIO DE LA RUTA:</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <select
+                      value={ruta.provinciaOrigen}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].provinciaOrigen = e.target.value;
+                        newRutas[index].ciudadOrigen = '';
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Seleccione la provincia...</option>
+                      {provincias.map((p) => (
+                        <option key={p.Provincia} value={p.Provincia}>
+                          {p.Provincia}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <select
+                      value={ruta.ciudadOrigen}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].ciudadOrigen = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Seleccione la ciudad...</option>
+                      {provincias.find(p => p.Provincia === ruta.provinciaOrigen)?.Ciudades.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL FINAL DE LA RUTA:</label>
+                    <select
+                      value={ruta.provinciaDestino}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].provinciaDestino = e.target.value;
+                        newRutas[index].ciudadDestino = '';
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Seleccione la provincia...</option>
+                      {provincias.map((p) => (
+                        <option key={p.Provincia} value={p.Provincia}>
+                          {p.Provincia}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'}</label>
+                    <select
+                      value={ruta.ciudadDestino}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].ciudadDestino = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Seleccione la ciudad...</option>
+                      {provincias.find(p => p.Provincia === ruta.provinciaDestino)?.Ciudades.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="mr-3 w-1/3">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
-                  <select
-                    value={ruta.nombreTransporte}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].nombreTransporte = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Selecciona un transporte...</option>
-                    {transportes.map((transporte, idx) => (
-                      <option key={idx} value={transporte.placa}>
-                        {transporte.placa}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-1/2 mr-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL INICIO DE LA RUTA:</label>
-                  <select
-                    value={ruta.provinciaOrigen}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].provinciaOrigen = e.target.value;
-                      newRutas[index].ciudadOrigen = '';
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Provincia Inicio</option>
-                    {provincias.map((p) => (
-                      <option key={p.Provincia} value={p.Provincia}>
-                        {p.Provincia}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-1/2 mr-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
-                  <select
-                    value={ruta.ciudadOrigen}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].ciudadOrigen = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Ciudad Inicio</option>
-                    {provincias.find(p => p.Provincia === ruta.provinciaOrigen)?.Ciudades.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+                    <input
+                      type="date"
+                      value={ruta.fechaSalida}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].fechaSalida = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+                    <input
+                      type="time"
+                      value={ruta.horaSalida}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].horaSalida = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+                    <input
+                      type="date"
+                      value={ruta.fechaLlegada}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].fechaLlegada = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+                    <input
+                      type="time"
+                      value={ruta.horaLlegada}
+                      onChange={(e) => {
+                        const newRutas = [...rutas];
+                        newRutas[index].horaLlegada = e.target.value;
+                        setRutas(newRutas);
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="mb-3 flex">
-                <div className="w-1/2 mr-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL FINAL DE LA RUTA:</label>
-                  <select
-                    value={ruta.provinciaDestino}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].provinciaDestino = e.target.value;
-                      newRutas[index].ciudadDestino = '';
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Provincia Final</option>
-                    {provincias.map((p) => (
-                      <option key={p.Provincia} value={p.Provincia}>
-                        {p.Provincia}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-1/2 mr-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
-                  <select
-                    value={ruta.ciudadDestino}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].ciudadDestino = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Ciudad Final</option>
-                    {provincias.find(p => p.Provincia === ruta.provinciaDestino)?.Ciudades.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
-                  <input
-                    type="date"
-                    value={ruta.fechaSalida}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].fechaSalida = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
-                  <input
-                    type="time"
-                    value={ruta.horaSalida}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].horaSalida = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
-                  <input
-                    type="date"
-                    value={ruta.fechaLlegada}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].fechaLlegada = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div className="w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
-                  <input
-                    type="time"
-                    value={ruta.horaLlegada}
-                    onChange={(e) => {
-                      const newRutas = [...rutas];
-                      newRutas[index].horaLlegada = e.target.value;
-                      setRutas(newRutas);
-                    }}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         <button
           type="button"
