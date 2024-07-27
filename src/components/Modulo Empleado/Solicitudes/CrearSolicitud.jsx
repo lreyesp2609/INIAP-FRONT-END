@@ -502,6 +502,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
 
   return (
     <div className="p-4">
+      <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
       <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
         SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
       </h2>
@@ -942,6 +943,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </button>
         </div>
         <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS PARA TRANSFERENCIA</h2>
+        
         <div className="flex justify-between">
           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Enviar
@@ -951,6 +953,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };
