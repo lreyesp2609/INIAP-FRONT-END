@@ -41,6 +41,18 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
   const [selectedCiudadDestino, setSelectedCiudadDestino] = useState('');
   const [ciudadesOrigen, setCiudadesOrigen] = useState([]);
   const [ciudadesDestino, setCiudadesDestino] = useState([]);
+  const [rutas, setRutas] = useState([{
+    tipoTransporte: '',
+    nombreTransporte: '',
+    provinciaOrigen: '',
+    ciudadOrigen: '',
+    provinciaDestino: '',
+    ciudadDestino: '',
+    fechaSalida: '',
+    horaSalida: '',
+    fechaLlegada: '',
+    horaLlegada: ''
+  }]);
 
 
   // Función para obtener la previsualización del código de solicitud y datos personales
@@ -344,12 +356,56 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
     setSelectedCiudadDestino('');
   };
 
+  const agregarRuta = () => {
+    setRutas([...rutas, {
+      tipoTransporte: '',
+      nombreTransporte: '',
+      provinciaOrigen: '',
+      ciudadOrigen: '',
+      provinciaDestino: '',
+      ciudadDestino: '',
+      fechaSalida: '',
+      horaSalida: '',
+      fechaLlegada: '',
+      horaLlegada: ''
+    }]);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split('-');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+  
+  const formatTime = (timeString) => {
+    return timeString + ':00';  // Añadir segundos si no están incluidos
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
 
-    const formattedFechaSalida = fechaSalida ? fechaSalida : null;
-    const formattedFechaLlegada = fechaLlegada ? fechaLlegada : null;
+    // Formatear las fechas principales
+    const formattedFechaSalida = formatDate(fechaSalida);
+    const formattedFechaLlegada = formatDate(fechaLlegada);
+
+    if (!formattedFechaSalida || !formattedFechaLlegada) {
+      setError('Las fechas de salida y llegada son obligatorias');
+      return;
+    }
+
+    // Formatear las fechas de las rutas
+    const formattedRutas = rutas.map(ruta => ({
+      ...ruta,
+      fechaSalida: formatDate(ruta.fechaSalida),
+      fechaLlegada: formatDate(ruta.fechaLlegada)
+    }));
+
+    // Validar que todas las rutas tengan fechas válidas
+    if (formattedRutas.some(ruta => !ruta.fechaSalida || !ruta.fechaLlegada)) {
+      setError('Todas las rutas deben tener fechas de salida y llegada válidas');
+      return;
+    }
 
     // Validación de fechas y horas
     const currentDateTime = new Date();
@@ -366,6 +422,23 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       return;
     }
 
+    // Validación de rutas
+    for (let i = 0; i < formattedRutas.length; i++) {
+      const ruta = formattedRutas[i];
+      const rutaFechaSalida = new Date(`${ruta.fechaSalida}T${ruta.horaSalida}`);
+      const rutaFechaLlegada = new Date(`${ruta.fechaLlegada}T${ruta.horaLlegada}`);
+
+      if (rutaFechaSalida < currentDateTime) {
+        setError(`La Fecha Salida y Hora Salida de la ruta ${i + 1} no pueden ser menores que la fecha y hora actual.`);
+        return;
+      }
+
+      if (rutaFechaLlegada < rutaFechaSalida) {
+        setError(`La Fecha Llegada y Hora Llegada de la ruta ${i + 1} no pueden ser menores que la Fecha Salida y Hora Salida.`);
+        return;
+      }
+    }
+
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const idUsuario = storedUser.usuario.id_usuario;
 
@@ -375,15 +448,14 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       return;
     }
 
-    // Formatear la ruta
-    const rutaFormateada = `${selectedCiudadOrigen} - ${selectedCiudadDestino}`;
+    
 
     try {
       const response = await fetch(`${API_URL}/Informes/crear-solicitud/${idUsuario}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           motivo_movilizacion: motivo,
@@ -395,17 +467,19 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           listado_empleado: empleadosSeleccionados.join(', '),
           lugar_servicio: `${selectedCiudad}-${selectedProvincia}`,
           id_empleado: idEmpleado,
-          tipo_transporte_soli: tipoTransporte,
-          nombre_transporte_soli: nombreTransporte,
-          ruta_soli: rutaFormateada,
-          fecha_salida_soli: formattedFechaSalida,
-          hora_salida_soli: horaSalida,
-          fecha_llegada_soli: formattedFechaLlegada,
-          hora_llegada_soli: horaLlegada,
-          provincia_origen: selectedProvinciaOrigen,
-          ciudad_origen: selectedCiudadOrigen,
-          provincia_destino: selectedProvinciaDestino,
-          ciudad_destino: selectedCiudadDestino
+          rutas: formattedRutas.map(ruta => ({
+            tipo_transporte_soli: ruta.tipoTransporte,
+            nombre_transporte_soli: ruta.nombreTransporte,
+            ruta_soli: `${ruta.ciudadOrigen} - ${ruta.ciudadDestino}`,
+            fecha_salida_soli: ruta.fechaSalida,
+            hora_salida_soli: ruta.horaSalida,
+            fecha_llegada_soli: ruta.fechaLlegada,
+            hora_llegada_soli: ruta.horaLlegada,
+            provincia_origen: ruta.provinciaOrigen,
+            ciudad_origen: ruta.ciudadOrigen,
+            provincia_destino: ruta.provinciaDestino,
+            ciudad_destino: ruta.ciudadDestino
+          }))
         }),
       });
 
@@ -657,146 +731,196 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <div className="mb-3 flex">
-          <div className="mr-3 w-1/3">
-            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo,Terrestre,Marítimo, Otros)</label>
-            <input
-              type="text"
-              value={tipoTransporte}
-              onChange={(e) => setTipoTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mr-3 w-1/3">
-            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <select
-              value={nombreTransporte}
-              onChange={(e) => setNombreTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Selecciona un transporte...</option>
-              {transportes.map((transporte, index) => (
-                <option key={index} value={transporte.placa}>
-                  {transporte.placa}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2 mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL INICIO DE LA RUTA:</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <select
-              value={selectedProvinciaOrigen}
-              onChange={handleProvinciaOrigenChange}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Provincia Inicio</option>
-              {provincias.map((p) => (
-                <option key={p.Provincia} value={p.Provincia}>
-                  {p.Provincia}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2 mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <select
-              value={selectedCiudadOrigen}
-              onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Ciudad Inicio</option>
-              {ciudadesOrigen.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2 mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL FINAL DE LA RUTA:</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <select
-              value={selectedProvinciaDestino}
-              onChange={handleProvinciaDestinoChange}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Provincia Final</option>
-              {provincias.map((p) => (
-                <option key={p.Provincia} value={p.Provincia}>
-                  {p.Provincia}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-1/2 mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
-            <select
-              value={selectedCiudadDestino}
-              onChange={(e) => setSelectedCiudadDestino(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Ciudad Final</option>
-              {ciudadesDestino.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
+          {rutas.map((ruta, index) => (
+            <div key={index} className="mb-3">
+              <div className="mb-3 flex">
+                <div className="mr-3 w-1/3">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo,Terrestre,Marítimo, Otros)</label>
+                  <input
+                    type="text"
+                    value={ruta.tipoTransporte}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].tipoTransporte = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="mr-3 w-1/3">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+                  <select
+                    value={ruta.nombreTransporte}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].nombreTransporte = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Selecciona un transporte...</option>
+                    {transportes.map((transporte, idx) => (
+                      <option key={idx} value={transporte.placa}>
+                        {transporte.placa}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2 mr-2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL INICIO DE LA RUTA:</label>
+                  <select
+                    value={ruta.provinciaOrigen}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].provinciaOrigen = e.target.value;
+                      newRutas[index].ciudadOrigen = '';
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Provincia Inicio</option>
+                    {provincias.map((p) => (
+                      <option key={p.Provincia} value={p.Provincia}>
+                        {p.Provincia}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2 mr-2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
+                  <select
+                    value={ruta.ciudadOrigen}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].ciudadOrigen = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Ciudad Inicio</option>
+                    {provincias.find(p => p.Provincia === ruta.provinciaOrigen)?.Ciudades.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-3 flex">
+                <div className="w-1/2 mr-2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">RUTA - SELECCIONE EL FINAL DE LA RUTA:</label>
+                  <select
+                    value={ruta.provinciaDestino}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].provinciaDestino = e.target.value;
+                      newRutas[index].ciudadDestino = '';
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Provincia Final</option>
+                    {provincias.map((p) => (
+                      <option key={p.Provincia} value={p.Provincia}>
+                        {p.Provincia}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/2 mr-2">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
+                  <select
+                    value={ruta.ciudadDestino}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].ciudadDestino = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Ciudad Final</option>
+                    {provincias.find(p => p.Provincia === ruta.provinciaDestino)?.Ciudades.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mb-4 flex">
+                <div className="mr-4 w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+                  <input
+                    type="date"
+                    value={ruta.fechaSalida}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].fechaSalida = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+                  <input
+                    type="time"
+                    value={ruta.horaSalida}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].horaSalida = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+                  <input
+                    type="date"
+                    value={ruta.fechaLlegada}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].fechaLlegada = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+                  <input
+                    type="time"
+                    value={ruta.horaLlegada}
+                    onChange={(e) => {
+                      const newRutas = [...rutas];
+                      newRutas[index].horaLlegada = e.target.value;
+                      setRutas(newRutas);
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="mb-4 flex">
-          <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
-            <input
-              type="date"
-              value={fechaSalidaTransporte}
-              onChange={(e) => setFechaSalidaTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
-            <input
-              type="time"
-              value={horaSalidaTransporte}
-              onChange={(e) => setHoraSalidaTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mr-4 w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
-            <input
-              type="date"
-              value={fechaLlegadaTransporte}
-              onChange={(e) => setFechaLlegadaTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="w-1/4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
-            <input
-              type="time"
-              value={horaLlegadaTransporte}
-              onChange={(e) => setHoraLlegadaTransporte(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={agregarRuta}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Agregar Ruta
+        </button>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
         <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">DATOS PARA TRANSFERENCIA</h2>
         <label className="block text-gray-700 text-sm font-bold mb-1/2">{'\u00A0'} {/* Espacio en blanco */}</label>
