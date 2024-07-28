@@ -1034,7 +1034,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
             <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
               Cancelar
             </button>
-          </div>
+          </div>    
         </form>
       </div>
     </div>

@@ -3,10 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 import CrearSolicitud from './CrearSolicitud';
 import API_URL from '../../../Config';
-import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
-import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
 
-const ListarSolicitudes = () => {
+const ListarSolicitudesCanceladas = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,29 +13,20 @@ const ListarSolicitudes = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('pendientes');
 
   useEffect(() => {
     fetchSolicitudes();
-  }, [selectedOption]);
+  }, []);
 
   const fetchSolicitudes = async () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const idUsuario = storedUser.usuario.id_usuario;
+
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      let url;
-      if (selectedOption === 'pendientes') {
-        url = `${API_URL}/Informes/listar-solicitudes/${idUsuario}/`;
-      } else if (selectedOption === 'aceptadas') {
-        url = `${API_URL}/Informes/listar-solicitudes-aceptadas/${idUsuario}/`;
-      } else if (selectedOption === 'canceladas') {
-        url = `${API_URL}/Informes/listar-solicitudes-canceladas/${idUsuario}/`;
-      }
-
-      const response = await fetch(url, {
+      const response = await fetch(`${API_URL}/Informes/listar-solicitudes-canceladas/${idUsuario}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -94,11 +83,6 @@ const ListarSolicitudes = () => {
     fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
   };
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-    setCurrentPage(1);
-  };
-
   return (
     <div className="p-4">
       {isCreating ? (
@@ -113,17 +97,6 @@ const ListarSolicitudes = () => {
             >
               Crear Solicitud
             </button>
-          </div>
-          <div className="mb-4">
-            <select 
-              value={selectedOption} 
-              onChange={handleOptionChange} 
-              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="pendientes">Solicitudes Pendientes</option>
-              <option value="aceptadas">Solicitudes Aceptadas</option>
-              <option value="canceladas">Solicitudes Canceladas</option>
-            </select>
           </div>
           <div className="mb-4">
             <div className="flex">
@@ -197,4 +170,4 @@ const ListarSolicitudes = () => {
   );
 };
 
-export default ListarSolicitudes;
+export default ListarSolicitudesCanceladas;
