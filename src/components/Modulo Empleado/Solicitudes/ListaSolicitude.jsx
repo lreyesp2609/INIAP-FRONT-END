@@ -106,7 +106,7 @@ const ListarSolicitudes = () => {
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Solicitudes del Usuario</h1>
+            <h1 className="text-2xl font-light">Solicitudes de Viaje</h1>
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={handleCreateSolicitud}
@@ -115,6 +115,7 @@ const ListarSolicitudes = () => {
             </button>
           </div>
           <div className="mb-4">
+          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
             <select 
               value={selectedOption} 
               onChange={handleOptionChange} 
