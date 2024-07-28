@@ -3,6 +3,8 @@ import API_URL from "../../../Config";
 import AgregarCategoriasBienes from "./agregarcategoriasbienes";
 import TablaGestionCategorias from "./Tablas/tablacategoriasbienes";
 import AgregarSubCategoriasBienes from "./agregarsubcategorias";
+import EditarCategoriaBienes from "./editarcategoriabienes";
+import EditarSubcategoriaBienes from "./editarsubcategoriabienes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,6 +18,8 @@ const GestionCategorias = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [categoryIdToAdd, setCategoryIdToAdd] = useState(null);
   const [showSubcategorias, setShowSubcategorias] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [selectedSubcategoria, setSelectedSubcategoria] = useState(null); // Agregar estado para subcategoría
   const forceUpdate = useRef(0);
 
   useEffect(() => {
@@ -111,6 +115,24 @@ const GestionCategorias = () => {
     );
   };
 
+  const handleEditSubcategoria = (categoriaId, subcategoriaId) => {
+    const categoria = categorias.find(cat => cat.id_categorias_bien === categoriaId);
+    const subcategoria = categoria.subcategorias.find(sub => sub.id_subcategoria_bien === subcategoriaId);
+    setSelectedCategoria(categoria);
+    setSelectedSubcategoria(subcategoria);
+  };
+
+  const handleEditCategoria = (idCategoria) => {
+    const categoria = categorias.find(cat => cat.id_categorias_bien === idCategoria);
+    setSelectedCategoria(categoria);
+  };
+
+  const handleCloseEditForm = () => {
+    setSelectedCategoria(null);
+    setSelectedSubcategoria(null); // Limpiar subcategoría seleccionada
+    fetchCategorias(user.usuario.id_usuario);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredCategorias.slice(
@@ -142,10 +164,23 @@ const GestionCategorias = () => {
           categoryId={categoryIdToAdd}
           updateSubcategorias={updateSubcategorias}
         />
+      ) : selectedCategoria && selectedSubcategoria ? (
+        <EditarSubcategoriaBienes
+          onClose={handleCloseEditForm}
+          user={user.usuario}
+          categoria={selectedCategoria}
+          subcategoria={selectedSubcategoria}
+        />
+      ) : selectedCategoria ? (
+        <EditarCategoriaBienes
+          onClose={handleCloseEditForm}
+          user={user.usuario}
+          categoria={selectedCategoria}
+        />
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-          <h1 className="text-2xl font-light">Gestión de Categorías de Bienes</h1>
+            <h1 className="text-2xl font-light">Gestión de Categorías de Bienes</h1>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
                 onClick={() => setIsAdding(true)}
@@ -171,7 +206,8 @@ const GestionCategorias = () => {
             categorias={currentItems}
             handleAddCategoria={handleAddCategoria}
             handleOpenSubcategorias={handleOpenSubcategorias}
-            subcategorias={categorias.flatMap(c => c.subcategorias)}
+            handleEditCategoria={handleEditCategoria}
+            handleEditSubcategoria={handleEditSubcategoria}
           />
           <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
             <button
