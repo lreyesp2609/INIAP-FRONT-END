@@ -397,7 +397,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
         setError('No se encontró el token de autenticación');
         return;
       }
-  
+
       const response = await fetch(`${API_URL}/Informes/listar-bancos/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -413,7 +413,7 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
       setError('Error al obtener la lista de bancos: ' + error.message);
     }
   };
-  
+
   // Modificar el useEffect para incluir el token como dependencia
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -985,44 +985,46 @@ const CrearSolicitud = ({ onClose, idEmpleado }) => {
           </div>
           <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS PARA TRANSFERENCIA</h2>
           <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Banco</label>
-              <select
-                value={selectedBanco}
-                onChange={(e) => setSelectedBanco(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccione un banco...</option>
-                {bancos.map((banco) => (
-                  <option key={banco.id_banco} value={banco.id_banco}>
-                    {banco.nombre_banco}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Tipo de Cuenta</label>
-              <select
-                value={tipoCuenta}
-                onChange={(e) => setTipoCuenta(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccione el tipo de cuenta...</option>
-                <option value="Ahorros">Ahorros</option>
-                <option value="Corriente">Corriente</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Número de Cuenta</label>
-              <input
-                type="text"
-                value={numeroCuenta}
-                onChange={(e) => setNumeroCuenta(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+            <div className="flex flex-wrap -mx-2">
+              <div className="w-full md:w-1/3 px-2 mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL BANCO:</label>
+                <select
+                  value={selectedBanco}
+                  onChange={(e) => setSelectedBanco(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Seleccione un banco...</option>
+                  {bancos.map((banco) => (
+                    <option key={banco.id_banco} value={banco.id_banco}>
+                      {banco.nombre_banco}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full md:w-1/3 px-2 mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE CUENTA:</label>
+                <select
+                  value={tipoCuenta}
+                  onChange={(e) => setTipoCuenta(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Seleccione el tipo de cuenta...</option>
+                  <option value="Ahorros">Ahorros</option>
+                  <option value="Corriente">Corriente</option>
+                </select>
+              </div>
+              <div className="w-full md:w-1/3 px-2 mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">No. DE CUENTA:</label>
+                <input
+                  type="text"
+                  value={numeroCuenta}
+                  onChange={(e) => setNumeroCuenta(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-between">
