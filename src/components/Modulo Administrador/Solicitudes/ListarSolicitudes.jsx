@@ -30,9 +30,9 @@ const ListarSolicitudes = () => {
       if (selectedOption === 'pendientes') {
         url = `${API_URL}/Informes/listar-solicitudes-pedientes-admin/`;
       } else if (selectedOption === 'aceptadas') {
-        url = `${API_URL}/Informes/listar-solicitudes-aceptadas/${idUsuario}/`;
+        url = `${API_URL}/Informes/listar-solicitudes-canceladas-admin/`;
       } else if (selectedOption === 'canceladas') {
-        url = `${API_URL}/Informes/listar-solicitudes-canceladas/${idUsuario}/`;
+        url = `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`;
       }
 
       const response = await fetch(url, {
