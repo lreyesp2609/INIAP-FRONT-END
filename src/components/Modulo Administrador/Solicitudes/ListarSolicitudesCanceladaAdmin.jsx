@@ -137,9 +137,6 @@ const ListarSolicitudesCanceladasAdmin = () => {
                       <button className="text-blue-500 hover:text-blue-700 mr-2">
                         <FontAwesomeIcon icon={faEye} />
                       </button>
-                      <button className="text-red-500 hover:text-red-700">
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </button>
                     </td>
                   </tr>
                 ))}
