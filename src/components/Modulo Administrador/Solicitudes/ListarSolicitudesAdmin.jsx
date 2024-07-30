@@ -6,7 +6,7 @@ import ListarSolicitudesAceptadasAdmin from './ListarSolicitudesAceptadoAdmin';
 import ListarSolicitudesCanceladasAdmin from './ListarSolicitudesCanceladaAdmin';
 
 
-const ListarSolicitudes = () => {
+const ListarSolicitudesPendientesAdmin = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -175,4 +175,4 @@ const ListarSolicitudes = () => {
   );
 };
 
-export default ListarSolicitudes;
+export default ListarSolicitudesPendientesAdmin;

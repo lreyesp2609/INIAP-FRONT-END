@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
+import CrearSolicitud from './CrearSolicitud';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
 import API_URL from '../../../Config';
 
-const ListarSolicitude = () => {
+const ListarSolicitudesPendientes = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,10 +128,13 @@ const ListarSolicitude = () => {
                       <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                       <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                       <td className="py-3 px-6 text-left">
+                        <button className="text-yellow-500 hover:text-yellow-700 mr-2">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
                         <button className="text-blue-500 hover:text-blue-700 mr-2">
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        <button className="text-red-500 hover:text-red-700">
+                        <button className="text-red-500 hover:text-red-700 mr-2">
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </td>
@@ -202,4 +206,4 @@ const ListarSolicitude = () => {
   );
 };
 
-export default ListarSolicitude;
+export default ListarSolicitudesPendientes;
