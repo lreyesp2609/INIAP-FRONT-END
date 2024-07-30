@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
-import CrearSolicitud from './CrearSolicitud';
-import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
-import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
+import { faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
+import ListarSolicitudesAceptadasAdmin from './ListarSolicitudesAceptadoAdmin';
+import ListarSolicitudesCanceladasAdmin from './ListarSolicitudesCanceladaAdmin';
 
-const ListarSolicitudesPendientes = () => {
+
+const ListarSolicitudesPendientesAdmin = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,6 @@ const ListarSolicitudesPendientes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [isCreating, setIsCreating] = useState(false);
   const [selectedOption, setSelectedOption] = useState('pendientes');
 
   useEffect(() => {
@@ -28,7 +27,7 @@ const ListarSolicitudesPendientes = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const url = `${API_URL}/Informes/listar-solicitudes/${idUsuario}/`;
+      const url = `${API_URL}/Informes/listar-solicitudes-pedientes-admin/`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -77,23 +76,11 @@ const ListarSolicitudesPendientes = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleCreateSolicitud = () => {
-    setIsCreating(true);
-  };
-
-  const handleCloseCreateSolicitud = () => {
-    setIsCreating(false);
-    fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
-  };
-
   const renderComponent = () => {
     switch (selectedOption) {
       case 'pendientes':
         return (
           <>
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-2xl font-light">Solicitudes Pendientes del Usuario</h1>
-            </div>
             <div className="mb-4">
               <div className="flex">
                 <input
@@ -131,14 +118,8 @@ const ListarSolicitudesPendientes = () => {
                       <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                       <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                       <td className="py-3 px-6 text-left">
-                        <button className="text-yellow-500 hover:text-yellow-700 mr-2">
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
                         <button className="text-blue-500 hover:text-blue-700 mr-2">
                           <FontAwesomeIcon icon={faEye} />
-                        </button>
-                        <button className="text-red-500 hover:text-red-700 mr-2">
-                          <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </td>
                     </tr>
@@ -166,47 +147,32 @@ const ListarSolicitudesPendientes = () => {
           </>
         );
       case 'aceptadas':
-        return <ListarSolicitudesAceptadas />;
+        return <ListarSolicitudesAceptadasAdmin />;
       case 'canceladas':
-        return <ListarSolicitudesCanceladas />;
+        return <ListarSolicitudesCanceladasAdmin />;
       default:
-        return <ListarSolicitudesPendientes />;
+        return <ListarSolicitudes />;
     }
   };
 
   return (
     <div className="p-4">
-      {isCreating ? (
-        <CrearSolicitud onClose={handleCloseCreateSolicitud} />
-      ) : (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Gestion de Solicitudes</h1>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={handleCreateSolicitud}
-            >
-              Crear Solicitud
-            </button>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="solicitudes-dropdown" className="mr-2">Mostrar solicitudes:</label>
-            <select
-              id="solicitudes-dropdown"
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
-              className="p-2 border border-gray-300 rounded"
-            >
-              <option value="pendientes">Pendientes</option>
-              <option value="aceptadas">Aceptadas</option>
-              <option value="canceladas">Canceladas</option>
-            </select>
-          </div>
-          {renderComponent()}
-        </>
-      )}
+      <div className="mb-4">
+        <label htmlFor="solicitudes-dropdown" className="mr-2">Mostrar solicitudes:</label>
+        <select
+          id="solicitudes-dropdown"
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+          className="p-2 border border-gray-300 rounded"
+        >
+          <option value="pendientes">Pendientes</option>
+          <option value="aceptadas">Aceptadas</option>
+          <option value="canceladas">Canceladas</option>
+        </select>
+      </div>
+      {renderComponent()}
     </div>
   );
 };
 
-export default ListarSolicitudesPendientes;
+export default ListarSolicitudesPendientesAdmin;

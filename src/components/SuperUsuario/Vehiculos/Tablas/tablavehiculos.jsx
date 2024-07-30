@@ -17,6 +17,7 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) =
         <table className="min-w-full bg-white border border-gray-200 table-auto">
           <thead>
             <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">ID</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Placa</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Modelo</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Marca</th>
@@ -28,6 +29,7 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) =
           <tbody>
             {vehiculos.map((vehiculo, index) => (
               <tr key={index} className="hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm text-gray-600">{vehiculo.id_vehiculo}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{vehiculo.placa}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{vehiculo.modelo}</td>
                 <td className="px-4 py-2 text-sm text-gray-600">{vehiculo.marca}</td>
@@ -56,6 +58,7 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) =
       <div className="block md:hidden">
         {vehiculos.map((vehiculo, index) => (
           <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4">
+            <p className="text-sm text-gray-700"><strong>ID:</strong> {vehiculo.id_vehiculo}</p>
             <p className="text-sm text-gray-700"><strong>Placa:</strong> {vehiculo.placa}</p>
             <p className="text-sm text-gray-700"><strong>Modelo:</strong> {vehiculo.modelo}</p>
             <p className="text-sm text-gray-700"><strong>Marca:</strong> {vehiculo.marca}</p>
