@@ -91,6 +91,9 @@ const ListarSolicitudesPendientes = () => {
       case 'pendientes':
         return (
           <>
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-light">Solicitudes Pendientes del Usuario</h1>
+            </div>
             <div className="mb-4">
               <div className="flex">
                 <input
@@ -178,7 +181,7 @@ const ListarSolicitudesPendientes = () => {
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Solicitudes</h1>
+            <h1 className="text-2xl font-light">Gestion de Solicitudes</h1>
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={handleCreateSolicitud}

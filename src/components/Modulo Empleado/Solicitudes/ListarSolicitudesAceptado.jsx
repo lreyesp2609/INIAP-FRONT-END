@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
 import CrearSolicitud from './CrearSolicitud';
 import API_URL from '../../../Config';
 
@@ -90,13 +90,7 @@ const ListarSolicitudesAceptadas = () => {
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Solicitudes del Usuario</h1>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={handleCreateSolicitud}
-            >
-              Crear Solicitud
-            </button>
+            <h1 className="text-2xl font-light">Solicitudes Aprobadas del Usuario</h1>
           </div>
           <div className="mb-4">
             <div className="flex">
@@ -135,6 +129,9 @@ const ListarSolicitudesAceptadas = () => {
                     <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                     <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                     <td className="py-3 px-6 text-left">
+                      <button className="text-yellow-500 hover:text-yellow-700 mr-2">
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
                       <button className="text-blue-500 hover:text-blue-700 mr-2">
                         <FontAwesomeIcon icon={faEye} />
                       </button>
