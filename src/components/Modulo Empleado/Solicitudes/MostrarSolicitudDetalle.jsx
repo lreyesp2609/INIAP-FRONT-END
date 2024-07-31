@@ -2,138 +2,334 @@ import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
 
 const MostrarSolicitud = ({ id_solicitud, onClose }) => {
-  const [solicitud, setSolicitud] = useState(null);
-  const [datosPersonales, setDatosPersonales] = useState(null);
-  const [rutas, setRutas] = useState([]);
-  const [cuentaBancaria, setCuentaBancaria] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+    const [solicitud, setSolicitud] = useState(null);
+    const [datosPersonales, setDatosPersonales] = useState(null);
+    const [rutas, setRutas] = useState([]);
+    const [cuentaBancaria, setCuentaBancaria] = useState(null);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSolicitud = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Token no encontrado');
-          setIsLoading(false);
-          return;
-        }
+    useEffect(() => {
+        const fetchSolicitud = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    setError('Token no encontrado');
+                    setIsLoading(false);
+                    return;
+                }
 
-        if (!id_solicitud || isNaN(id_solicitud)) {
-          setError('ID de solicitud no válido');
-          setIsLoading(false);
-          return;
-        }
+                if (!id_solicitud || isNaN(id_solicitud)) {
+                    setError('ID de solicitud no válido');
+                    setIsLoading(false);
+                    return;
+                }
 
-        const response = await fetch(`${API_URL}/Informes/listar-solicitud-empleado/${id_solicitud}/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+                const response = await fetch(`${API_URL}/Informes/listar-solicitud-empleado/${id_solicitud}/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Datos de la solicitud:', data); // Depuración
-          setSolicitud(data.solicitud);
-          setDatosPersonales(data.datos_personales);
-          setRutas(data.rutas);
-          setCuentaBancaria(data.cuenta_bancaria);
-        } else {
-          const errorData = await response.json();
-          console.log('Error al obtener la solicitud:', errorData); // Depuración
-          setError(errorData.error || 'Error al obtener la solicitud');
-        }
-      } catch (error) {
-        console.log('Error al obtener la solicitud:', error); // Depuración
-        setError('Error al obtener la solicitud: ' + error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Datos de la solicitud:', data);
+                    setSolicitud(data.solicitud);
+                    setDatosPersonales(data.datos_personales);
+                    setRutas(data.rutas);
+                    setCuentaBancaria(data.cuenta_bancaria);
+                } else {
+                    const errorData = await response.json();
+                    console.log('Error al obtener la solicitud:', errorData);
+                    setError(errorData.error || 'Error al obtener la solicitud');
+                }
+            } catch (error) {
+                console.log('Error al obtener la solicitud:', error);
+                setError('Error al obtener la solicitud: ' + error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    fetchSolicitud();
-  }, [id_solicitud]);
+        fetchSolicitud();
+    }, [id_solicitud]);
 
-  if (isLoading) {
-    return <div>Cargando...</div>;
-  }
+    if (isLoading) {
+        return <div>Cargando...</div>;
+    }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+    if (error) {
+        return <div className="text-red-500">{error}</div>;
+    }
 
-  if (!solicitud) {
-    return <div>No se encontraron datos de la solicitud</div>;
-  }
+    if (!solicitud) {
+        return <div>No se encontraron datos de la solicitud</div>;
+    }
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Solicitud de Autorización para Cumplimiento de Servicios Institucionales</h1>
-      
-      <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-        <h2 className="text-xl font-bold mb-2">Datos Generales</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p><strong>Código de Solicitud:</strong> {solicitud['Codigo de Solicitud']}</p>
-            <p><strong>Fecha de Solicitud:</strong> {solicitud['Fecha Solicitud']}</p>
-            <p><strong>Motivo:</strong> {solicitud['Motivo']}</p>
-            <p><strong>Lugar de Servicio:</strong> {solicitud['Lugar de Servicio']}</p>
-          </div>
-          <div>
-            <p><strong>Fecha de Salida:</strong> {solicitud['Fecha de Salida']}</p>
-            <p><strong>Hora de Salida:</strong> {solicitud['Hora de Salida']}</p>
-            <p><strong>Fecha de Llegada:</strong> {solicitud['Fecha de Llegada']}</p>
-            <p><strong>Hora de Llegada:</strong> {solicitud['Hora de Llegada']}</p>
-          </div>
-        </div>
-        <p><strong>Descripción de Actividades:</strong> {solicitud['Descripción de Actividades']}</p>
-        <p><strong>Listado de Empleados:</strong> {solicitud['Listado de Empleados']}</p>
-      </div>
-
-      {datosPersonales && (
-        <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-2">Datos Personales</h2>
-          <p><strong>Nombre:</strong> {datosPersonales.Nombre}</p>
-          <p><strong>Cargo:</strong> {datosPersonales.Cargo}</p>
-          <p><strong>Unidad:</strong> {datosPersonales.Unidad}</p>
-        </div>
-      )}
-
-      {rutas.length > 0 && (
-        <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-2">Rutas</h2>
-          {rutas.map((ruta, index) => (
-            <div key={index} className="mb-4 border-b pb-2">
-              <h3 className="font-bold">Ruta {index + 1}</h3>
-              <p><strong>Tipo de Transporte:</strong> {ruta['Tipo de Transporte']}</p>
-              <p><strong>Nombre del Transporte:</strong> {ruta['Nombre del Transporte']}</p>
-              <p><strong>Ruta:</strong> {ruta['Ruta']}</p>
-              <p><strong>Fecha de Salida:</strong> {ruta['Fecha de Salida']}</p>
-              <p><strong>Hora de Salida:</strong> {ruta['Hora de Salida']}</p>
-              <p><strong>Fecha de Llegada:</strong> {ruta['Fecha de Llegada']}</p>
-              <p><strong>Hora de Llegada:</strong> {ruta['Hora de Llegada']}</p>
+    return (
+        <div className="p-4">
+            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
+                    SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+                </h2>
+                {error && <div className="mb-4 text-red-500">{error}</div>}
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    <div className="mb-4 flex">
+                        <div className="mr-4 w-1/2">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                                Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+                            </label>
+                            <input
+                                type="text"
+                                value={solicitud['Codigo de Solicitud']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-1/2">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                                FECHA DE SOLICITUD (dd-mmm-aaa)
+                            </label>
+                            <input
+                                type="text"
+                                value={solicitud['Fecha Solicitud']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">MOTIVO MOVILIZACIÓN</label>
+                        <input
+                            type="text"
+                            value={solicitud['Motivo']}
+                            readOnly
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS GENERALES</h2>
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    {datosPersonales && (
+                        <div className="w-full mr-2">
+                            <div className="flex mb-2">
+                                <div className="mr-2 w-1/2">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+                                    <input
+                                        type="text"
+                                        value={datosPersonales.Nombre}
+                                        readOnly
+                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div className="mr-4 w-1/2">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
+                                    <input
+                                        type="text"
+                                        value={datosPersonales.Cargo}
+                                        readOnly
+                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mb-4 flex">
+                                <div className="w-1/2 mr-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL:</label>
+                                    <input
+                                        type="text"
+                                        value={solicitud['Lugar de Servicio']}
+                                        readOnly
+                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div className="w-1/2">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+                                    <input
+                                        type="text"
+                                        value={datosPersonales.Unidad}
+                                        readOnly
+                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className="mb-4 flex">
+                        <div className="mr-4 w-1/4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA (dd-mmm-aaaa)</label>
+                            <input
+                                type="text"
+                                value={solicitud['Fecha de Salida']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mr-4 w-1/4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA (hh:mm)</label>
+                            <input
+                                type="text"
+                                value={solicitud['Hora de Salida']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mr-4 w-1/4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA (dd-mmm-aaaa)</label>
+                            <input
+                                type="text"
+                                value={solicitud['Fecha de Llegada']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-1/4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA (hh:mm)</label>
+                            <input
+                                type="text"
+                                value={solicitud['Hora de Llegada']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
+                        <input
+                            type="text"
+                            value={solicitud['Listado de Empleados']}
+                            readOnly
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
+                        <textarea
+                            value={solicitud['Descripción de Actividades']}
+                            readOnly
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                </div>
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    <div className="mb-3 flex">
+                        <div className="mb-3">
+                            {rutas.map((ruta, index) => (
+                                <div key={index} className="mb-6 border-b pb-4">
+                                    <h3 className="text-lg font-bold mb-2">Ruta {index + 1}</h3>
+                                    <div className="mb-3 grid grid-cols-1 md:grid-cols-6 gap-3">
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Tipo de Transporte']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Nombre del Transporte']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Ruta']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Fecha de Salida']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Hora de Salida']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Fecha de Llegada']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Hora de Llegada']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS PARA TRANSFERENCIA</h2>
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    <div className="flex flex-wrap -mx-2">
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL BANCO:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.Banco}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE CUENTA:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.['Tipo de Cuenta']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">No. DE CUENTA:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.['Número de Cuenta']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex justify-between">
+                    <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        Cerrar
+                    </button>
+                </div>
             </div>
-          ))}
         </div>
-      )}
-
-      {cuentaBancaria && (
-        <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-2">Datos para Transferencia</h2>
-          <p><strong>Banco:</strong> {cuentaBancaria.Banco}</p>
-          <p><strong>Tipo de Cuenta:</strong> {cuentaBancaria['Tipo de Cuenta']}</p>
-          <p><strong>Número de Cuenta:</strong> {cuentaBancaria['Número de Cuenta']}</p>
-        </div>
-      )}
-
-      <button 
-        onClick={onClose}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Cerrar
-      </button>
-    </div>
-  );
+    );
 };
 
 export default MostrarSolicitud;
