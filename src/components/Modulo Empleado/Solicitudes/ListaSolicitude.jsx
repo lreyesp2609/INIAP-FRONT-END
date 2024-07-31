@@ -4,6 +4,7 @@ import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
 import CrearSolicitud from './CrearSolicitud';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
+import MostrarSolicitud from './MostrarSolicitudDetalle';
 import API_URL from '../../../Config';
 
 const ListarSolicitudesPendientes = () => {
@@ -16,6 +17,8 @@ const ListarSolicitudesPendientes = () => {
   const [itemsPerPage] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
   const [selectedOption, setSelectedOption] = useState('pendientes');
+  const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
+  const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -83,12 +86,19 @@ const ListarSolicitudesPendientes = () => {
 
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
-    fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
+    fetchSolicitudes();
   };
 
   const handleVer = (id_solicitud) => {
-    console.log('Respuesta del servidor:', id_solicitud);
-  }
+    console.log('La id es:',id_solicitud)
+    setSelectedSolicitudId(id_solicitud);
+    setShowMostrarSolicitud(true);
+  };
+
+  const handleCloseMostrarSolicitud = () => {
+    setShowMostrarSolicitud(false);
+    setSelectedSolicitudId(null);
+  };
 
   const renderComponent = () => {
     switch (selectedOption) {
@@ -135,17 +145,19 @@ const ListarSolicitudesPendientes = () => {
                       <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                       <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                       <td className="py-3 px-6 text-left">
-                        <button className="text-yellow-500 hover:text-yellow-700 mr-2">
+                        <button className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                          title="Editar Solicitud de Movilización">
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         <button
-                         className="p-2 bg-blue-500 text-white rounded-full mr-2"
-                         title="Ver Solicitud de Movilización"
-                         onClick={handleVer(solicitud.id)}
+                          className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                          title="Ver Solicitud de Movilización"
+                          onClick={() => handleVer(solicitud.id)}
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        <button className="text-red-500 hover:text-red-700 mr-2">
+                        <button className="p-2 bg-red-500 text-white rounded-full mr-2"
+                         title="Eliminar Solicitud de Movilización">
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </td>
@@ -186,6 +198,11 @@ const ListarSolicitudesPendientes = () => {
     <div className="p-4">
       {isCreating ? (
         <CrearSolicitud onClose={handleCloseCreateSolicitud} />
+      ) : showMostrarSolicitud ? (
+        <MostrarSolicitud 
+          id_solicitud={selectedSolicitudId} 
+          onClose={handleCloseMostrarSolicitud} 
+        />
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
