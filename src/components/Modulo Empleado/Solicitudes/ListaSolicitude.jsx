@@ -86,6 +86,10 @@ const ListarSolicitudesPendientes = () => {
     fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
   };
 
+  const handleVer = (id_solicitud) => {
+    console.log('Respuesta del servidor:', id_solicitud);
+  }
+
   const renderComponent = () => {
     switch (selectedOption) {
       case 'pendientes':
@@ -134,7 +138,11 @@ const ListarSolicitudesPendientes = () => {
                         <button className="text-yellow-500 hover:text-yellow-700 mr-2">
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
-                        <button className="text-blue-500 hover:text-blue-700 mr-2">
+                        <button
+                         className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                         title="Ver Solicitud de Movilización"
+                         onClick={handleVer(solicitud.id)}
+                        >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
                         <button className="text-red-500 hover:text-red-700 mr-2">
