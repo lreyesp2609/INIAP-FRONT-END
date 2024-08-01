@@ -26,7 +26,6 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                     setIsLoading(false);
                     return;
                 }
-
                 const response = await fetch(`${API_URL}/Informes/listar-solicitud-empleado/${id_solicitud}/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
