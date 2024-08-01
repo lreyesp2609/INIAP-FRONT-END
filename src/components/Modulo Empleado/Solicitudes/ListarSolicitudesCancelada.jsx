@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
-import CrearSolicitud from './CrearSolicitud';
+import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
+import MostrarSolicitud from './MostrarSolicitudDetalle';
 import API_URL from '../../../Config';
 
 const ListarSolicitudesCanceladas = () => {
@@ -12,7 +12,8 @@ const ListarSolicitudesCanceladas = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [isCreating, setIsCreating] = useState(false);
+  const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
+  const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -22,11 +23,11 @@ const ListarSolicitudesCanceladas = () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const idUsuario = storedUser.usuario.id_usuario;
-
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const response = await fetch(`${API_URL}/Informes/listar-solicitudes-canceladas/${idUsuario}/`, {
+      const url = `${API_URL}/Informes/listar-solicitudes-canceladas/${idUsuario}/`;
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -74,25 +75,25 @@ const ListarSolicitudesCanceladas = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleCreateSolicitud = () => {
-    setIsCreating(true);
+  const handleVer = (id_solicitud) => {
+    setSelectedSolicitudId(id_solicitud);
+    setShowMostrarSolicitud(true);
   };
 
-  const handleCloseCreateSolicitud = () => {
-    setIsCreating(false);
-    fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
+  const handleCloseMostrarSolicitud = () => {
+    setShowMostrarSolicitud(false);
+    setSelectedSolicitudId(null);
   };
 
   return (
     <div className="p-4">
-      {isCreating ? (
-        <CrearSolicitud onClose={handleCloseCreateSolicitud} />
-      ) : (
+      {showMostrarSolicitud && selectedSolicitudId && (
+        <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+      )}
+      {!showMostrarSolicitud && (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Solicitudes Canceladas del Usuario</h1>
-          </div>
           <div className="mb-4">
+          <h2 className="text-xl font-light mb-4">Solicitudes Canceladas del Usuario</h2>
             <div className="flex">
               <input
                 type="text"
@@ -129,7 +130,11 @@ const ListarSolicitudesCanceladas = () => {
                     <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                     <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                     <td className="py-3 px-6 text-left">
-                      <button className="text-blue-500 hover:text-blue-700 center-text">
+                      <button
+                        className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                        title="Ver Solicitud de Movilización"
+                        onClick={() => handleVer(solicitud.id)}
+                      >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
                     </td>

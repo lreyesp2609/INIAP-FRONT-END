@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
 import CrearSolicitud from './CrearSolicitud';
+import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import API_URL from '../../../Config';
-import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 
 const ListarSolicitudesPendientes = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -19,12 +19,11 @@ const ListarSolicitudesPendientes = () => {
   const [selectedOption, setSelectedOption] = useState('pendientes');
   const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
   const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
+  const [showSelector, setShowSelector] = useState(true); // Nueva variable de estado
 
   useEffect(() => {
-    if (selectedOption === 'pendientes') {
-      fetchSolicitudes();
-    }
-  }, [selectedOption]);
+    fetchSolicitudes();
+  }, []);
 
   const fetchSolicitudes = async () => {
     try {
@@ -86,24 +85,29 @@ const ListarSolicitudesPendientes = () => {
     setIsCreating(true);
     setShowMostrarSolicitud(false);
     setSelectedOption('');
+    setShowSelector(false); // Ocultar el selector cuando se crea una solicitud
   };
 
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
     fetchSolicitudes();
     setSelectedOption('pendientes');
+    setShowSelector(true); // Mostrar el selector cuando se cierra la creación de solicitud
   };
 
   const handleVer = (id_solicitud) => {
     setSelectedSolicitudId(id_solicitud);
     setShowMostrarSolicitud(true);
     setIsCreating(false);
+    setSelectedOption('');
+    setShowSelector(false); // Ocultar el selector cuando se ve una solicitud
   };
 
   const handleCloseMostrarSolicitud = () => {
     setShowMostrarSolicitud(false);
     setSelectedSolicitudId(null);
     setSelectedOption('pendientes');
+    setShowSelector(true); // Mostrar el selector cuando se cierra la visualización de solicitud
   };
 
   return (
@@ -116,7 +120,7 @@ const ListarSolicitudesPendientes = () => {
       )}
       {!isCreating && !showMostrarSolicitud && (
         <>
-          {selectedOption === 'pendientes' && (
+          {showSelector && (
             <>
               <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
@@ -144,8 +148,9 @@ const ListarSolicitudesPendientes = () => {
           )}
           {selectedOption === 'pendientes' && (
             <>
-              <h2 className="text-xl font-light mb-4">Solicitudes Pendientes del Usuario</h2>
+
               <div className="mb-4">
+                <h2 className="text-xl font-light mb-4">Solicitudes Pendientes del Usuario</h2>
                 <div className="flex">
                   <input
                     type="text"
