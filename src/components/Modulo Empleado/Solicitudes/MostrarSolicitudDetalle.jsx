@@ -87,7 +87,7 @@ const MostrarSolicitud = ({ id_solicitud, onClose }) => {
                             />
                         </div>
                         <div className="w-1/2">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                            <label className="block text-gray-700 text-sm font-bold mb-2 h-10">
                                 FECHA DE SOLICITUD (dd-mmm-aaa)
                             </label>
                             <input
@@ -122,7 +122,7 @@ const MostrarSolicitud = ({ id_solicitud, onClose }) => {
                                         className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
-                                <div className="mr-4 w-1/2">
+                                <div className="w-1/2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA:</label>
                                     <input
                                         type="text"
@@ -218,8 +218,8 @@ const MostrarSolicitud = ({ id_solicitud, onClose }) => {
                             {rutas.map((ruta, index) => (
                                 <div key={index} className="mb-6 border-b pb-4">
                                     <h3 className="text-lg font-bold mb-2">Ruta {index + 1}</h3>
-                                    <div className="mb-3 grid grid-cols-1 md:grid-cols-6 gap-3">
-                                        <div>
+                                    <div className="mb-3 grid grid-cols-12 gap-2">
+                                        <div className="col-span-3">
                                             <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
                                             <input
                                                 type="text"
@@ -228,8 +228,8 @@ const MostrarSolicitud = ({ id_solicitud, onClose }) => {
                                                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
-                                        <div>
-                                            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL TRANSPORTE</label>
+                                        <div className="col-span-3">
+                                            <label className="block text-gray-700 text-sm font-bold mb-2 h-10">NOMBRE DEL TRANSPORTE</label>
                                             <input
                                                 type="text"
                                                 value={ruta['Nombre del Transporte']}
@@ -237,8 +237,8 @@ const MostrarSolicitud = ({ id_solicitud, onClose }) => {
                                                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
-                                        <div>
-                                            <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
+                                        <div className="col-span-6">
+                                            <label className="block text-gray-700 text-sm font-bold mb-2 h-10">RUTA</label>
                                             <input
                                                 type="text"
                                                 value={ruta['Ruta']}
