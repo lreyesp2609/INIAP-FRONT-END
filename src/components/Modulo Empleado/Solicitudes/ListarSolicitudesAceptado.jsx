@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
+import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada'; // Importar el nuevo componente
+import ListarSolicitudesPendientes from './ListaSolicitude'; // Importar el nuevo componente
+import CrearSolicitud from './CrearSolicitud'; // Importar el nuevo componente
 import API_URL from '../../../Config';
 
 const ListarSolicitudesAceptadas = () => {
@@ -14,6 +17,9 @@ const ListarSolicitudesAceptadas = () => {
   const [itemsPerPage] = useState(10);
   const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
   const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
+  const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Estado para solicitudes canceladas
+  const [showPendingRequests, setShowPendingRequests] = useState(false); // Estado para solicitudes pendientes
+  const [isCreating, setIsCreating] = useState(false); // Estado para crear solicitud
 
   useEffect(() => {
     fetchSolicitudes();
@@ -85,16 +91,71 @@ const ListarSolicitudesAceptadas = () => {
     setSelectedSolicitudId(null);
   };
 
+  const handleShowCancelledRequests = () => {
+    setShowCancelledRequests(true);
+  };
+
+  const handleShowPendingRequests = () => {
+    setShowPendingRequests(true);
+  };
+
+  const handleCreateSolicitud = () => {
+    setIsCreating(true);
+    setShowMostrarSolicitud(false);
+    setShowCancelledRequests(false);
+    setShowPendingRequests(false);
+  };
+
+  const handleCloseCreateSolicitud = () => {
+    setIsCreating(false);
+    fetchSolicitudes();
+  };
+
+  if (isCreating) {
+    return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
+  }
+
+  if (showCancelledRequests) {
+    return <ListarSolicitudesCanceladas />;
+  }
+
+  if (showPendingRequests) {
+    return <ListarSolicitudesPendientes />;
+  }
+
   return (
     <div className="p-4">
       {showMostrarSolicitud && selectedSolicitudId && (
         <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
       )}
-      {!showMostrarSolicitud && (
+      {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
         <>
           <div className="mb-4">
-          <h2 className="text-xl font-light mb-4">Solicitudes Canceladas del Usuario</h2>
-            <div className="flex">
+            <h2 className="text-xl font-light mb-4">Solicitudes Aceptadas del Usuario</h2>
+            <div className="flex space-x-2">
+              <button
+                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                onClick={handleShowPendingRequests}
+                style={{ marginBottom: '16px' }}
+              >
+                Solicitudes Pendientes
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={handleShowCancelledRequests}
+                style={{ marginBottom: '16px' }}
+              >
+                Solicitudes Canceladas
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleCreateSolicitud}
+                style={{ marginBottom: '16px' }}
+              >
+                Crear Solicitud
+              </button>
+            </div>
+            <div className="flex mb-4">
               <input
                 type="text"
                 placeholder="Buscar por número, motivo o estado"
