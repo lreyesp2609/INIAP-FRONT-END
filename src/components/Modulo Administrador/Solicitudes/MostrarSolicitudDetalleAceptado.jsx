@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
 
-const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
+const MostrarSolicitudAceptadoAdmin = ({ id_solicitud, onClose }) => {
     const [solicitud, setSolicitud] = useState(null);
     const [datosPersonales, setDatosPersonales] = useState(null);
     const [rutas, setRutas] = useState([]);
@@ -238,12 +238,6 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                 </div>
                 <div className="flex justify-end mt-4">
                     <button
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-                        onClick={() => { setShowModal(true); setModalAction('aceptado'); }}
-                    >
-                        Aceptar
-                    </button>
-                    <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         onClick={() => { setShowModal(true); setModalAction('cancelado'); }}
                     >
@@ -284,4 +278,4 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
     );
 };
 
-export default MostrarSolicitudPendienteAdmin;
+export default MostrarSolicitudAceptadoAdmin;
