@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
 import CrearSolicitud from './CrearSolicitud';
-import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import API_URL from '../../../Config';
+import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 
 const ListarSolicitudesPendientes = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -21,8 +21,10 @@ const ListarSolicitudesPendientes = () => {
   const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
 
   useEffect(() => {
-    fetchSolicitudes();
-  }, []);
+    if (selectedOption === 'pendientes') {
+      fetchSolicitudes();
+    }
+  }, [selectedOption]);
 
   const fetchSolicitudes = async () => {
     try {
@@ -82,152 +84,150 @@ const ListarSolicitudesPendientes = () => {
 
   const handleCreateSolicitud = () => {
     setIsCreating(true);
+    setShowMostrarSolicitud(false);
+    setSelectedOption('');
   };
 
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
     fetchSolicitudes();
+    setSelectedOption('pendientes');
   };
 
   const handleVer = (id_solicitud) => {
-    console.log('La id es:',id_solicitud)
     setSelectedSolicitudId(id_solicitud);
     setShowMostrarSolicitud(true);
+    setIsCreating(false);
   };
 
   const handleCloseMostrarSolicitud = () => {
     setShowMostrarSolicitud(false);
     setSelectedSolicitudId(null);
-  };
-
-  const renderComponent = () => {
-    switch (selectedOption) {
-      case 'pendientes':
-        return (
-          <>
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-2xl font-light">Solicitudes Pendientes del Usuario</h1>
-            </div>
-            <div className="mb-4">
-              <div className="flex">
-                <input
-                  type="text"
-                  placeholder="Buscar por número, motivo o estado"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
-                  onClick={handleClear}
-                  style={{ minWidth: '80px' }}
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                  <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                    <th className="py-3 px-6 text-left">Código de Solicitud</th>
-                    <th className="py-3 px-6 text-left">Fecha Solicitud</th>
-                    <th className="py-3 px-6 text-left">Motivo Movilización</th>
-                    <th className="py-3 px-6 text-left">Estado Solicitud</th>
-                    <th className="py-3 px-6 text-left">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-600 text-sm font-light">
-                  {currentItems.map((solicitud) => (
-                    <tr key={solicitud['Codigo de Solicitud']} className="border-b border-gray-300 hover:bg-gray-100">
-                      <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud['Codigo de Solicitud']}</td>
-                      <td className="py-3 px-6 text-left">{solicitud['Fecha Solicitud']}</td>
-                      <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
-                      <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
-                      <td className="py-3 px-6 text-left">
-                        <button className="p-2 bg-yellow-500 text-white rounded-full mr-2"
-                          title="Editar Solicitud de Movilización">
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        <button
-                          className="p-2 bg-blue-500 text-white rounded-full mr-2"
-                          title="Ver Solicitud de Movilización"
-                          onClick={() => handleVer(solicitud.id)}
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                        <button className="p-2 bg-red-500 text-white rounded-full mr-2"
-                         title="Eliminar Solicitud de Movilización">
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex justify-between items-center mt-4">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                disabled={currentPage === 1}
-              >
-                Anterior
-              </button>
-              <span>{`Página ${currentPage} de ${totalPages}`}</span>
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                disabled={currentPage === totalPages}
-              >
-                Siguiente
-              </button>
-            </div>
-          </>
-        );
-      case 'aceptadas':
-        return <ListarSolicitudesAceptadas />;
-      case 'canceladas':
-        return <ListarSolicitudesCanceladas />;
-      default:
-        return <ListarSolicitudesPendientes />;
-    }
+    setSelectedOption('pendientes');
   };
 
   return (
     <div className="p-4">
-      {isCreating ? (
+      {isCreating && (
         <CrearSolicitud onClose={handleCloseCreateSolicitud} />
-      ) : showMostrarSolicitud ? (
-        <MostrarSolicitud 
-          id_solicitud={selectedSolicitudId} 
-          onClose={handleCloseMostrarSolicitud} 
-        />
-      ) : (
+      )}
+      {showMostrarSolicitud && (
+        <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+      )}
+      {!isCreating && !showMostrarSolicitud && (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Gestion de Solicitudes</h1>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={handleCreateSolicitud}
-            >
-              Crear Solicitud
-            </button>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="solicitudes-dropdown" className="mr-2">Mostrar solicitudes:</label>
-            <select
-              id="solicitudes-dropdown"
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
-              className="p-2 border border-gray-300 rounded"
-            >
-              <option value="pendientes">Pendientes</option>
-              <option value="aceptadas">Aceptadas</option>
-              <option value="canceladas">Canceladas</option>
-            </select>
-          </div>
-          {renderComponent()}
+          {selectedOption === 'pendientes' && (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={handleCreateSolicitud}
+                >
+                  Crear Solicitud
+                </button>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="solicitudes-dropdown" className="mr-2">Mostrar solicitudes:</label>
+                <select
+                  id="solicitudes-dropdown"
+                  value={selectedOption}
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                  className="p-2 border border-gray-300 rounded"
+                >
+                  <option value="pendientes">Pendientes</option>
+                  <option value="aceptadas">Aceptadas</option>
+                  <option value="canceladas">Canceladas</option>
+                </select>
+              </div>
+            </>
+          )}
+          {selectedOption === 'pendientes' && (
+            <>
+              <h2 className="text-xl font-light mb-4">Solicitudes Pendientes del Usuario</h2>
+              <div className="mb-4">
+                <div className="flex">
+                  <input
+                    type="text"
+                    placeholder="Buscar por número, motivo o estado"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
+                    onClick={handleClear}
+                    style={{ minWidth: '80px' }}
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-300">
+                  <thead>
+                    <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                      <th className="py-3 px-6 text-left">Código de Solicitud</th>
+                      <th className="py-3 px-6 text-left">Fecha Solicitud</th>
+                      <th className="py-3 px-6 text-left">Motivo Movilización</th>
+                      <th className="py-3 px-6 text-left">Estado Solicitud</th>
+                      <th className="py-3 px-6 text-left">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-600 text-sm font-light">
+                    {currentItems.map((solicitud) => (
+                      <tr key={solicitud['Codigo de Solicitud']} className="border-b border-gray-300 hover:bg-gray-100">
+                        <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud['Codigo de Solicitud']}</td>
+                        <td className="py-3 px-6 text-left">{solicitud['Fecha Solicitud']}</td>
+                        <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
+                        <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
+                        <td className="py-3 px-6 text-left">
+                          <button
+                            className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                            title="Editar Solicitud de Movilización"
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </button>
+                          <button
+                            className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                            title="Ver Solicitud de Movilización"
+                            onClick={() => handleVer(solicitud.id)}
+                          >
+                            <FontAwesomeIcon icon={faEye} />
+                          </button>
+                          <button
+                            className="p-2 bg-red-500 text-white rounded-full mr-2"
+                            title="Eliminar Solicitud de Movilización"
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                  disabled={currentPage === 1}
+                >
+                  Anterior
+                </button>
+                <span>{`Página ${currentPage} de ${totalPages}`}</span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                </button>
+              </div>
+            </>
+          )}
+          {selectedOption === 'aceptadas' && <ListarSolicitudesAceptadas />}
+          {selectedOption === 'canceladas' && <ListarSolicitudesCanceladas />}
         </>
       )}
     </div>
