@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
+import ListarSolicitudesCanceladasAdmin from './ListarSolicitudesCanceladaAdmin';
+import ListarSolicitudesPendientesAdmin from './ListarSolicitudesAdmin';
+import MostrarSolicitudAdmin from './MostrarSolicitudDetalleAdmin';
 
 const ListarSolicitudesAceptadasAdmin = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -11,7 +14,11 @@ const ListarSolicitudesAceptadasAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [isCreating, setIsCreating] = useState(false);
+  const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
+  const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
+  const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Estado para solicitudes canceladas
+  const [showPendingRequests, setShowPendingRequests] = useState(false); // Estado para solicitudes pendientes
+  const [isCreating, setIsCreating] = useState(false); // Estado para crear solicitud
 
   useEffect(() => {
     fetchSolicitudes();
@@ -21,11 +28,11 @@ const ListarSolicitudesAceptadasAdmin = () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const idUsuario = storedUser.usuario.id_usuario;
-
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const response = await fetch(`${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`, {
+      const url = `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`;
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,32 +80,59 @@ const ListarSolicitudesAceptadasAdmin = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleCreateSolicitud = () => {
-    setIsCreating(true);
+  const handleVer = (id_solicitud) => {
+    setSelectedSolicitudId(id_solicitud);
+    setShowMostrarSolicitud(true);
   };
 
-  const handleCloseCreateSolicitud = () => {
-    setIsCreating(false);
-    fetchSolicitudes(); // Volver a cargar las solicitudes después de crear una nueva
+  const handleCloseMostrarSolicitud = () => {
+    setShowMostrarSolicitud(false);
+    setSelectedSolicitudId(null);
   };
+
+  const handleShowCancelledRequests = () => {
+    setShowCancelledRequests(true);
+  };
+
+  const handleShowPendingRequests = () => {
+    setShowPendingRequests(true);
+  };
+
+
+  if (showCancelledRequests) {
+    return <ListarSolicitudesCanceladasAdmin />;
+  }
+
+  if (showPendingRequests) {
+    return <ListarSolicitudesPendientesAdmin />;
+  }
 
   return (
     <div className="p-4">
-      {isCreating ? (
-        <CrearSolicitud onClose={handleCloseCreateSolicitud} />
-      ) : (
+      {showMostrarSolicitud && selectedSolicitudId && (
+        <MostrarSolicitudAdmin id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+      )}
+      {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Solicitudes del Usuario</h1>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={handleCreateSolicitud}
-            >
-              Crear Solicitud
-            </button>
-          </div>
           <div className="mb-4">
-            <div className="flex">
+            <h2 className="text-xl font-light mb-4">Solicitudes Aceptadas del Usuario</h2>
+            <div className="flex space-x-2">
+              <button
+                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                onClick={handleShowPendingRequests}
+                style={{ marginBottom: '16px' }}
+              >
+                Solicitudes Pendientes
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={handleShowCancelledRequests}
+                style={{ marginBottom: '16px' }}
+              >
+                Solicitudes Canceladas
+              </button>
+            </div>
+            <div className="flex mb-4">
               <input
                 type="text"
                 placeholder="Buscar por número, motivo o estado"
@@ -134,7 +168,11 @@ const ListarSolicitudesAceptadasAdmin = () => {
                     <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
                     <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                     <td className="py-3 px-6 text-left">
-                      <button className="text-blue-500 hover:text-blue-700 mr-2">
+                      <button
+                        className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                        title="Ver Solicitud de Movilización"
+                        onClick={() => handleVer(solicitud.id)}
+                      >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
                     </td>
