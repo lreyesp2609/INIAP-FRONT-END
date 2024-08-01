@@ -4,6 +4,7 @@ import { faEye } from '@fortawesome/free-solid-svg-icons';
 import MostrarSolicitudAdmin from './MostrarSolicitudDetalleAdmin';
 import ListarSolicitudesAceptadasAdmin from './ListarSolicitudesAceptadoAdmin';
 import ListarSolicitudesCanceladasAdmin from './ListarSolicitudesCanceladaAdmin';
+import MostrarSolicitudPendienteAdmin from './MostrarSolicitudDetallePendienteAdmin'
 
 import API_URL from '../../../Config';
 
@@ -111,7 +112,7 @@ const ListarSolicitudesPendientesAdmin = () => {
   return (
     <div className="p-4">
       {showMostrarSolicitud && selectedSolicitudId && (
-        <MostrarSolicitudAdmin id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+        <MostrarSolicitudPendienteAdmin id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
       )}
       {!showMostrarSolicitud && !showAcceptedRequests && !showCancelledRequests && !isCreating && (
         <>
