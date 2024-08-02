@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
-import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada'; // Importar el nuevo componente
-import ListarSolicitudesPendientes from './ListaSolicitude'; // Importar el nuevo componente
-import CrearSolicitud from './CrearSolicitud'; // Importar el nuevo componente
+import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
+import ListarSolicitudesPendientes from './ListaSolicitude';
+import CrearSolicitud from './CrearSolicitud';
 import API_URL from '../../../Config';
 
 const ListarSolicitudesAceptadas = () => {
@@ -17,15 +17,13 @@ const ListarSolicitudesAceptadas = () => {
   const [itemsPerPage] = useState(10);
   const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
   const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
-  const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Estado para solicitudes canceladas
-  const [showPendingRequests, setShowPendingRequests] = useState(false); // Estado para solicitudes pendientes
-  const [isCreating, setIsCreating] = useState(false); // Estado para crear solicitud
+  const [showCancelledRequests, setShowCancelledRequests] = useState(false);
+  const [showPendingRequests, setShowPendingRequests] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [solicitudToCancel, setSolicitudToCancel] = useState(null);
 
-  useEffect(() => {
-    fetchSolicitudes();
-  }, []);
-
-  const fetchSolicitudes = async () => {
+  const fetchSolicitudes = useCallback(async () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const idUsuario = storedUser.usuario.id_usuario;
@@ -48,7 +46,38 @@ const ListarSolicitudesAceptadas = () => {
       setError(error.message);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchSolicitudes();
+  }, [fetchSolicitudes]);
+
+  const handleCancelarSolicitud = useCallback(async (id_solicitud) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+
+      const url = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estado_solicitud: 'cancelado' })
+      });
+
+      if (!response.ok) throw new Error('Error al cancelar la solicitud');
+
+      const data = await response.json();
+      console.log(data.mensaje);
+
+      // Actualizar la lista de solicitudes
+      fetchSolicitudes();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }, [fetchSolicitudes]);
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
@@ -109,6 +138,18 @@ const ListarSolicitudesAceptadas = () => {
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
     fetchSolicitudes();
+  };
+
+  const handleConfirmCancel = (id_solicitud) => {
+    console.log(`Confirmar cancelación para solicitud ID: ${id_solicitud}`); // Agregado para depuración
+    setSolicitudToCancel(id_solicitud);
+    setShowConfirmModal(true);
+  };
+
+  const handleCancelConfirmed = async () => {
+    await handleCancelarSolicitud(solicitudToCancel);
+    setShowConfirmModal(false);
+    setSolicitudToCancel(null);
   };
 
   if (isCreating) {
@@ -198,6 +239,13 @@ const ListarSolicitudesAceptadas = () => {
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
+                      <button
+                        className="p-2 bg-red-500 text-white rounded-full mr-2"
+                        title="Cancelar Solicitud de Movilización"
+                        onClick={() => handleConfirmCancel(solicitud.id)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -221,6 +269,28 @@ const ListarSolicitudesAceptadas = () => {
               Siguiente
             </button>
           </div>
+          {showConfirmModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-lg">
+                <h2 className="text-xl mb-4">¿Está seguro de cancelar esta solicitud?</h2>
+                <p className="mb-4">Una vez realizada esta acción no se podrá revertir.</p>
+                <div className="flex justify-end">
+                  <button
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded mr-2"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    onClick={handleCancelConfirmed}
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

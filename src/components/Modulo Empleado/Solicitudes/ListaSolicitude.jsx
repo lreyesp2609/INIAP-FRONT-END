@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
-import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada'; // Importar el nuevo componente
-import CrearSolicitud from './CrearSolicitud'; // Importar el nuevo componente
+import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
+import CrearSolicitud from './CrearSolicitud';
 import API_URL from '../../../Config';
 
 const ListarSolicitudesPendientes = () => {
@@ -18,8 +18,10 @@ const ListarSolicitudesPendientes = () => {
   const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
   const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
-  const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Nuevo estado para solicitudes canceladas
+  const [showCancelledRequests, setShowCancelledRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [solicitudToCancel, setSolicitudToCancel] = useState(null);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -50,6 +52,32 @@ const ListarSolicitudesPendientes = () => {
     }
   };
 
+  const handleCancelarSolicitud = useCallback(async (id_solicitud) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+
+      const url = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estado_solicitud: 'cancelado' })
+      });
+
+      if (!response.ok) throw new Error('Error al cancelar la solicitud');
+
+      const data = await response.json();
+      console.log(data.mensaje);
+
+      fetchSolicitudes();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }, [fetchSolicitudes]);
+
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
@@ -77,10 +105,6 @@ const ListarSolicitudesPendientes = () => {
   const currentItems = filteredSolicitudes.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
 
-  const handleClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   const handleVer = (id_solicitud) => {
     setSelectedSolicitudId(id_solicitud);
     setShowMostrarSolicitud(true);
@@ -103,12 +127,31 @@ const ListarSolicitudesPendientes = () => {
     setIsCreating(true);
     setShowMostrarSolicitud(false);
     setShowAcceptedRequests(false);
-    setShowCancelledRequests(false); // Ocultar solicitudes canceladas cuando se crea una solicitud
+    setShowCancelledRequests(false);
   };
 
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
     fetchSolicitudes();
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
+
+  const handleConfirmCancel = (id_solicitud) => {
+    setSolicitudToCancel(id_solicitud);
+    setShowConfirmModal(true);
+  };
+
+  const handleCancelConfirmed = async () => {
+    await handleCancelarSolicitud(solicitudToCancel);
+    setShowConfirmModal(false);
+    setSolicitudToCancel(null);
   };
 
   if (isCreating) {
@@ -198,6 +241,13 @@ const ListarSolicitudesPendientes = () => {
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
+                      <button
+                        className="p-2 bg-red-500 text-white rounded-full"
+                        title="Cancelar Solicitud de Movilización"
+                        onClick={() => handleConfirmCancel(solicitud.id)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -221,6 +271,28 @@ const ListarSolicitudesPendientes = () => {
               Siguiente
             </button>
           </div>
+          {showConfirmModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-lg">
+                <h2 className="text-xl mb-4">¿Está seguro de cancelar esta solicitud?</h2>
+                <p className="mb-4">Una vez realizada esta acción no se podrá revertir.</p>
+                <div className="flex justify-end">
+                  <button
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded mr-2"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    onClick={handleCancelConfirmed}
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
