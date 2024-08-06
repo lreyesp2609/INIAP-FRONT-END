@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
+import MesView from "./Mesview";
+import SemanaView from "./Semanaview";
+import AgendaView from "./Agendaview";
 
 const Calendario = () => {
   const [view, setView] = useState("month");
@@ -32,7 +35,12 @@ const Calendario = () => {
           }
         );
         const data = await response.json();
-        setOrdenesAprobadas(data.ordenes_aprobadas);
+        const today = new Date().setHours(0, 0, 0, 0); // Reset time part for comparison
+        const filteredOrders = data.ordenes_aprobadas.filter((orden) => {
+          const ordenDate = new Date(orden.fecha_viaje).setHours(0, 0, 0, 0);
+          return ordenDate >= today;
+        });
+        setOrdenesAprobadas(filteredOrders);
       } catch (error) {
         console.error("Error al obtener las órdenes de movilización:", error);
       }
@@ -63,110 +71,6 @@ const Calendario = () => {
 
   const handleToday = () => {
     setDate(new Date());
-  };
-
-  const daysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const renderMonthView = () => {
-    const month = date.toLocaleString("default", { month: "long" });
-    const year = date.getFullYear();
-    const startOfMonth = new Date(year, date.getMonth(), 1);
-    const startDay = (startOfMonth.getDay() + 6) % 7;
-    const daysInCurrentMonth = daysInMonth(year, date.getMonth());
-
-    const daysOfWeek = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
-    const daysArray = [
-      ...Array(startDay).fill(null),
-      ...Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1),
-    ];
-
-    return (
-      <div>
-        <h2 className="text-center text-xl mb-4">{`${month} ${year}`}</h2>
-        <div className="grid grid-cols-7 gap-2 text-center">
-          {daysOfWeek.map((day, index) => (
-            <div key={index} className="font-bold">
-              {day}
-            </div>
-          ))}
-          {daysArray.map((day, index) => {
-            const currentDay = new Date(year, date.getMonth(), day);
-            const orden = ordenesAprobadas.find(
-              (o) =>
-                new Date(o.fecha_viaje).toDateString() ===
-                currentDay.toDateString()
-            );
-            return (
-              <div key={index} className="border p-2 relative min-w-[2.5rem] sm:min-w-[3rem] lg:min-w-[4rem]">
-                {day !== null ? (
-                  <div className="relative overflow-visible text-sm">
-                    {day}
-                    {orden && (
-                      <a
-                        href="#"
-                        className="block mt-2 p-1 rounded bg-yellow-400 border border-yellow-400 text-black overflow-visible whitespace-normal text-xs sm:text-sm lg:text-base"
-                      >
-                        {orden.secuencial_orden_movilizacion}
-                      </a>
-                    )}
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const renderWeekView = () => {
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - ((date.getDay() + 6) % 7));
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    const daysOfWeek = [];
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      daysOfWeek.push(day);
-    }
-    return (
-      <div>
-        <h2 className="text-center text-xl mb-4">
-          {`${startOfWeek.getDate()} - ${endOfWeek.getDate()} ${endOfWeek.toLocaleString(
-            "default",
-            { month: "short" }
-          )} ${endOfWeek.getFullYear()}`}
-        </h2>
-        <div className="grid grid-cols-7 gap-2 text-center">
-          {daysOfWeek.map((day, i) => {
-            const orden = ordenesAprobadas.find(
-              (o) =>
-                new Date(o.fecha_viaje).toDateString() === day.toDateString()
-            );
-            return (
-              <div key={i} className="border p-2 relative min-w-[2.5rem] sm:min-w-[3rem] lg:min-w-[4rem]">
-                {`${day.toLocaleDateString("default", {
-                  weekday: "short",
-                })} ${day.getDate()}/${day.getMonth() + 1}`}
-                {orden && (
-                  <a
-                    href="#"
-                    className="block mt-2 p-1 rounded bg-yellow-400 border border-yellow-400 text-black overflow-visible whitespace-normal text-xs sm:text-sm lg:text-base"
-                  >
-                    {orden.secuencial_orden_movilizacion}
-                  </a>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -220,9 +124,15 @@ const Calendario = () => {
         </div>
       </div>
       <div>
-        {view === "month" && renderMonthView()}
-        {view === "week" && renderWeekView()}
-        {view === "agenda" && <div>Agenda View</div>}
+        {view === "month" && (
+          <MesView date={date} ordenesAprobadas={ordenesAprobadas} />
+        )}
+        {view === "week" && (
+          <SemanaView date={date} ordenesAprobadas={ordenesAprobadas} />
+        )}
+        {view === "agenda" && (
+          <AgendaView ordenesAprobadas={ordenesAprobadas} />
+        )}
       </div>
     </div>
   );
