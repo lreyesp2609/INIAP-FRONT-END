@@ -35,7 +35,7 @@ const Calendario = () => {
           }
         );
         const data = await response.json();
-        const today = new Date().setHours(0, 0, 0, 0); // Reset time part for comparison
+        const today = new Date().setHours(0, 0, 0, 0);
         const filteredOrders = data.ordenes_aprobadas.filter((orden) => {
           const ordenDate = new Date(orden.fecha_viaje).setHours(0, 0, 0, 0);
           return ordenDate >= today;

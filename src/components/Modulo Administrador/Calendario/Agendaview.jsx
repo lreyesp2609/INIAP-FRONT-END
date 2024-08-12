@@ -7,7 +7,7 @@ const AgendaView = ({ ordenesAprobadas }) => {
       month: "long",
       year: "numeric",
       weekday: "long",
-      timeZone: "UTC"  // Asegura que la fecha se interprete en UTC
+      timeZone: "UTC"
     };
     return new Date(date + "T00:00:00Z").toLocaleDateString("es-ES", options);
   };

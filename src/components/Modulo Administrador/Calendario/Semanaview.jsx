@@ -36,22 +36,25 @@ const SemanaView = ({ date, ordenesAprobadas }) => {
           endOfWeek
         )}`}
       </h2>
-      <div className="grid grid-cols-7 gap-2 text-center">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center">
         {daysOfWeek.map((day, i) => {
-          // Buscar la orden para el día actual
           const orden = ordenesAprobadas.find(
-            (o) => new Date(o.fecha_viaje).toISOString().split('T')[0] === day.toISOString().split('T')[0]
+            (o) =>
+              new Date(o.fecha_viaje).toISOString().split('T')[0] ===
+              day.toISOString().split('T')[0]
           );
           return (
             <div
               key={i}
-              className="border p-2 relative min-w-[2.5rem] sm:min-w-[3rem] lg:min-w-[4rem]"
+              className="border p-2 relative min-w-[5rem] sm:min-w-[7rem] lg:min-w-[10rem] h-auto flex flex-col items-center justify-center"
             >
-              {dateFormatter.format(day)}
+              <div className="font-bold mb-1">
+                {dateFormatter.format(day)}
+              </div>
               {orden && (
                 <a
                   href="#"
-                  className="block mt-2 p-1 rounded bg-yellow-400 border border-yellow-400 text-black overflow-visible whitespace-normal text-xs sm:text-sm lg:text-base"
+                  className="block p-1 rounded bg-yellow-400 border border-yellow-400 text-black text-xs sm:text-sm lg:text-base break-words text-center"
                 >
                   {orden.secuencial_orden_movilizacion}
                 </a>
