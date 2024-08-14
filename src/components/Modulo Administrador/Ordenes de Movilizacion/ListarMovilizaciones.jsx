@@ -279,7 +279,7 @@ const ListarMovilizaciones = () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Token no encontrado');
 
-        const response = await fetch(`${API_URL}/OrdenesMovilizacion/generar_pdf/${userId}/${idOrden}/pdf/`, {
+        const response = await fetch(`${API_URL}/OrdenesMovilizacion/generar-pdf/${userId}/${idOrden}/pdf/`, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`,
