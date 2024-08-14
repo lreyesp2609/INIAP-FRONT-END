@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FiUsers, FiMenu, FiTruck, FiList } from 'react-icons/fi';
 import { FaBuilding, FaClipboardList } from 'react-icons/fa';
+import { IoDocumentAttachOutline } from 'react-icons/io5';
 
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -97,7 +98,6 @@ const LeftMenu = ({ user, onNavigate }) => {
                 <FiList className="w-6 h-6 text-white mx-3" />
                 <span className="text-white text-xs">Gestión de Provincias</span>
               </button>
-              {/* Nueva opción */}
               <button 
                 onClick={() => {
                   onNavigate('gestion-encabezados');
@@ -107,6 +107,16 @@ const LeftMenu = ({ user, onNavigate }) => {
               >
                 <FiList className="w-6 h-6 text-white mx-3" />
                 <span className="text-white text-xs">Gestión de Encabezados</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-movilizaciones');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <IoDocumentAttachOutline className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Movilizaciones</span>
               </button>
             </div>
           </div>
@@ -171,13 +181,19 @@ const LeftMenu = ({ user, onNavigate }) => {
             <FiList className="w-6 h-6 text-white mx-3" />
             <span className="text-white text-xs hidden md:inline">Gestión de Provincias</span>
           </button>
-          {/* Nueva opción */}
           <button 
             onClick={() => onNavigate('gestion-encabezados')} 
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
             <FiList className="w-6 h-6 text-white mx-3" />
             <span className="text-white text-xs hidden md:inline">Gestión de Encabezados</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-movilizaciones')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <IoDocumentAttachOutline className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Movilizaciones</span>
           </button>
         </div>
       </div>

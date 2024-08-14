@@ -10,6 +10,7 @@ import GestionLicencias from "./Licencias/gestionlicencias";
 import GestionOrdenes from "./Motivos/gestionordenes";
 import ChangePasswordModal from "../Login/changepasswordmodal";
 import GestionProvincias from "./Provincias/gestionprovincias";
+import GestionOrdenMovilizacion from "./Ordenes de Movilizacion/GestionOrdenesMovilizacion";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -112,6 +113,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-licencias" && <GestionLicencias />}
         {view === "gestion-motivos-ordenes" && <GestionOrdenes />}
         {view === "gestion-provincias" && <GestionProvincias />}
+        {view === "gestion-movilizaciones" && <GestionOrdenMovilizacion />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
