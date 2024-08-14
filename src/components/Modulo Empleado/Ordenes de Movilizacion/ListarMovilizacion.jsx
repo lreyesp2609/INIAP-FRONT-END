@@ -267,23 +267,6 @@ const ListarMovilizacion = () => {
     fetchSolicitudes();
   };
 
-
-  const handleShowPending = () => {
-    setViewMode('pendientes');
-  };
-
-  const handleShowCancelled = () => {
-    setViewMode('canceladas');
-  };
-
-  const handleShowHistorial = () => {
-    setViewMode('historial');
-  };
-
-  const handleShowHistorialMovilizaciones = () => {
-    setViewMode('historialMovilizaciones');
-  };
-
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -314,8 +297,6 @@ const ListarMovilizacion = () => {
             </button>
           </div>
       </div>
-
-      {error && <div className="text-red-500 mb-4">{error}</div>}
       <div className="mb-4">
         <div className="flex">
           <input
@@ -341,6 +322,9 @@ const ListarMovilizacion = () => {
               <th className="py-3 px-6 text-left">Origen - Destino</th>
               <th className="py-3 px-6 text-left">Motivo</th>
               <th className="py-3 px-6 text-left">Estado</th>
+              {currentItems.some(item => item.estado_movilizacion === 'Aprobado') && (
+                <th className="py-3 px-6 text-left">Secuencial</th>
+              )}
               <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
               <th className="py-3 px-6 text-left">Duración</th>
               <th className="py-3 px-6 text-left">Conductor</th>
@@ -355,6 +339,17 @@ const ListarMovilizacion = () => {
                   <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
+                  {solicitud.estado_movilizacion !== 'Aprobado' && viewMode === 'historial' && (
+                    <td className="py-3 px-6 text-left">
+                      {solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
+                    </td>
+                  )}
+
+                  {solicitud.estado_movilizacion === 'Aprobado'  && (
+                    <td className="py-3 px-6 text-left">
+                      {solicitud.secuencial_orden_movilizacion}
+                    </td>
+                  )}
                   <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
                   <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
                   <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>

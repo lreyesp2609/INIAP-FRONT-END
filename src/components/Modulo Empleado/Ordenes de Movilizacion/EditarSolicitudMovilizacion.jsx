@@ -262,7 +262,7 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
                 type="date"
                 name="fecha_viaje"
                 value={formData.fecha_viaje}
-                min={new Date().toISOString().split('T')[0]} // Permite ingresar solo desde la fecha actual en adelante
+                min={moment().tz('America/Guayaquil').format('YYYY-MM-DD')}
                 onChange={handleInputChange}
                 required
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -276,6 +276,7 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
               name="motivo_movilizacion"
               value={formData.motivo_movilizacion}
               onChange={handleInputChange}
+              maxLength="30"
               required
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

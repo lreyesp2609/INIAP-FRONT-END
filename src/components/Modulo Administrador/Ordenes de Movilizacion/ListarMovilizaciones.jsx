@@ -362,6 +362,11 @@ const ListarMovilizaciones = () => {
                 </>
               )}
               <th className="py-3 px-6 text-left">Estado</th>
+              {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
+                <>
+                  <th className="py-3 px-6 text-left">Secuencial</th>
+                </>
+              )}
               <th className="py-3 px-6 text-left">Origen - Destino</th>
               <th className="py-3 px-6 text-left">Motivo</th>
               <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
@@ -386,6 +391,12 @@ const ListarMovilizaciones = () => {
                       </>
                     )}
                     <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
+                    {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
+                      <>
+                        <td className="py-3 px-6 text-left">{solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
+                        </td>
+                      </>
+                    )}
                     <td className="py-3 px-6 text-left">{solicitud.lugar_origen_destino_movilizacion}</td>
                     <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
                     <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
