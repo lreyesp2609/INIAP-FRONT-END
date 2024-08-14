@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FiUsers, FiMenu, FiTruck, FiList } from 'react-icons/fi';
 import { FaBuilding, FaClipboardList } from 'react-icons/fa';
 
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null);
 
   if (!user || !user.unidades || user.unidades.length === 0) {
     return null;
@@ -20,68 +21,94 @@ const LeftMenu = ({ user, onNavigate }) => {
             <FiMenu className="w-8 h-8 text-white" />
           </button>
         </div>
-        <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 overflow-y-auto pt-16`}>
-          <div className="flex flex-col items-center space-y-6 w-full">
-            <button 
-              onClick={() => {
-                onNavigate('gestion-empleados');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+        <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 pt-16`}>
+          <div className="relative h-full flex flex-col">
+            <div 
+              className="flex flex-col items-center space-y-6 w-full overflow-y-auto pt-10"
+              ref={menuRef}
             >
-              <FiUsers className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Empleados</span>
-            </button>
-            <button 
-              onClick={() => {
-                onNavigate('gestion-vehiculos');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-            >
-              <FiTruck className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Vehículos</span>
-            </button>
-            <button 
-              onClick={() => {
-                onNavigate('gestion-categorias-bienes');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-            >
-              <FiList className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Categorías de Bienes</span>
-            </button>
-            <button 
-              onClick={() => {
-                onNavigate('gestion-estaciones');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-            >
-              <FaBuilding className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Estaciones</span>
-            </button>
-            <button 
-              onClick={() => {
-                onNavigate('gestion-licencias');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-            >
-              <FaClipboardList className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Licencias</span>
-            </button>
-            <button 
-              onClick={() => {
-                onNavigate('gestion-motivos-ordenes');
-                setIsOpen(false);
-              }} 
-              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-            >
-              <FiList className="w-8 h-8 text-white mx-4" />
-              <span className="text-white text-sm">Gestión de Motivos para las Órdenes</span>
-            </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-empleados');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiUsers className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Empleados</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-vehiculos');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiTruck className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Vehículos</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-categorias-bienes');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiList className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Categorías de Bienes</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-estaciones');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FaBuilding className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Estaciones</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-licencias');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FaClipboardList className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Licencias</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-motivos-ordenes');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiList className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Motivos para las Órdenes</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-provincias');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiList className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Provincias</span>
+              </button>
+              {/* Nueva opción */}
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-encabezados');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiList className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Encabezados</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -97,45 +124,60 @@ const LeftMenu = ({ user, onNavigate }) => {
         <div className="flex flex-col items-center space-y-6 mt-20 w-full">
           <button 
             onClick={() => onNavigate('gestion-empleados')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FiUsers className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Empleados</span>
+            <FiUsers className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Empleados</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-vehiculos')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FiTruck className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Vehículos</span>
+            <FiTruck className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Vehículos</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-categorias-bienes')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FiList className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Categorías de Bienes</span>
+            <FiList className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Categorías de Bienes</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-estaciones')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FaBuilding className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Estaciones</span>
+            <FaBuilding className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Estaciones</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-licencias')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FaClipboardList className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Licencias</span>
+            <FaClipboardList className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Licencias</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-motivos-ordenes')} 
-            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FiList className="w-8 h-8 text-white mx-4" />
-            <span className="text-white text-sm hidden md:inline">Gestión de Motivos para las Órdenes</span>
+            <FiList className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Motivos para las Órdenes</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-provincias')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FiList className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Provincias</span>
+          </button>
+          {/* Nueva opción */}
+          <button 
+            onClick={() => onNavigate('gestion-encabezados')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FiList className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Encabezados</span>
           </button>
         </div>
       </div>
