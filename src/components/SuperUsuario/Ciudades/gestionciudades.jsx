@@ -1,41 +1,36 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
-import TablaProvincias from "./Tablas/tablaprovincias";
-import AgregarProvincia from "./agregarprovincia";
-import EditarProvincia from "./editarprovincia";
-import GestionCiudades from "../Ciudades/gestionciudades";
+import TablaCiudades from "./Tablas/tablaciudades";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-const GestionProvincias = () => {
-  const [provincias, setProvincias] = useState([]);
-  const [filteredProvincias, setFilteredProvincias] = useState([]);
+const GestionCiudades = ({ id_provincia }) => {
+  const [ciudades, setCiudades] = useState([]);
+  const [filteredCiudades, setFilteredCiudades] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isAdding, setIsAdding] = useState(false);
-  const [selectedProvincia, setSelectedProvincia] = useState(null);
+  const [selectedCiudad, setSelectedCiudad] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [userId, setUserId] = useState(null);
-  const [viewingCiudades, setViewingCiudades] = useState(false); // Estado para manejar la visualización de ciudades
-  const [selectedProvinciaId, setSelectedProvinciaId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const id_usuario = JSON.parse(atob(token.split(".")[1])).id_usuario;
       setUserId(id_usuario);
-      fetchProvincias(id_usuario);
+      fetchCiudades(id_usuario, id_provincia);
     }
-  }, []);
+  }, [id_provincia]);
 
-  const fetchProvincias = async (id_usuario) => {
+  const fetchCiudades = async (id_usuario, id_provincia) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
       const response = await fetch(
-        `${API_URL}/Provincias/listar_provincias/${id_usuario}/`,
+        `${API_URL}/Ciudades/ciudades/${id_usuario}/${id_provincia}/`,
         {
           headers: {
             Authorization: `${token}`,
@@ -44,99 +39,87 @@ const GestionProvincias = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setProvincias(data);
-        setFilteredProvincias(data);
+        setCiudades(data);
+        setFilteredCiudades(data);
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error);
-        console.error("Error al obtener provincias:", response.statusText);
+        console.error("Error al obtener ciudades:", response.statusText);
       }
     } catch (error) {
-      console.error("Error al obtener provincias:", error);
+      console.error("Error al obtener ciudades:", error);
     }
   };
 
-  const handleAddProvincia = () => {
+  const handleAddCiudad = () => {
     setIsAdding(true);
   };
 
   const handleCloseForm = () => {
     setIsAdding(false);
-    setSelectedProvincia(null);
-    setViewingCiudades(false); // Cerrar la vista de ciudades al cerrar el formulario
+    setSelectedCiudad(null);
   };
 
-  const handleProvinciaAdded = async () => {
-    await fetchProvincias(userId);  // Refetch provincias to include the new one
+  const handleCiudadAdded = async () => {
+    await fetchCiudades(userId, id_provincia); // Refetch ciudades to include the new one
     setIsAdding(false);
   };
 
-  const handleEditProvincia = (provincia) => {
-    setSelectedProvincia(provincia);
+  const handleEditCiudad = (ciudad) => {
+    setSelectedCiudad(ciudad);
   };
 
-  const handleProvinciaUpdated = async () => {
-    await fetchProvincias(userId);  // Refetch provincias to include the updated one
-    setSelectedProvincia(null);
+  const handleCiudadUpdated = async () => {
+    await fetchCiudades(userId, id_provincia); // Refetch ciudades to include the updated one
+    setSelectedCiudad(null);
   };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    const filtered = provincias.filter((provincia) =>
-      provincia.provincia
-        .toLowerCase()
-        .includes(event.target.value.toLowerCase())
+    const filtered = ciudades.filter((ciudad) =>
+      ciudad.ciudad.toLowerCase().includes(event.target.value.toLowerCase())
     );
-    setFilteredProvincias(filtered);
+    setFilteredCiudades(filtered);
     setCurrentPage(1);
-  };
-
-  const handleViewCiudades = (id_provincia) => {
-    setSelectedProvinciaId(id_provincia);
-    setViewingCiudades(true);
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProvincias.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-  const totalPages = Math.ceil(filteredProvincias.length / itemsPerPage);
+  const currentItems = filteredCiudades.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCiudades.length / itemsPerPage);
 
   return (
     <div className="p-4">
-      {viewingCiudades ? (
-        <GestionCiudades id_provincia={selectedProvinciaId} />
-      ) : selectedProvincia ? (
+      {selectedCiudad ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <EditarProvincia
-            provincia={selectedProvincia}
+          <EditarCiudad
+            ciudad={selectedCiudad}
             onClose={handleCloseForm}
-            onProvinciaUpdated={handleProvinciaUpdated}
+            onCiudadUpdated={handleCiudadUpdated}
             userId={userId}
           />
         </div>
       ) : isAdding ? (
         <div className="bg-white p-4 border rounded shadow-lg">
-          <AgregarProvincia
+          <AgregarCiudad
             onClose={handleCloseForm}
-            onProvinciaAdded={handleProvinciaAdded}
+            onCiudadAdded={handleCiudadAdded}
             userId={userId}
+            id_provincia={id_provincia}
           />
         </div>
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-            <h1 className="text-2xl font-light">Gestión de Provincias</h1>
+            <h1 className="text-2xl font-light">Gestión de Ciudades</h1>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
-                onClick={handleAddProvincia}
+                onClick={handleAddCiudad}
                 className="
                 bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                Agregar Provincia
+                Agregar Ciudad
               </button>
             </div>
           </div>
@@ -145,17 +128,17 @@ const GestionProvincias = () => {
               type="text"
               value={searchTerm}
               onChange={handleSearch}
-              placeholder="Buscar por nombre de provincia"
+              placeholder="Buscar por nombre de ciudad"
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
           {errorMessage && (
             <div className="text-red-500 mb-4">{errorMessage}</div>
           )}
-          <TablaProvincias
-            provincias={currentItems}
-            onEditProvincia={handleEditProvincia}
-            onViewCiudades={handleViewCiudades} // Pasar la función para ver ciudades
+          <TablaCiudades
+            ciudades={currentItems}
+            onEditCiudad={handleEditCiudad}
+            userId={userId}
           />
           <div className="mt-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
             <button
@@ -182,4 +165,4 @@ const GestionProvincias = () => {
   );
 };
 
-export default GestionProvincias;
+export default GestionCiudades;

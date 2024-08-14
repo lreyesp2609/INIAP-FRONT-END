@@ -1,9 +1,13 @@
 import React from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaCity } from "react-icons/fa";
 
-const TablaProvincias = ({ provincias, onEditProvincia }) => {
+const TablaProvincias = ({ provincias, onEditProvincia, onViewCiudades }) => {
   const handleEditClick = (provincia) => {
     onEditProvincia(provincia);
+  };
+
+  const handleViewCitiesClick = (provincia) => {
+    onViewCiudades(provincia.id_provincia); // Solo se pasa el ID de la provincia
   };
 
   return (
@@ -30,6 +34,13 @@ const TablaProvincias = ({ provincias, onEditProvincia }) => {
                   >
                     <FaEdit />
                   </button>
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full"
+                    title="Ver ciudades"
+                    onClick={() => handleViewCitiesClick(provincia)}
+                  >
+                    <FaCity />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -50,6 +61,13 @@ const TablaProvincias = ({ provincias, onEditProvincia }) => {
                 onClick={() => handleEditClick(provincia)}
               >
                 <FaEdit />
+              </button>
+              <button
+                className="p-2 bg-green-500 text-white rounded-full"
+                title="Ver ciudades"
+                onClick={() => handleViewCitiesClick(provincia)}
+              >
+                <FaCity />
               </button>
             </div>
           </div>
