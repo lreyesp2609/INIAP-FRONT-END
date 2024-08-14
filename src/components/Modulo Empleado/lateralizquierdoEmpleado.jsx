@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FiUsers, FiMenu, FiTruck, FiList, FiMap } from 'react-icons/fi';
 import { MdEmojiTransportation } from "react-icons/md";
-import { IoDocumentText, IoDocumentAttachOutline  } from "react-icons/io5";
+import { IoDocumentText, IoCash ,IoDocumentAttachOutline,IoDocumentTextSharp,IoDocumentAttachSharp  } from "react-icons/io5";
 
 
 
@@ -46,7 +46,26 @@ const LeftMenu = ({ user, onNavigate }) => {
               <IoDocumentText className="w-8 h-8 text-white mx-4" />
               <span className="text-white text-sm">Solicitudes de viaje</span>
             </button>
-        
+            <button 
+              onClick={() => {
+                onNavigate('gestion-informe');
+                setIsOpen(false);
+              }} 
+              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            >
+              <IoDocumentAttachSharp className="w-8 h-8 text-white mx-4" />
+              <span className="text-white text-sm">Informes de Servicios</span>
+            </button>
+            <button 
+              onClick={() => {
+                onNavigate('gestion-gastos');
+                setIsOpen(false);
+              }} 
+              className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+            >
+              <IoCash className="w-8 h-8 text-white mx-4" />
+              <span className="text-white text-sm">Justificacion de Gastos</span>
+            </button>
           </div>
         </div>
 
@@ -73,6 +92,20 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <IoDocumentText className="w-10 h-10 text-white mx-6" />
             <span className="text-white text-sm hidden md:inline">Solicitudes de viaje</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-informe')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+          >
+            <IoDocumentAttachSharp className="w-10 h-10 text-white mx-6" />
+            <span className="text-white text-sm hidden md:inline">Informes de Servicios</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-gastos')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
+          >
+            <IoCash className="w-10 h-10 text-white mx-6" />
+            <span className="text-white text-sm hidden md:inline">Informes de Servicios</span>
           </button>
         </div>
       </div>

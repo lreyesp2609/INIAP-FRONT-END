@@ -7,6 +7,7 @@ import ChangePasswordModal from '../Login/changepasswordmodal';  // Asegúrate d
 import API_URL from '../../Config';
 import { notification } from 'antd';
 import ListarSolicitudes from './Solicitudes/ListaSolicitude';
+import InformesPendientes from './Informes/ListarInformesPendientes';
 
 const MenuEmpleados = () => {
   const navigate = useNavigate();
@@ -102,6 +103,8 @@ const MenuEmpleados = () => {
         )}
         {view === 'gestion-solicitud' && <ListarSolicitudes />}
         {view === 'gestion-empleados' && <ListarMovilizacion />}
+        {view === 'gestion-informe' && <InformesPendientes/>}
+        {view === 'gestion-gastos' && <InformesPendientes/>}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
