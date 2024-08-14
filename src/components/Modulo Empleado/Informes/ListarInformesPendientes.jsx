@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faTrash, faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import MostrarSolicitud from './MostrarSolicitudDetalle';
-import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
-import ListarSolicitudesPendientes from './ListaSolicitude';
-import CrearSolicitud from './CrearSolicitud';
+import { faEye, faTrash, faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 
-const ListarSolicitudesAceptadas = () => {
+const InformesPendientes = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,10 +11,6 @@ const ListarSolicitudesAceptadas = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [showMostrarSolicitud, setShowMostrarSolicitud] = useState(false);
-  const [selectedSolicitudId, setSelectedSolicitudId] = useState(null);
-  const [showCancelledRequests, setShowCancelledRequests] = useState(false);
-  const [showPendingRequests, setShowPendingRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
@@ -111,28 +103,11 @@ const ListarSolicitudesAceptadas = () => {
   };
 
   const handleVer = (id_solicitud) => {
-    setSelectedSolicitudId(id_solicitud);
-    setShowMostrarSolicitud(true);
-  };
-
-  const handleCloseMostrarSolicitud = () => {
-    setShowMostrarSolicitud(false);
-    setSelectedSolicitudId(null);
-  };
-
-  const handleShowCancelledRequests = () => {
-    setShowCancelledRequests(true);
-  };
-
-  const handleShowPendingRequests = () => {
-    setShowPendingRequests(true);
+    // Aquí puedes agregar la lógica para ver detalles de la solicitud
   };
 
   const handleCreateSolicitud = () => {
     setIsCreating(true);
-    setShowMostrarSolicitud(false);
-    setShowCancelledRequests(false);
-    setShowPendingRequests(false);
   };
 
   const handleCloseCreateSolicitud = () => {
@@ -141,7 +116,6 @@ const ListarSolicitudesAceptadas = () => {
   };
 
   const handleConfirmCancel = (id_solicitud) => {
-    console.log(`Confirmar cancelación para solicitud ID: ${id_solicitud}`); // Agregado para depuración
     setSolicitudToCancel(id_solicitud);
     setShowConfirmModal(true);
   };
@@ -152,49 +126,13 @@ const ListarSolicitudesAceptadas = () => {
     setSolicitudToCancel(null);
   };
 
-  if (isCreating) {
-    return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
-  }
-
-  if (showCancelledRequests) {
-    return <ListarSolicitudesCanceladas />;
-  }
-
-  if (showPendingRequests) {
-    return <ListarSolicitudesPendientes />;
-  }
-
   return (
     <div className="p-4">
-      {showMostrarSolicitud && selectedSolicitudId && (
-        <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
-      )}
-      {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
+      {!isCreating && (
         <>
           <div className="mb-4">
-            <h2 className="text-xl font-light mb-4">Solicitudes Aceptadas del Usuario</h2>
+            <h2 className="text-xl font-light mb-4">Solicitudes con Informes Pendientes</h2>
             <div className="flex space-x-2">
-              <button
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                onClick={handleShowPendingRequests}
-                style={{ marginBottom: '16px' }}
-              >
-                Solicitudes Pendientes
-              </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={handleShowCancelledRequests}
-                style={{ marginBottom: '16px' }}
-              >
-                Solicitudes Canceladas
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleCreateSolicitud}
-                style={{ marginBottom: '16px' }}
-              >
-                Crear Solicitud
-              </button>
             </div>
             <div className="flex mb-4">
               <input
@@ -237,20 +175,7 @@ const ListarSolicitudesAceptadas = () => {
                         title="Ver Solicitud de Movilización"
                         onClick={() => handleVer(solicitud.id)}
                       >
-                        <FontAwesomeIcon icon={faEye} />
-                      </button>
-                      <button
-                        className="p-2 bg-red-500 text-white rounded-full mr-2"
-                        title="Cancelar Solicitud de Movilización"
-                        onClick={() => handleConfirmCancel(solicitud.id)}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                      <button
-                        className="p-2 bg-gray-500 text-white rounded-full mr-2"
-                        title="Cancelar Solicitud de Movilización"
-                      >
-                        <FontAwesomeIcon icon={faFilePdf} />
+                        <FontAwesomeIcon icon={faFileEdit} />
                       </button>
                     </td>
                   </tr>
@@ -276,22 +201,21 @@ const ListarSolicitudesAceptadas = () => {
             </button>
           </div>
           {showConfirmModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl mb-4">¿Está seguro de cancelar esta solicitud?</h2>
-                <p className="mb-4">Una vez realizada esta acción no se podrá revertir.</p>
-                <div className="flex justify-end">
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded shadow-lg">
+                <p>¿Estás seguro de que deseas cancelar esta solicitud?</p>
+                <div className="flex justify-end mt-4">
                   <button
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded mr-2"
-                    onClick={() => setShowConfirmModal(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    className="px-4 py-2 bg-red-500 text-white rounded mr-2"
                     onClick={handleCancelConfirmed}
                   >
                     Confirmar
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    Cancelar
                   </button>
                 </div>
               </div>
@@ -303,4 +227,4 @@ const ListarSolicitudesAceptadas = () => {
   );
 };
 
-export default ListarSolicitudesAceptadas;
+export default InformesPendientes;

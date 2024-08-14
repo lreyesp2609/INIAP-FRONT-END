@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faTrash, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faFileEdit, faEdit } from '@fortawesome/free-solid-svg-icons';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
@@ -235,6 +235,12 @@ const ListarSolicitudesPendientes = () => {
                     <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
                     <td className="py-3 px-6 text-left">
                       <button
+                        className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                        title="Editar Solicitud de Movilización"
+                      >
+                        <FontAwesomeIcon icon={faFileEdit} />
+                      </button>
+                      <button
                         className="p-2 bg-blue-500 text-white rounded-full mr-2"
                         title="Ver Solicitud de Movilización"
                         onClick={() => handleVer(solicitud.id)}
@@ -242,7 +248,7 @@ const ListarSolicitudesPendientes = () => {
                         <FontAwesomeIcon icon={faEye} />
                       </button>
                       <button
-                        className="p-2 bg-red-500 text-white rounded-full"
+                        className="p-2 bg-red-500 text-white rounded-full mr-2"
                         title="Cancelar Solicitud de Movilización"
                         onClick={() => handleConfirmCancel(solicitud.id)}
                       >

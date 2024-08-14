@@ -6,6 +6,7 @@ import GestionEmpleados from "../Modulo Administrador/Empleados/gestionempleados
 import ChangePasswordModal from "../Login/changepasswordmodal";
 import ListarMovilizaciones from "./Ordenes de Movilizacion/ListarMovilizaciones";
 import Calendario from "./Calendario/calendario";
+import Reportes from "./Reportes/Inicio"
 import API_URL from "../../Config";
 import { notification } from "antd";
 import ListarSolicitudesPendientesAdmin from "./Solicitudes/ListarSolicitudesAdmin";
@@ -105,6 +106,7 @@ const MenuAdministrador = () => {
         {view === "gestion-empleados" && <GestionEmpleados />}
         {view === 'gestion-movilizaciones' && <ListarMovilizaciones />}
         {view === 'gestion-solicitud' && <ListarSolicitudesPendientesAdmin/>}
+        {view === 'reportes' && <Reportes />}
         {view === 'calendario-ordenes-aprobadas' && <Calendario />}
       </div>
       <ChangePasswordModal

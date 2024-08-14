@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiUsers, FiMenu } from 'react-icons/fi';
-import { MdEmojiTransportation, MdCalendarToday } from 'react-icons/md'; 
+import { FaFileAlt } from 'react-icons/fa';
+import { MdCalendarToday } from 'react-icons/md'; 
 import { IoDocumentAttachOutline, IoDocumentText } from 'react-icons/io5';
 
 const LeftMenu = ({ user, onNavigate }) => {
@@ -30,6 +31,11 @@ const LeftMenu = ({ user, onNavigate }) => {
       icon: <MdCalendarToday className="w-8 h-8 text-white mx-4" />,
       label: 'Calendario de Órdenes Aprobadas',
       onClick: () => onNavigate('calendario-ordenes-aprobadas'),
+    },
+    {
+      icon: <FaFileAlt className="w-8 h-8 text-white mx-4" />,
+      label: 'Reportes',
+      onClick: () => onNavigate('reportes'),
     }
   ];
 
