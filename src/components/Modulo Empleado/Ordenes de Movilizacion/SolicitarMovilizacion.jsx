@@ -104,8 +104,37 @@ const SolicitarMovilizacion = ({ onClose }) => {
     });
   };
 
+  const validateTimeRange = () => {
+    const [idaHoras, idaMinutos] = formData.hora_ida.split(':').map(Number);
+    const [duracionHoras, duracionMinutos] = formData.duracion_movilizacion.split(':').map(Number);
+
+    // Convertir todo a minutos para facilitar el cálculo
+    const idaEnMinutos = idaHoras * 60 + idaMinutos;
+    const duracionEnMinutos = duracionHoras * 60 + duracionMinutos;
+    const regresoEnMinutos = idaEnMinutos + duracionEnMinutos;
+
+    // Horas de inicio y fin en minutos
+    const inicioEnMinutos = 7 * 60; // 7:00 AM
+    const finEnMinutos = 17 * 60; // 5:00 PM
+
+    // Validar que la hora de ida y de regreso están dentro del rango permitido
+    return idaEnMinutos >= inicioEnMinutos && regresoEnMinutos <= finEnMinutos;
+  };
+
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Validar el rango de horas antes de continuar
+    if (!validateTimeRange()) {
+      notification.error({
+        message: 'Error',
+        description: 'La solicitud debe realizarse entre las 7:00 a.m. y las 5:00 p.m.',
+        placement: 'topRight',
+      });
+      return;
+    }
+
     const token = localStorage.getItem('token');
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const idEmpleado = storedUser?.usuario?.id_empleado;
@@ -191,7 +220,7 @@ const SolicitarMovilizacion = ({ onClose }) => {
                 type="date"
                 name="fecha_viaje"
                 value={formData.fecha_viaje}
-                min={new Date().toISOString().split('T')[0]} // Permite ingresar solo desde la fecha actual en adelante
+                min={moment().tz('America/Guayaquil').format('YYYY-MM-DD')}
                 onChange={handleInputChange}
                 required
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -205,6 +234,7 @@ const SolicitarMovilizacion = ({ onClose }) => {
               name="motivo_movilizacion"
               value={formData.motivo_movilizacion}
               onChange={handleInputChange}
+              maxLength="30"
               required
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

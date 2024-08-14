@@ -13,7 +13,7 @@ import GestionEstaciones from './components/SuperUsuario/Estaciones/gestionestac
 import SolicitarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/SolicitarMovilizacion';
 import ListarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/ListarMovilizacion';
 import GestionOrdenes from './components/SuperUsuario/Motivos/gestionordenes';
-
+import GestionProvincias from './components/SuperUsuario/Provincias/gestionprovincias';
 const AppContent = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -72,6 +72,7 @@ const AppContent = () => {
         <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
         <Route path="/solicitar-movilizacion" element={<SolicitarMovilizacion />} />
         <Route path="/listar-movilizacion" element={<ListarMovilizacion />} /> 
+        <Route path="/gestion-provincias" element={<GestionProvincias />} /> 
       </Routes>
     </div>
   );
