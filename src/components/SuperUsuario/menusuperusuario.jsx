@@ -9,6 +9,7 @@ import GestionEstaciones from "./Estaciones/gestionestaciones";
 import GestionLicencias from "./Licencias/gestionlicencias";
 import GestionOrdenes from "./Motivos/gestionordenes";
 import ChangePasswordModal from "../Login/changepasswordmodal";
+import GestionProvincias from "./Provincias/gestionprovincias";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -110,6 +111,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-estaciones" && <GestionEstaciones />}
         {view === "gestion-licencias" && <GestionLicencias />}
         {view === "gestion-motivos-ordenes" && <GestionOrdenes />}
+        {view === "gestion-provincias" && <GestionProvincias />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
