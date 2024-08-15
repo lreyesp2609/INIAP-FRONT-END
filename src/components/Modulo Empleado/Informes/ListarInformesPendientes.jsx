@@ -22,7 +22,7 @@ const InformesPendientes = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const url = `${API_URL}/Informes/listar-solicitudes-aceptadas/${idUsuario}/`;
+      const url = `${API_URL}/Informes/listar-solicitudes-sin-informe/${idUsuario}/`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,

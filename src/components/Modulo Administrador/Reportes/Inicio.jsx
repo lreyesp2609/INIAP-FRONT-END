@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { notification } from 'antd';
 import API_URL from '../../../Config';
-import axios from 'axios';
 
 const Reportes = () => {
   const [conductores, setConductores] = useState([]);
