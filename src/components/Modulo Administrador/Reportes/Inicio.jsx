@@ -68,41 +68,55 @@ const Reportes = () => {
     }
   };
 
-  const handleGenerarReporte = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('fecha_inicio', fechaInicio);
-      formData.append('fecha_fin', fechaFin);
-      formData.append('empleado', empleadoSeleccionado);
-      formData.append('conductor', conductorSeleccionado);
-      formData.append('vehiculo', vehiculoSeleccionado);
+  const handleGenerarReporte = () => {
+    const popup = window.open('', '_blank');
+    const token = localStorage.getItem('token');
   
-      const response = await axios.post(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, formData, {
-        headers: {
-          Authorization: `${token}`,
-          'Content-Type': 'multipart/form-data'
-        },
-        responseType: 'blob'
-      });
-  
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      window.open(url, '_blank');
+    const formData = new FormData();
+    formData.append('fecha_inicio', fechaInicio);
+    formData.append('fecha_fin', fechaFin);
+    formData.append('empleado', empleadoSeleccionado);
+    formData.append('conductor', conductorSeleccionado);
+    formData.append('vehiculo', vehiculoSeleccionado);
 
-      notification.success({
-        message: 'Éxito',
-        description: 'Reporte generado exitosamente.',
-        placement: 'topRight',
-      });
-    } catch (error) {
+    fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+      },
+      body: formData,
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      console.log('Response text:', response.statusText);
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text || 'Network response was not ok'); });
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      if (popup) {
+        popup.location.href = url;
+      } else {
+        notification.error({
+          message: 'Error',
+          description: 'No se pudo abrir la ventana del reporte. Por favor, permite las ventanas emergentes.',
+          placement: 'topRight',
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error generando el reporte:", error);
       notification.error({
         message: 'Error',
-        description: error.message || 'Ha ocurrido un error al generar el reporte.',
+        description: `Error generando el reporte: ${error.message}`,
         placement: 'topRight',
       });
-    }
+    });
   };
   
+
   return (
     <div className="p-4 sm:p-6">
       <div className="flex justify-between items-center mb-4">
