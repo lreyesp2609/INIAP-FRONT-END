@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
 import { notification, Button, Input } from 'antd';
 
@@ -8,6 +8,53 @@ const EditarHorarioMovilizacion = ({ onClose }) => {
   const [duracionMinima, setDuracionMinima] = useState('');
   const [duracionMaxima, setDuracionMaxima] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchHorario = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        notification.error({
+          message: 'Error',
+          description: 'Token no proporcionado',
+        });
+        return;
+      }
+
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const idUsuario = storedUser?.usuario?.id_usuario;
+
+      try {
+        const response = await fetch(`${API_URL}/OrdenesMovilizacion/ver-horario/${idUsuario}/`, {
+          method: 'GET',
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const horario = data.horario;
+          setHoraIdaMinima(horario.hora_ida_minima || '');
+          setHoraLlegadaMaxima(horario.hora_llegada_maxima || '');
+          setDuracionMinima(horario.duracion_minima || '');
+          setDuracionMaxima(horario.duracion_maxima || '');
+        } else {
+          const errorData = await response.json();
+          notification.error({
+            message: 'Error',
+            description: errorData.error,
+          });
+        }
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: 'Error al obtener los datos del horario',
+        });
+      }
+    };
+
+    fetchHorario();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -32,7 +79,7 @@ const EditarHorarioMovilizacion = ({ onClose }) => {
     formData.append('duracion_minima', parseInt(duracionMinima));
     formData.append('duracion_maxima', parseInt(duracionMaxima));
 
-    try {
+ 
       const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-horario/${idUsuario}/`, {
         method: 'POST',
         headers: {
@@ -55,14 +102,7 @@ const EditarHorarioMovilizacion = ({ onClose }) => {
           description: errorData.error,
         });
       }
-    } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: 'Error al enviar el formulario',
-      });
-    } finally {
-      setLoading(false);
-    }
+
   };
 
   return (
