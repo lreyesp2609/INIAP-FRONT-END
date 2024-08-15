@@ -18,88 +18,88 @@ const GestionOrdenMovilizacion = () => {
   const idUsuario = storedUser?.usuario?.id_usuario;
 
   useEffect(() => {
-    const fetchHorario = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        notification.error({
-          message: 'Error',
-          description: 'Token no proporcionado',
-        });
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_URL}/OrdenesMovilizacion/ver-horario/${idUsuario}/`,
-          {
-            headers: {
-              Authorization: `${token}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setHorario(data.horario);
-        } else {
-          const errorData = await response.json();
-          setError(errorData.error);
-          notification.error({
-            message: 'Error',
-            description: errorData.error,
-          });
-        }
-      } catch (error) {
-        setError(error.toString());
-        notification.error({
-          message: 'Error',
-          description: 'Error al obtener el horario',
-        });
-      }
-    };
-
-    const fetchRutas = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        notification.error({
-          message: 'Error',
-          description: 'Token no proporcionado',
-        });
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-rutas/${idUsuario}/`,
-          {
-            headers: {
-              Authorization: `${token}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setRutas(data.rutas);
-        } else {
-          const errorData = await response.json();
-          setError(errorData.error);
-          notification.error({
-            message: 'Error',
-            description: errorData.error,
-          });
-        }
-      } catch (error) {
-        setError(error.toString());
-        notification.error({
-          message: 'Error',
-          description: 'Error al obtener las rutas',
-        });
-      }
-    };
-
     fetchHorario();
     fetchRutas();
   }, [idUsuario]);
 
+
+  const fetchHorario = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      notification.error({
+        message: 'Error',
+        description: 'Token no proporcionado',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/ver-horario/${idUsuario}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setHorario(data.horario);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error);
+        notification.error({
+          message: 'Error',
+          description: errorData.error,
+        });
+      }
+    } catch (error) {
+      setError(error.toString());
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener el horario',
+      });
+    }
+  };
+
+  const fetchRutas = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      notification.error({
+        message: 'Error',
+        description: 'Token no proporcionado',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-rutas/${idUsuario}/`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setRutas(data.rutas);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error);
+        notification.error({
+          message: 'Error',
+          description: errorData.error,
+        });
+      }
+    } catch (error) {
+      setError(error.toString());
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener las rutas',
+      });
+    }
+  };
 
   const handleClickCrearRuta = () => {
     setShowCrearRuta(true);
@@ -133,6 +133,7 @@ const GestionOrdenMovilizacion = () => {
 
   const handleCloseEditarHorario = () => {
     setShowEditarHorario(false);
+    fetchHorario();
     useEffect(); 
   };
 
@@ -161,7 +162,13 @@ const GestionOrdenMovilizacion = () => {
               Las Órdenes de Movilización se pueden realizar desde las <strong>{horario.hora_ida_minima}</strong> 
               hasta las <strong>{horario.hora_llegada_maxima}</strong>, 
               pueden tener una duración mínima de <strong>{horario.duracion_minima}</strong> 
-              y durar máximo <strong>{horario.duracion_maxima}</strong>.
+              y durar máximo <strong>{horario.duracion_maxima}</strong>. {' '}
+              <span
+                className="text-blue-500 cursor-pointer hover:underline"
+                onClick={handleClickEditarHorario}
+              >
+                Editar Horario
+              </span>
             </p>
           </div>
         )}
