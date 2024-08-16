@@ -101,6 +101,20 @@ const GestionOrdenMovilizacion = () => {
     }
   };
 
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    const hourInt = parseInt(hours, 10);
+    const ampm = hourInt >= 12 ? 'pm' : 'am';
+    const formattedHour = hourInt % 12 || 12;
+    return `${formattedHour}:${minutes}${ampm}`;
+  };
+
+  const formatDuration = (minutes) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hrs}:${mins.toString().padStart(2, '0')}hrs`;
+  };
+
   const handleClickCrearRuta = () => {
     setShowCrearRuta(true);
   };
@@ -159,11 +173,12 @@ const GestionOrdenMovilizacion = () => {
         ) : (
           <div>
             <p>
-              Las Órdenes de Movilización se pueden realizar desde las <strong>{horario.hora_ida_minima}</strong> 
-              hasta las <strong>{horario.hora_llegada_maxima}</strong>, 
-              pueden tener una duración mínima de <strong>{horario.duracion_minima}</strong> 
-              y durar máximo <strong>{horario.duracion_maxima}</strong>. {' '}
-              <span
+              Las Órdenes de Movilización se pueden realizar desde las{' '}
+              <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
+              <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
+              tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
+              máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '}
+             <span
                 className="text-blue-500 cursor-pointer hover:underline"
                 onClick={handleClickEditarHorario}
               >
