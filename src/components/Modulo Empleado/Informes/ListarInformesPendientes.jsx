@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faTrash, faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
+import { faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
+import CrearInformes from './CrearInforme';
 
 const InformesPendientes = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -12,8 +13,7 @@ const InformesPendientes = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [solicitudToCancel, setSolicitudToCancel] = useState(null);
+  const [selectedSolicitud, setSelectedSolicitud] = useState(null);
 
   const fetchSolicitudes = useCallback(async () => {
     try {
@@ -42,33 +42,6 @@ const InformesPendientes = () => {
 
   useEffect(() => {
     fetchSolicitudes();
-  }, [fetchSolicitudes]);
-
-  const handleCancelarSolicitud = useCallback(async (id_solicitud) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Token no encontrado');
-
-      const url = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ estado_solicitud: 'cancelado' })
-      });
-
-      if (!response.ok) throw new Error('Error al cancelar la solicitud');
-
-      const data = await response.json();
-      console.log(data.mensaje);
-
-      // Actualizar la lista de solicitudes
-      fetchSolicitudes();
-    } catch (error) {
-      console.error('Error:', error);
-    }
   }, [fetchSolicitudes]);
 
   const handleSearch = (event) => {
@@ -102,38 +75,23 @@ const InformesPendientes = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleVer = (id_solicitud) => {
-    // Aquí puedes agregar la lógica para ver detalles de la solicitud
-  };
-
-  const handleCreateSolicitud = () => {
+  const handleCreateSolicitud = (id_solicitud) => {
+    setSelectedSolicitud(id_solicitud);
     setIsCreating(true);
   };
 
   const handleCloseCreateSolicitud = () => {
     setIsCreating(false);
+    setSelectedSolicitud(null);
     fetchSolicitudes();
-  };
-
-  const handleConfirmCancel = (id_solicitud) => {
-    setSolicitudToCancel(id_solicitud);
-    setShowConfirmModal(true);
-  };
-
-  const handleCancelConfirmed = async () => {
-    await handleCancelarSolicitud(solicitudToCancel);
-    setShowConfirmModal(false);
-    setSolicitudToCancel(null);
   };
 
   return (
     <div className="p-4">
-      {!isCreating && (
+      {!isCreating ? (
         <>
           <div className="mb-4">
             <h2 className="text-xl font-light mb-4">Solicitudes con Informes Pendientes</h2>
-            <div className="flex space-x-2">
-            </div>
             <div className="flex mb-4">
               <input
                 type="text"
@@ -172,8 +130,8 @@ const InformesPendientes = () => {
                     <td className="py-3 px-6 text-left">
                       <button
                         className="p-2 bg-blue-500 text-white rounded-full mr-2"
-                        title="Ver Solicitud de Movilización"
-                        onClick={() => handleVer(solicitud.id)}
+                        title="Crear Informe"
+                        onClick={() => handleCreateSolicitud(solicitud.id)}
                       >
                         <FontAwesomeIcon icon={faFileEdit} />
                       </button>
@@ -200,28 +158,9 @@ const InformesPendientes = () => {
               Siguiente
             </button>
           </div>
-          {showConfirmModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white p-6 rounded shadow-lg">
-                <p>¿Estás seguro de que deseas cancelar esta solicitud?</p>
-                <div className="flex justify-end mt-4">
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded mr-2"
-                    onClick={handleCancelConfirmed}
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-                    onClick={() => setShowConfirmModal(false)}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </>
+      ) : (
+        <CrearInformes idSolicitud={selectedSolicitud} onClose={handleCloseCreateSolicitud} />
       )}
     </div>
   );
