@@ -7,7 +7,7 @@ const TablaProvincias = ({ provincias, onEditProvincia, onViewCiudades }) => {
   };
 
   const handleViewCitiesClick = (provincia) => {
-    onViewCiudades(provincia.id_provincia); // Solo se pasa el ID de la provincia
+    onViewCiudades(provincia.id_provincia);
   };
 
   return (

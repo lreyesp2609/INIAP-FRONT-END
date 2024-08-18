@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
 import TablaCiudades from "./Tablas/tablaciudades";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-
-const GestionCiudades = ({ id_provincia }) => {
+import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import AgregarCiudad from "./agregarciudades";
+import EditarCiudad from "./editarciudades";
+const GestionCiudades = ({ id_provincia, onBack, provinciaNombre}) => {
   const [ciudades, setCiudades] = useState([]);
   const [filteredCiudades, setFilteredCiudades] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,7 +62,7 @@ const GestionCiudades = ({ id_provincia }) => {
   };
 
   const handleCiudadAdded = async () => {
-    await fetchCiudades(userId, id_provincia); // Refetch ciudades to include the new one
+    await fetchCiudades(userId, id_provincia);
     setIsAdding(false);
   };
 
@@ -70,7 +71,7 @@ const GestionCiudades = ({ id_provincia }) => {
   };
 
   const handleCiudadUpdated = async () => {
-    await fetchCiudades(userId, id_provincia); // Refetch ciudades to include the updated one
+    await fetchCiudades(userId, id_provincia);
     setSelectedCiudad(null);
   };
 
@@ -85,7 +86,10 @@ const GestionCiudades = ({ id_provincia }) => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredCiudades.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredCiudades.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredCiudades.length / itemsPerPage);
 
   return (
@@ -97,6 +101,8 @@ const GestionCiudades = ({ id_provincia }) => {
             onClose={handleCloseForm}
             onCiudadUpdated={handleCiudadUpdated}
             userId={userId}
+            provinciaNombre={provinciaNombre} 
+
           />
         </div>
       ) : isAdding ? (
@@ -106,17 +112,26 @@ const GestionCiudades = ({ id_provincia }) => {
             onCiudadAdded={handleCiudadAdded}
             userId={userId}
             id_provincia={id_provincia}
+            provinciaNombre={provinciaNombre} 
           />
         </div>
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-            <h1 className="text-2xl font-light">Gestión de Ciudades</h1>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onBack}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                Volver
+              </button>
+              <h1 className="text-2xl font-light">Gestión de Ciudades</h1>
+            </div>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
                 onClick={handleAddCiudad}
-                className="
-                bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Agregar Ciudad

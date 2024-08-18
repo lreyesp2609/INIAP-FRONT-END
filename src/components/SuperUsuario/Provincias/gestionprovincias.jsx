@@ -17,8 +17,9 @@ const GestionProvincias = () => {
   const [selectedProvincia, setSelectedProvincia] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [userId, setUserId] = useState(null);
-  const [viewingCiudades, setViewingCiudades] = useState(false); // Estado para manejar la visualización de ciudades
+  const [viewingCiudades, setViewingCiudades] = useState(false); 
   const [selectedProvinciaId, setSelectedProvinciaId] = useState(null);
+  const [selectedProvinciaNombre, setSelectedProvinciaNombre] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -63,11 +64,10 @@ const GestionProvincias = () => {
   const handleCloseForm = () => {
     setIsAdding(false);
     setSelectedProvincia(null);
-    setViewingCiudades(false); // Cerrar la vista de ciudades al cerrar el formulario
   };
 
   const handleProvinciaAdded = async () => {
-    await fetchProvincias(userId);  // Refetch provincias to include the new one
+    await fetchProvincias(userId); 
     setIsAdding(false);
   };
 
@@ -76,7 +76,7 @@ const GestionProvincias = () => {
   };
 
   const handleProvinciaUpdated = async () => {
-    await fetchProvincias(userId);  // Refetch provincias to include the updated one
+    await fetchProvincias(userId); 
     setSelectedProvincia(null);
   };
 
@@ -91,9 +91,19 @@ const GestionProvincias = () => {
     setCurrentPage(1);
   };
 
-  const handleViewCiudades = (id_provincia) => {
-    setSelectedProvinciaId(id_provincia);
+  const handleViewCiudades = (provinciaId) => {
+    const provincia = provincias.find(p => p.id_provincia === provinciaId);
+    if (provincia) {
+      setSelectedProvinciaId(provinciaId);
+      setSelectedProvinciaNombre(provincia.provincia); 
+    }
     setViewingCiudades(true);
+  };
+
+  const handleBackToProvincias = () => {
+    setViewingCiudades(false);
+    setSelectedProvinciaId(null);
+    setSelectedProvinciaNombre("");
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -107,7 +117,11 @@ const GestionProvincias = () => {
   return (
     <div className="p-4">
       {viewingCiudades ? (
-        <GestionCiudades id_provincia={selectedProvinciaId} />
+        <GestionCiudades
+          id_provincia={selectedProvinciaId}
+          onBack={handleBackToProvincias}
+          provinciaNombre={selectedProvinciaNombre}
+        />
       ) : selectedProvincia ? (
         <div className="bg-white p-4 border rounded shadow-lg">
           <EditarProvincia
@@ -128,12 +142,13 @@ const GestionProvincias = () => {
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
-            <h1 className="text-2xl font-light">Gestión de Provincias</h1>
+            <div>
+              <h1 className="text-2xl font-light">Gestión de Provincias</h1>
+            </div>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
               <button
                 onClick={handleAddProvincia}
-                className="
-                bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Agregar Provincia
@@ -155,7 +170,8 @@ const GestionProvincias = () => {
           <TablaProvincias
             provincias={currentItems}
             onEditProvincia={handleEditProvincia}
-            onViewCiudades={handleViewCiudades} // Pasar la función para ver ciudades
+            onViewCiudades={handleViewCiudades}
+            userId={userId}
           />
           <div className="mt-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
             <button
