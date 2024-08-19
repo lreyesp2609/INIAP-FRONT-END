@@ -11,6 +11,7 @@ import GestionOrdenes from "./Motivos/gestionordenes";
 import ChangePasswordModal from "../Login/changepasswordmodal";
 import GestionProvincias from "./Provincias/gestionprovincias";
 import GestionOrdenMovilizacion from "./Ordenes de Movilizacion/GestionOrdenesMovilizacion";
+import GestionEncabezados from "./Encabezados/gestionencabezados";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -114,6 +115,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-motivos-ordenes" && <GestionOrdenes />}
         {view === "gestion-provincias" && <GestionProvincias />}
         {view === "gestion-movilizaciones" && <GestionOrdenMovilizacion />}
+        {view === "gestion-encabezados" && <GestionEncabezados />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
