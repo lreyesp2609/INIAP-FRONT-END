@@ -128,7 +128,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div className="mb-4 flex">
             <div className="mr-4 w-1/2">
-              <label className="block font-semibold">Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</label>
               <input
                 type="text"
                 value="026-TAKM-UI-INIAP-EETP-2024"
@@ -137,7 +137,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
               />
             </div>
             <div className="mr-4 w-1/2">
-              <label className="block font-semibold">FECHA DE INFORME (dd-mmm-aaa)</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">FECHA DE INFORME (dd-mmm-aaa)</label>
               <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'} {/* Espacio en blanco */}</label>
               <input
                 type="text"
@@ -152,52 +152,58 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
           DATOS GENERALES
         </h2>
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-          <label className="block font-semibold">Nombre Completo:</label>
-          <input
-            type="text"
-            value="Ing. Triana Arrieta Kerly Mikaela"
-            readOnly
-            className="w-full p-2 border rounded"
-          />
-        
-        <div>
-          <label className="block font-semibold">Cargo:</label>
-          <input
-            type="text"
-            value="ASISTENTE TIC 1 DE ESTACION EXPERIMENTAL"
-            readOnly
-            className="w-full p-2 border rounded"
-          />
+          <div className="mb-4 flex">
+            <div className="mr-4 w-1/2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+              <input
+                type="text"
+                value="Ing. Triana Arrieta Kerly Mikaela"
+                readOnly
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mr-4 w-1/2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">PUESTO QUE OCUPA</label>
+              <input
+                type="text"
+                value="ASISTENTE TIC 1 DE ESTACION EXPERIMENTAL"
+                readOnly
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
+          <div className="mb-4 flex">
+            <div className="mr-4 w-1/2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL</label>
+              <input
+                type="text"
+                value="Mejía-Pichincha"
+                readOnly
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mr-4 w-1/2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+              <input
+                type="text"
+                value="UNIDAD DE INFORMATICA"
+                readOnly
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
         </div>
+        <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN EL SERVICIO INSTITUCIONAL</label>
+            <input
+              type="text"
+              value="Ing. Kerly Mikaela Triana Arrieta, Ing. Rafael Alexander Navas Rivera, Agricultores"
+              readOnly
+              className="w-full p-2 border rounded"
+            />
+          </div>
         </div>
-        <div>
-          <label className="block font-semibold">Lugar de Servicio:</label>
-          <input
-            type="text"
-            value="Mejía-Pichincha"
-            readOnly
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Nombre de Unidad:</label>
-          <input
-            type="text"
-            value="UNIDAD DE INFORMATICA"
-            readOnly
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Listado de Empleados:</label>
-          <input
-            type="text"
-            value="Ing. Kerly Mikaela Triana Arrieta, Ing. Rafael Alexander Navas Rivera, Agricultores"
-            readOnly
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block mb-1">Fecha Informe:</label>
