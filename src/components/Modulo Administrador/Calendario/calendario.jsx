@@ -32,7 +32,10 @@ const Calendario = () => {
 
   useEffect(() => {
     const fetchOrdenesAprobadas = async () => {
-      if (!id_usuario || !token) return;
+      if (!id_usuario || !token) {
+        console.log("No user ID or token, skipping API call.");
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -89,7 +92,7 @@ const Calendario = () => {
     setShowAgenda(false);
     setShowCalendar(false);
   };
-  
+
   const handleShowSolicitudList = (date) => {
     const selectedDateString = new Date(date).toISOString().split("T")[0];
     const ordersForDate = ordenesAprobadas.filter((orden) => {
@@ -104,7 +107,6 @@ const Calendario = () => {
     setShowAgenda(false);
     setShowCalendar(false);
   };
-  
 
   const handleShowAgenda = (date) => {
     setSelectedDate(date);
@@ -130,7 +132,6 @@ const Calendario = () => {
     }
     setPrevView(null);
   };
-  
 
   const closeAgendaView = () => {
     setShowAgenda(false);
@@ -171,13 +172,15 @@ const Calendario = () => {
           onClose={closeDetalleOrden}
         />
       )}
-      {showAgenda && selectedDate && (
+      {showAgenda && selectedDate && id_usuario && token && (
         <AgendaView
           ordenesAprobadas={ordenesAprobadas.filter(
             (o) =>
               new Date(o.fecha_viaje).toDateString() ===
               new Date(selectedDate).toDateString()
           )}
+          idUsuario={id_usuario}
+          token={token}
           onOrdenClick={handleOrdenClick}
           onClose={closeAgendaView}
         />
