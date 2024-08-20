@@ -1,6 +1,11 @@
 import React from "react";
 
-const MesView = ({ date, ordenesAprobadas, onOrdenClick, onShowSolicitudList }) => {
+const MesView = ({
+  date,
+  ordenesAprobadas,
+  onOrdenClick,
+  onShowSolicitudList,
+}) => {
   const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
   const month = date.toLocaleString("default", { month: "long" });

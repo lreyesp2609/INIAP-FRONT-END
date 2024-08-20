@@ -5,7 +5,7 @@ const AgendaView = ({ ordenesAprobadas }) => {
   const [ordenSeleccionada, setOrdenSeleccionada] = useState(null);
   const [idUsuario, setIdUsuario] = useState(null);
   const [token, setToken] = useState(null);
-  const [mostrarLista, setMostrarLista] = useState(true); // Estado para controlar la visibilidad
+  const [mostrarLista, setMostrarLista] = useState(true);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -69,12 +69,12 @@ const AgendaView = ({ ordenesAprobadas }) => {
 
   const handleOrderClick = (orderId) => {
     setOrdenSeleccionada(orderId);
-    setMostrarLista(false); // Ocultar lista al seleccionar una orden
+    setMostrarLista(false);
   };
 
   const handleCloseDetail = () => {
     setOrdenSeleccionada(null);
-    setMostrarLista(true); // Mostrar lista al cerrar el detalle
+    setMostrarLista(true);
   };
 
   return (
@@ -87,7 +87,7 @@ const AgendaView = ({ ordenesAprobadas }) => {
           onClose={handleCloseDetail}
         />
       )}
-      {mostrarLista && (
+      {mostrarLista &&
         Object.keys(ordersByDate).map((date) => (
           <div key={date} className="mb-4">
             <h2 className="text-lg font-bold">{formatDate(date)}</h2>
@@ -98,15 +98,19 @@ const AgendaView = ({ ordenesAprobadas }) => {
                 onClick={() => handleOrderClick(order.id_orden_movilizacion)}
               >
                 <div className="text-sm text-gray-600">
-                  {`${formatTime(order.hora_ida)} - ${formatTime(order.hora_regreso)}`}
+                  {`${formatTime(order.hora_ida)} - ${formatTime(
+                    order.hora_regreso
+                  )}`}
                   <span className="mx-2 inline-block w-2 h-2 bg-orange-400 rounded-full"></span>
                   {`Orden de movilización: ${order.motivo_movilizacion}`}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {`Secuencial: ${order.secuencial_orden_movilizacion}`}
                 </div>
               </div>
             ))}
           </div>
-        ))
-      )}
+        ))}
     </div>
   );
 };

@@ -3,7 +3,14 @@ import MesView from "./Mesview";
 import SemanaView from "./Semanaview";
 import AgendaView from "./Agendaview";
 
-const CalendarView = ({ view, date, ordenesAprobadas, onOrdenClick, onShowAgenda, onShowSolicitudList }) => {
+const CalendarView = ({
+  view,
+  date,
+  ordenesAprobadas,
+  onOrdenClick,
+  onShowAgenda,
+  onShowSolicitudList,
+}) => {
   return (
     <div>
       {view === "month" && (

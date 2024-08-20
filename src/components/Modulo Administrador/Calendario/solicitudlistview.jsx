@@ -52,6 +52,9 @@ const SolicitudListView = ({ ordenes, onClose, onOrdenSelect }) => {
                   <span className="mx-2 inline-block w-2 h-2 bg-orange-400 rounded-full"></span>
                   {`Orden de movilización: ${order.motivo_movilizacion}`}
                 </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {`Secuencial: ${order.secuencial_orden_movilizacion}`}
+                </div>
               </div>
             ))}
           </div>
