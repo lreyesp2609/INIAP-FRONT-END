@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../../../Config";
-import MesView from "./Mesview";
-import SemanaView from "./Semanaview";
+import CalendarControls from "./calendarcontrols";
+import CalendarView from "./calendarview";
+import DetalleOrden from "./detalleorden";
+import SolicitudListView from "./solicitudlistview";
 import AgendaView from "./Agendaview";
 
 const Calendario = () => {
@@ -10,6 +12,13 @@ const Calendario = () => {
   const [ordenesAprobadas, setOrdenesAprobadas] = useState([]);
   const [id_usuario, setIdUsuario] = useState(null);
   const [token, setToken] = useState(null);
+  const [selectedOrden, setSelectedOrden] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(true);
+  const [showAgenda, setShowAgenda] = useState(false);
+  const [showSolicitudList, setShowSolicitudList] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [ordersForSelectedDate, setOrdersForSelectedDate] = useState([]);
+  const [prevView, setPrevView] = useState(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -23,7 +32,10 @@ const Calendario = () => {
 
   useEffect(() => {
     const fetchOrdenesAprobadas = async () => {
-      if (!id_usuario || !token) return;
+      if (!id_usuario || !token) {
+        console.log("No user ID or token, skipping API call.");
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -73,67 +85,115 @@ const Calendario = () => {
     setDate(new Date());
   };
 
+  const handleOrdenClick = (idOrden) => {
+    setSelectedOrden(idOrden);
+    setPrevView(showSolicitudList ? "solicitudList" : "calendar");
+    setShowSolicitudList(false);
+    setShowAgenda(false);
+    setShowCalendar(false);
+  };
+
+  const handleShowSolicitudList = (date) => {
+    const selectedDateString = new Date(date).toISOString().split("T")[0];
+    const ordersForDate = ordenesAprobadas.filter((orden) => {
+      const orderDateString = new Date(orden.fecha_viaje)
+        .toISOString()
+        .split("T")[0];
+      return orderDateString === selectedDateString;
+    });
+    setOrdersForSelectedDate(ordersForDate);
+    setPrevView("calendar");
+    setShowSolicitudList(true);
+    setShowAgenda(false);
+    setShowCalendar(false);
+  };
+
+  const handleShowAgenda = (date) => {
+    setSelectedDate(date);
+    setPrevView("calendar");
+    setShowAgenda(true);
+    setShowCalendar(false);
+  };
+
+  const closeDetalleOrden = () => {
+    setSelectedOrden(null);
+    if (prevView === "solicitudList") {
+      setShowSolicitudList(true);
+      setShowAgenda(false);
+      setShowCalendar(false);
+    } else if (prevView === "agenda") {
+      setShowAgenda(true);
+      setShowSolicitudList(false);
+      setShowCalendar(false);
+    } else {
+      setShowCalendar(true);
+      setShowSolicitudList(false);
+      setShowAgenda(false);
+    }
+    setPrevView(null);
+  };
+
+  const closeAgendaView = () => {
+    setShowAgenda(false);
+    setShowCalendar(true);
+  };
+
+  const closeSolicitudListView = () => {
+    setShowSolicitudList(false);
+    setShowCalendar(true);
+  };
+
   return (
     <div className="p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-        <div>
-          <button
-            onClick={handlePrev}
-            className="bg-gray-200 px-4 py-2 mr-2 rounded"
-          >
-            Anterior
-          </button>
-          <button
-            onClick={handleToday}
-            className="bg-gray-200 px-4 py-2 mr-2 rounded"
-          >
-            Hoy
-          </button>
-          <button
-            onClick={handleNext}
-            className="bg-gray-200 px-4 py-2 rounded"
-          >
-            Siguiente
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={() => setView("month")}
-            className={`px-4 py-2 mr-2 rounded ${
-              view === "month" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
-          >
-            Mes
-          </button>
-          <button
-            onClick={() => setView("week")}
-            className={`px-4 py-2 mr-2 rounded ${
-              view === "week" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
-          >
-            Semana
-          </button>
-          <button
-            onClick={() => setView("agenda")}
-            className={`px-4 py-2 rounded ${
-              view === "agenda" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
-          >
-            Agenda
-          </button>
-        </div>
-      </div>
-      <div>
-        {view === "month" && (
-          <MesView date={date} ordenesAprobadas={ordenesAprobadas} />
+      {showCalendar && !showAgenda && !showSolicitudList && !selectedOrden && (
+        <>
+          <CalendarControls
+            handlePrev={handlePrev}
+            handleNext={handleNext}
+            handleToday={handleToday}
+            view={view}
+            setView={setView}
+          />
+          <CalendarView
+            view={view}
+            date={date}
+            ordenesAprobadas={ordenesAprobadas}
+            onOrdenClick={handleOrdenClick}
+            onShowAgenda={handleShowAgenda}
+            onShowSolicitudList={handleShowSolicitudList}
+          />
+        </>
+      )}
+      {selectedOrden && (
+        <DetalleOrden
+          idUsuario={id_usuario}
+          idOrden={selectedOrden}
+          token={token}
+          onClose={closeDetalleOrden}
+        />
+      )}
+      {showAgenda && selectedDate && id_usuario && token && (
+        <AgendaView
+          ordenesAprobadas={ordenesAprobadas.filter(
+            (o) =>
+              new Date(o.fecha_viaje).toDateString() ===
+              new Date(selectedDate).toDateString()
+          )}
+          idUsuario={id_usuario}
+          token={token}
+          onOrdenClick={handleOrdenClick}
+          onClose={closeAgendaView}
+        />
+      )}
+      {showSolicitudList &&
+        ordersForSelectedDate.length > 0 &&
+        !selectedOrden && (
+          <SolicitudListView
+            ordenes={ordersForSelectedDate}
+            onClose={closeSolicitudListView}
+            onOrdenSelect={handleOrdenClick}
+          />
         )}
-        {view === "week" && (
-          <SemanaView date={date} ordenesAprobadas={ordenesAprobadas} />
-        )}
-        {view === "agenda" && (
-          <AgendaView ordenesAprobadas={ordenesAprobadas} />
-        )}
-      </div>
     </div>
   );
 };

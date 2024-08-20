@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import API_URL from '../../../Config';
 
 const CrearInformes = ({ idSolicitud, onClose }) => {
@@ -9,10 +11,18 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     hora_salida_informe: '',
     fecha_llegada_informe: '',
     hora_llegada_informe: '',
-    evento: '',
     observacion: '',
-    transportes: [],
-    productos: []
+    transportes: [{
+      tipo_transporte_info: '',
+      nombre_transporte_info: '',
+      ruta_info: '',
+      fecha_salida_info: '',
+      hora_salida_info: '',
+      fecha_llegada_info: '',
+      hora_llegada_info: ''
+    }],
+    productos: [{ descripcion: '' }],
+    informeActividades: ''
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,6 +61,13 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     }));
   };
 
+  const handleEditorChange = (content) => {
+    setFormData(prevState => ({
+      ...prevState,
+      informeActividades: content
+    }));
+  };
+
   const handleTransporteChange = (index, field, value) => {
     const newTransportes = [...formData.transportes];
     newTransportes[index] = { ...newTransportes[index], [field]: value };
@@ -75,19 +92,10 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     }));
   };
 
-  const handleProductoChange = (index, value) => {
-    const newProductos = [...formData.productos];
-    newProductos[index] = { descripcion: value };
+  const removeTransporte = (index) => {
     setFormData(prevState => ({
       ...prevState,
-      productos: newProductos
-    }));
-  };
-
-  const addProducto = () => {
-    setFormData(prevState => ({
-      ...prevState,
-      productos: [...prevState.productos, { descripcion: '' }]
+      transportes: prevState.transportes.filter((_, i) => i !== index)
     }));
   };
 
@@ -97,13 +105,18 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
+      const dataToSend = {
+        ...formData,
+        productos: [{ descripcion: formData.informeActividades }]
+      };
+
       const response = await fetch(`${API_URL}/Informes/crear-informe/${idSolicitud}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
 
       if (!response.ok) throw new Error('Error al crear el informe');
@@ -122,9 +135,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
   return (
     <div className="p-4">
       <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-        <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
-          INFORME DE SERVICIOS INSTITUCIONALES
-        </h2>
+        <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">INFORME DE SERVICIOS INSTITUCIONALES</h2>
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div className="mb-4 flex">
             <div className="mr-4 w-1/2">
@@ -138,7 +149,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
             </div>
             <div className="mr-4 w-1/2">
               <label className="block text-gray-700 text-sm font-bold mb-2">FECHA DE INFORME (dd-mmm-aaa)</label>
-              <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'} {/* Espacio en blanco */}</label>
+              <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
               <input
                 type="text"
                 value="19-08-2024"
@@ -205,163 +216,212 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1">Fecha Informe:</label>
-            <input
-              type="date"
-              name="fecha_informe"
-              value={formData.fecha_informe}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
+          <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
+            INFORME DE ACTIVIDADES Y PRODUCTOS ALCANZADOS
+          </h2>
+          <div className="mb-2 border-2 border-gray-600 rounded-lg p-14">
+            <ReactQuill
+              value={formData.informeActividades}
+              onChange={handleEditorChange}
+              modules={{
+                toolbar: [
+                  [{ 'header': [1, 2, false] }],
+                  ['bold', 'italic', 'underline', 'strike'],
+                  [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+                  ['link'],
+                  ['clean']
+                ],
+              }}
+              formats={[
+                'header',
+                'bold', 'italic', 'underline', 'strike', 'blockquote',
+                'list', 'bullet', 'indent',
+                'link', 'image'
+              ]}
+              className="h-60"
             />
           </div>
-          <div>
-            <label className="block mb-1">Fecha Salida:</label>
-            <input
-              type="date"
-              name="fecha_salida_informe"
-              value={formData.fecha_salida_informe}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
+          <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+              <div className="mb-4 flex">
+                <div className="mr-4 w-1/4">
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">INTINERARIO</h2>
+                </div>
+                <div className="mr-4 w-1/2">
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SALIDA</h2>
+                </div>
+                <div className="mr-4 w-1/2">
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">LLEGADA</h2>
+                </div>
+              </div>
+            </div>
+            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+              <div className="mb-4 flex">
+                <div className="mr-4 w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">FECHA</h2>
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">dd-mmm-aaaa</h2>
+                </div>
+                <div className="mr-4 w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <input
+                    type="date"
+                    name="fecha_salida_informe"
+                    value={formData.fecha_salida_informe}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+                <div className="mr-4 w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <input
+                    type="date"
+                    name="fecha_llegada_informe"
+                    value={formData.fecha_llegada_informe}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+              <div className="mb-4 flex">
+                <div className="mr-4 w-1/4">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">HORA</h2>
+                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">hh-mm</h2>
+                </div>
+                <div className="mr-4 w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <input
+                    type="time"
+                    name="hora_salida_informe"
+                    value={formData.hora_salida_informe}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+                <div className="mr-4 w-1/2">
+                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                  <input
+                    type="time"
+                    name="hora_llegada_informe"
+                    value={formData.hora_llegada_informe}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
           </div>
+          <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
+          <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+            {formData.transportes.map((transporte, index) => (
+              <div key={index} className="mb-4">
+                <div className="mb-4 flex">
+                  <div className="mr-4 w-1/4">
+                    <input
+                      type="text"
+                      placeholder="Tipo de Transporte"
+                      value={transporte.tipo_transporte_info}
+                      onChange={(e) => handleTransporteChange(index, 'tipo_transporte_info', e.target.value)}
+                      className="w-full p-2 mb-2 border rounded"
+                    />
+                  </div>
+                  <div className="mr-4 w-1/4">
+                    <input
+                      type="text"
+                      placeholder="Nombre de Transporte"
+                      value={transporte.nombre_transporte_info}
+                      onChange={(e) => handleTransporteChange(index, 'nombre_transporte_info', e.target.value)}
+                      className="w-full p-2 mb-2 border rounded"
+                    />
+                  </div>
+                  <div className="mr-4 w-1/4">
+                    <input
+                    type="text"
+                    placeholder="Ruta"
+                    value={transporte.ruta_info}
+                    onChange={(e) => handleTransporteChange(index, 'ruta_info', e.target.value)}
+                    className="w-full p-2 mb-2 border rounded"
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <input
+                    type="date"
+                    value={transporte.fecha_salida_info}
+                    onChange={(e) => handleTransporteChange(index, 'fecha_salida_info', e.target.value)}
+                    className="w-full p-2 mb-2 border rounded"
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <input
+                    type="time"
+                    value={transporte.hora_salida_info}
+                    onChange={(e) => handleTransporteChange(index, 'hora_salida_info', e.target.value)}
+                    className="w-full p-2 mb-2 border rounded"
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <input
+                    type="date"
+                    value={transporte.fecha_llegada_info}
+                    onChange={(e) => handleTransporteChange(index, 'fecha_llegada_info', e.target.value)}
+                    className="w-full p-2 mb-2 border rounded"
+                  />
+                </div>
+                <div className="mr-4 w-1/4">
+                  <input
+                    type="time"
+                    value={transporte.hora_llegada_info}
+                    onChange={(e) => handleTransporteChange(index, 'hora_llegada_info', e.target.value)}
+                    className="w-full p-2 mb-2 border rounded"
+                  />
+                </div>
+              </div>
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeTransporte(index)}
+                  className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+                >
+                  Eliminar
+                </button>
+              )}
+              <div className="border-t border-gray-300 my-4"></div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addTransporte}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Agregar Ruta
+          </button>
+        </div>
+        <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">OBSERVACIONES</h2>
+        <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div>
-            <label className="block mb-1">Hora Salida:</label>
-            <input
-              type="time"
-              name="hora_salida_informe"
-              value={formData.hora_salida_informe}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Fecha Llegada:</label>
-            <input
-              type="date"
-              name="fecha_llegada_informe"
-              value={formData.fecha_llegada_informe}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Hora Llegada:</label>
-            <input
-              type="time"
-              name="hora_llegada_informe"
-              value={formData.hora_llegada_informe}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Evento:</label>
-            <textarea
-              name="evento"
-              value={formData.evento}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              rows="3"
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Observación:</label>
             <textarea
               name="observacion"
               value={formData.observacion}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
-              rows="3"
+              rows="4"
             />
           </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Transportes</h3>
-            {formData.transportes.map((transporte, index) => (
-              <div key={index} className="mb-4 p-4 border rounded">
-                <input
-                  type="text"
-                  placeholder="Tipo de Transporte"
-                  value={transporte.tipo_transporte_info}
-                  onChange={(e) => handleTransporteChange(index, 'tipo_transporte_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Nombre del Transporte"
-                  value={transporte.nombre_transporte_info}
-                  onChange={(e) => handleTransporteChange(index, 'nombre_transporte_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Ruta"
-                  value={transporte.ruta_info}
-                  onChange={(e) => handleTransporteChange(index, 'ruta_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="date"
-                  placeholder="Fecha de Salida"
-                  value={transporte.fecha_salida_info}
-                  onChange={(e) => handleTransporteChange(index, 'fecha_salida_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="time"
-                  placeholder="Hora de Salida"
-                  value={transporte.hora_salida_info}
-                  onChange={(e) => handleTransporteChange(index, 'hora_salida_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="date"
-                  placeholder="Fecha de Llegada"
-                  value={transporte.fecha_llegada_info}
-                  onChange={(e) => handleTransporteChange(index, 'fecha_llegada_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-                <input
-                  type="time"
-                  placeholder="Hora de Llegada"
-                  value={transporte.hora_llegada_info}
-                  onChange={(e) => handleTransporteChange(index, 'hora_llegada_info', e.target.value)}
-                  className="w-full p-2 mb-2 border rounded"
-                />
-              </div>
-            ))}
-            <button type="button" onClick={addTransporte} className="bg-blue-500 text-white px-4 py-2 rounded">
-              Agregar Transporte
-            </button>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Productos</h3>
-            {formData.productos.map((producto, index) => (
-              <input
-                key={index}
-                type="text"
-                placeholder="Descripción del Producto"
-                value={producto.descripcion}
-                onChange={(e) => handleProductoChange(index, e.target.value)}
-                className="w-full p-2 mb-2 border rounded"
-              />
-            ))}
-            <button type="button" onClick={addProducto} className="bg-blue-500 text-white px-4 py-2 rounded">
-              Agregar Producto
-            </button>
-          </div>
-          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-            Crear Informe
-          </button>
-        </form>
-      </div>
+        </div>
+        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+          Crear Informe
+        </button>
+      </form>
     </div>
-  );
+  </div>
+);
 };
 
 export default CrearInformes;

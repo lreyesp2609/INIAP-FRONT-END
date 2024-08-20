@@ -105,7 +105,7 @@ const LeftMenu = ({ user, onNavigate }) => {
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
           >
             <IoCash className="w-10 h-10 text-white mx-6" />
-            <span className="text-white text-sm hidden md:inline">Informes de Servicios</span>
+            <span className="text-white text-sm hidden md:inline">Justificacion de Gastos</span>
           </button>
         </div>
       </div>

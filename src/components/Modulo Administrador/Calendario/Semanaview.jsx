@@ -19,14 +19,14 @@ const SemanaView = ({ date, ordenesAprobadas }) => {
     weekday: "short",
     day: "numeric",
     month: "numeric",
-    timeZone: "UTC"
+    timeZone: "UTC",
   });
 
   const headerFormatter = new Intl.DateTimeFormat("es-ES", {
     day: "numeric",
     month: "short",
     year: "numeric",
-    timeZone: "UTC"
+    timeZone: "UTC",
   });
 
   return (
@@ -40,17 +40,15 @@ const SemanaView = ({ date, ordenesAprobadas }) => {
         {daysOfWeek.map((day, i) => {
           const orden = ordenesAprobadas.find(
             (o) =>
-              new Date(o.fecha_viaje).toISOString().split('T')[0] ===
-              day.toISOString().split('T')[0]
+              new Date(o.fecha_viaje).toISOString().split("T")[0] ===
+              day.toISOString().split("T")[0]
           );
           return (
             <div
               key={i}
               className="border p-2 relative min-w-[5rem] sm:min-w-[7rem] lg:min-w-[10rem] h-auto flex flex-col items-center justify-center"
             >
-              <div className="font-bold mb-1">
-                {dateFormatter.format(day)}
-              </div>
+              <div className="font-bold mb-1">{dateFormatter.format(day)}</div>
               {orden && (
                 <a
                   href="#"
