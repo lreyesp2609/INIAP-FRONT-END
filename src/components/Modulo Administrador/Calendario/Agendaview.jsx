@@ -7,7 +7,7 @@ const AgendaView = ({ ordenesAprobadas }) => {
       month: "long",
       year: "numeric",
       weekday: "long",
-      timeZone: "UTC"
+      timeZone: "UTC",
     };
     return new Date(date + "T00:00:00Z").toLocaleDateString("es-ES", options);
   };
@@ -29,7 +29,17 @@ const AgendaView = ({ ordenesAprobadas }) => {
       acc[date].push(order);
       return acc;
     }, {});
-    return groupedOrders;
+
+    // Ordenar las fechas
+    const sortedDates = Object.keys(groupedOrders).sort((a, b) => new Date(a) - new Date(b));
+    
+    // Crear un nuevo objeto ordenado por fechas
+    const sortedGroupedOrders = sortedDates.reduce((acc, date) => {
+      acc[date] = groupedOrders[date];
+      return acc;
+    }, {});
+
+    return sortedGroupedOrders;
   };
 
   const ordersByDate = groupOrdersByDate(ordenesAprobadas);
