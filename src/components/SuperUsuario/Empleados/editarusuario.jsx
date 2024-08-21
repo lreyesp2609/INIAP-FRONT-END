@@ -244,22 +244,20 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
 
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
-    const newValue =
-      type === "checkbox" ? checked : value;
+    const newValue = type === "checkbox" ? checked : value;
+  
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: name === "habilitado" ? newValue === true : newValue,
+    }));
   
     if (name === "id_cargo") {
       console.log("Nuevo valor de id_cargo:", value);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: newValue,
-      }));
-    } else {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: name === "habilitado" ? newValue === true : newValue,
-      }));
+    } else if (name === "id_licencia") {
+      console.log("Nuevo valor de id_licencia:", value);
     }
   };
+  
   
   const handleSave = async () => {
     if (!formData.id_cargo) {
@@ -284,16 +282,14 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("genero", formData.genero);
       formDataForUpdate.append("celular", formData.celular);
       formDataForUpdate.append("direccion", formData.direccion);
-      formDataForUpdate.append(
-        "correo_electronico",
-        formData.correo_electronico
-      );
+      formDataForUpdate.append("correo_electronico", formData.correo_electronico);
       formDataForUpdate.append("id_cargo", formData.id_cargo);
       formDataForUpdate.append("fecha_ingreso", formData.fecha_ingreso);
       formDataForUpdate.append("habilitado", formData.habilitado ? 1 : 0);
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
       formDataForUpdate.append("id_rol", formData.id_rol);
+      formDataForUpdate.append("id_licencia", formData.id_licencia); // Añadir este campo
   
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
@@ -337,6 +333,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       });
     }
   };
+  
   
 
   return (
