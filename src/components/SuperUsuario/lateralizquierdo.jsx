@@ -70,6 +70,26 @@ const LeftMenu = ({ user, onNavigate }) => {
               </button>
               <button 
                 onClick={() => {
+                  onNavigate('gestion-unidades');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FaBuilding className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Unidades</span>
+              </button>
+              <button 
+                onClick={() => {
+                  onNavigate('gestion-cargos');
+                  setIsOpen(false);
+                }} 
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FaBuilding className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Cargos</span>
+              </button>
+              <button 
+                onClick={() => {
                   onNavigate('gestion-licencias');
                   setIsOpen(false);
                 }} 
@@ -131,7 +151,13 @@ const LeftMenu = ({ user, onNavigate }) => {
       </div>
 
       <div className="hidden md:flex md:flex-col md:w-1/6 p-4 text-white justify-start items-center fixed left-0 top-0 h-full z-40 bg-[#169658]">
-        <div className="flex flex-col items-center space-y-6 mt-20 w-full">
+        <div 
+          className="flex flex-col items-center space-y-6 mt-20 w-full overflow-y-auto max-h-full"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#0d4b34 transparent'
+          }}
+        >
           <button 
             onClick={() => onNavigate('gestion-empleados')} 
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
@@ -159,6 +185,20 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <FaBuilding className="w-6 h-6 text-white mx-3" />
             <span className="text-white text-xs hidden md:inline">Gestión de Estaciones</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-unidades')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FaBuilding className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestió de Unidades</span>
+          </button>
+          <button 
+            onClick={() => onNavigate('gestion-cargos')} 
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FaBuilding className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Cargos</span>
           </button>
           <button 
             onClick={() => onNavigate('gestion-licencias')} 

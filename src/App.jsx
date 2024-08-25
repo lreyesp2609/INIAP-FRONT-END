@@ -14,6 +14,8 @@ import SolicitarMovilizacion from './components/Modulo Empleado/Ordenes de Movil
 import ListarMovilizacion from './components/Modulo Empleado/Ordenes de Movilizacion/ListarMovilizacion';
 import GestionOrdenes from './components/SuperUsuario/Motivos/gestionordenes';
 import GestionProvincias from './components/SuperUsuario/Provincias/gestionprovincias';
+import GestionCargos from './components/SuperUsuario/Cargos/gestioncargos';
+import GestionUnidadesPorEstacion from './components/SuperUsuario/Unidades/gestionunidades';
 const AppContent = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -69,6 +71,9 @@ const AppContent = () => {
         <Route path="/gestion-empleados" element={<GestionEmpleados />} />
         <Route path="/gestion-vehiculos" element={<GestionVehiculos />} />
         <Route path="/gestion-categorias-bienes" element={<GestionCategorias />} />
+        <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
+        <Route path="/gestion-unidades" element={<GestionUnidadesPorEstacion />} />
+        <Route path="/gestion-cargos" element={<GestionCargos />} />
         <Route path="/gestion-estaciones" element={<GestionEstaciones />} />
         <Route path="/solicitar-movilizacion" element={<SolicitarMovilizacion />} />
         <Route path="/listar-movilizacion" element={<ListarMovilizacion />} /> 

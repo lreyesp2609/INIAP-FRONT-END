@@ -12,6 +12,8 @@ import ChangePasswordModal from "../Login/changepasswordmodal";
 import GestionProvincias from "./Provincias/gestionprovincias";
 import GestionOrdenMovilizacion from "./Ordenes de Movilizacion/GestionOrdenesMovilizacion";
 import GestionEncabezados from "./Encabezados/gestionencabezados";
+import GestionUnidadesPorEstacion from "./Unidades/gestionunidades";
+import GestionCargos from "./Cargos/gestioncargos";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -116,6 +118,8 @@ const MenuSuperUsuario = () => {
         {view === "gestion-provincias" && <GestionProvincias />}
         {view === "gestion-movilizaciones" && <GestionOrdenMovilizacion />}
         {view === "gestion-encabezados" && <GestionEncabezados />}
+        {view === "gestion-unidades" && <GestionUnidadesPorEstacion />}
+        {view === "gestion-cargos" && <GestionCargos />}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
