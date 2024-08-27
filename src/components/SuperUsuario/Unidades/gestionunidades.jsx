@@ -6,7 +6,7 @@ import TablaUnidades from "./Tablas/tablaunidades";
 import GestionCargos from "../Cargos/gestioncargos";
 import AgregarUnidad from "./agregarunidad";
 
-const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
+const GestionUnidadesPorEstacion = () => {
   const [unidades, setUnidades] = useState([]);
   const [filteredUnidades, setFilteredUnidades] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
@@ -15,10 +15,22 @@ const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const id_usuario = JSON.parse(atob(token.split(".")[1])).id_usuario;
+      setUserId(id_usuario);
+      fetchUnidades(id_usuario);
+    }
+  }, []);
+
+
 
   useEffect(() => {
     fetchUnidades();
-  }, [id_estacion]);
+  });
 
   const fetchUnidades = async () => {
     try {
@@ -28,7 +40,6 @@ const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
       }
 
       const formData = new FormData();
-      formData.append("estacion_id", id_estacion);
 
       const response = await fetch(`${API_URL}/Unidades/unidades/`, {
         method: "POST",
@@ -72,6 +83,7 @@ const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
   };
 
   const handleAddUnidad = () => {
+    fetchUnidades(userId);
     setIsAdding(true);
   };
 
@@ -93,16 +105,7 @@ const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
     setCurrentPage(pageNumber);
   };
 
-  if (isAdding) {
-    return (
-      <AgregarUnidad
-        id_estacion={id_estacion}
-        onClose={() => setIsAdding(false)}
-        onUnidadAdded={handleUnidadAdded}
-        id_usuario={id_usuario}
-      />
-    );
-  }
+ 
 
   if (selectedUnidad) {
     return (
@@ -117,13 +120,7 @@ const GestionUnidadesPorEstacion = ({ id_estacion, onClose, id_usuario }) => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onClose} // Llama a la función onClose cuando se hace clic en el botón
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-          Volver
-        </button>
+       
         <h1 className="text-2xl font-light">Gestionar Unidades</h1>
         <button
           onClick={handleAddUnidad}

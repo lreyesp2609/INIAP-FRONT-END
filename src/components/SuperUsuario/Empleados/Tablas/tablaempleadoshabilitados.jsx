@@ -1,5 +1,5 @@
 import React from "react";
-import { FaEdit, FaKey } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import DeshabilitarEmpleado from "../deshabilitarempleado";
 import ResetPasswordEmpleado from "../resetpasswordempleado";
 
@@ -9,7 +9,7 @@ const TablaEmpleados = ({
   user,
   fetchEmpleados,
 }) => {
-  
+
   const handleDeshabilitar = () => {
     fetchEmpleados(user.usuario.id_usuario);
   };
@@ -46,6 +46,9 @@ const TablaEmpleados = ({
                   Estación
                 </th>
                 <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                  Licencia
+                </th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
                   Acciones
                 </th>
               </tr>
@@ -76,6 +79,9 @@ const TablaEmpleados = ({
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600">
                     {empleado.nombre_estacion}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-600">
+                    {empleado.Licencia}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
                     <button
@@ -142,6 +148,10 @@ const TablaEmpleados = ({
               <div className="mb-2">
                 <span className="font-bold">Estación: </span>
                 {empleado.nombre_estacion}
+              </div>
+              <div className="mb-2">
+                <span className="font-bold">Licencia: </span>
+                {empleado.Licencia}
               </div>
               <div className="flex space-x-2">
                 <button

@@ -1,6 +1,12 @@
 import React from "react";
 
-const CalendarControls = ({ handlePrev, handleNext, handleToday, view, setView }) => {
+const CalendarControls = ({
+  handlePrev,
+  handleNext,
+  handleToday,
+  view,
+  setView,
+}) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
       <div>
@@ -16,10 +22,7 @@ const CalendarControls = ({ handlePrev, handleNext, handleToday, view, setView }
         >
           Hoy
         </button>
-        <button
-          onClick={handleNext}
-          className="bg-gray-200 px-4 py-2 rounded"
-        >
+        <button onClick={handleNext} className="bg-gray-200 px-4 py-2 rounded">
           Siguiente
         </button>
       </div>

@@ -1,6 +1,6 @@
 import React from "react";
 
-const SolicitudListView = ({ ordenes, onClose, onOrdenSelect }) => {
+const SolicitudListView = ({ ordenes, viajes, onClose, onOrdenSelect }) => {
   const formatDate = (date) => {
     const options = {
       day: "numeric",
@@ -20,42 +20,70 @@ const SolicitudListView = ({ ordenes, onClose, onOrdenSelect }) => {
     });
   };
 
-  const groupOrdersByDate = (orders) => {
-    return orders.reduce((acc, order) => {
-      const date = new Date(order.fecha_viaje).toISOString().split("T")[0];
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(order);
+  const groupItemsByDate = (items, dateField) => {
+    return items.reduce((acc, item) => {
+      const fecha = item[dateField];
+      if (!fecha) return acc;
+      const date = new Date(fecha);
+      if (isNaN(date.getTime())) return acc;
+      const formattedDate = date.toISOString().split("T")[0];
+      if (!acc[formattedDate]) acc[formattedDate] = [];
+      acc[formattedDate].push(item);
       return acc;
     }, {});
   };
 
-  const ordersByDate = groupOrdersByDate(ordenes);
+  const ordersByDate = groupItemsByDate(ordenes, "fecha_viaje");
+  const viajesByDate = groupItemsByDate(viajes, "Fecha de Llegada");
+
+  const allDates = [
+    ...new Set([...Object.keys(ordersByDate), ...Object.keys(viajesByDate)]),
+  ].sort();
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-lg">
-      {Object.keys(ordersByDate).length === 0 ? (
-        <p>No hay órdenes para mostrar.</p>
+      {allDates.length === 0 ? (
+        <p>No hay órdenes ni viajes para mostrar.</p>
       ) : (
-        Object.keys(ordersByDate).map((date) => (
-          <div key={date} className="mb-4">
-            <h2 className="text-lg font-bold">{formatDate(date)}</h2>
-            {ordersByDate[date].map((order) => (
-              <div
-                key={order.id_orden_movilizacion}
-                className="p-2 border border-gray-300 rounded mt-2 cursor-pointer"
-                onClick={() => onOrdenSelect(order.id_orden_movilizacion)}
-              >
-                <div className="text-sm text-gray-600">
-                  {`${formatTime(order.hora_ida)} - ${formatTime(
-                    order.hora_regreso
-                  )}`}
-                  <span className="mx-2 inline-block w-2 h-2 bg-orange-400 rounded-full"></span>
-                  {`Orden de movilización: ${order.motivo_movilizacion}`}
+        <>
+          {allDates.map((date) => (
+            <div key={date} className="mb-4">
+              <h2 className="text-lg font-bold">{formatDate(date)}</h2>
+              {ordersByDate[date]?.map((order) => (
+                <div
+                  key={order.id_orden_movilizacion}
+                  className="p-2 border border-gray-300 rounded mt-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => onOrdenSelect(order.id_orden_movilizacion)}
+                >
+                  <div className="text-sm text-gray-600">
+                    {`${formatTime(order.hora_ida)} - ${formatTime(
+                      order.hora_regreso
+                    )}`}
+                    <span className="mx-2 inline-block w-2 h-2 bg-orange-400 rounded-full"></span>
+                    {`Orden de movilización: ${order.motivo_movilizacion}`}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {`Secuencial: ${order.secuencial_orden_movilizacion}`}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))
+              ))}
+              {viajesByDate[date]?.map((viaje) => (
+                <div
+                  key={viaje["Codigo de Solicitud"]}
+                  className="p-2 border border-gray-300 rounded mt-2 hover:bg-gray-100"
+                >
+                  <div className="text-sm text-gray-600">
+                    <span className="mx-2 inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+                    {`Viaje: ${viaje["Codigo de Solicitud"]}`}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {`Motivo: ${viaje["Motivo"]}`}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
       )}
       <button
         onClick={onClose}
