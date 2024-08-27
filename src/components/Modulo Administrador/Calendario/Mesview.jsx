@@ -1,10 +1,9 @@
-import React from "react";
-
 const MesView = ({
   date,
   ordenesAprobadas,
+  solicitudesAceptadas,
   onOrdenClick,
-  onShowSolicitudList,
+  handleShowSolicitud,
 }) => {
   const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
@@ -41,47 +40,61 @@ const MesView = ({
           const ordenesDelDia = isCurrentMonth
             ? ordenesAprobadas.filter(
                 (o) =>
-                  new Date(o.fecha_viaje).toISOString().slice(0, 10) ===
-                  currentDay.toISOString().slice(0, 10)
+                  new Date(o.fecha_viaje).toISOString().split("T")[0] ===
+                  currentDay.toISOString().split("T")[0]
+              )
+            : [];
+          const solicitudesDelDia = isCurrentMonth
+            ? solicitudesAceptadas.filter(
+                (s) =>
+                  new Date(s["Fecha de Llegada"])
+                    .toISOString()
+                    .split("T")[0] === currentDay.toISOString().split("T")[0]
               )
             : [];
 
           return (
             <div
               key={index}
-              className={`border p-2 relative min-w-[3rem] min-h-[3rem] sm:min-w-[4rem] lg:min-w-[5rem] ${
+              className={`border p-1 relative min-w-[3rem] min-h-[3rem] sm:min-w-[4rem] lg:min-w-[5rem] ${
                 isToday(day) ? "bg-blue-100 border-blue-500" : ""
               } ${isCurrentMonth ? "" : "text-gray-400"}`}
             >
               {day !== null ? (
-                <div className="relative overflow-visible text-sm">
-                  <div className="font-bold">
+                <div className="relative overflow-visible text-xs">
+                  <div className="font-bold mb-1">
                     {dayOfWeek} {day}
                   </div>
-                  {ordenesDelDia.length === 1 && (
-                    <button
-                      className="block mt-2 p-1 rounded bg-yellow-400 border border-yellow-400 text-black whitespace-normal break-words text-xs sm:text-sm lg:text-base cursor-pointer"
-                      onClick={() => {
-                        onOrdenClick(ordenesDelDia[0].id_orden_movilizacion);
-                      }}
-                    >
-                      {ordenesDelDia[0].secuencial_orden_movilizacion}
-                    </button>
-                  )}
-                  {ordenesDelDia.length > 1 && (
-                    <button
-                      className="mt-2 p-2 rounded bg-yellow-200 border border-yellow-400 text-black text-xs sm:text-sm lg:text-base cursor-pointer 
-                                 hover:bg-yellow-300 transition duration-200 ease-in-out 
-                                 text-center overflow-hidden text-ellipsis"
-                      style={{ maxWidth: "100%", whiteSpace: "nowrap" }}
-                      onClick={() => onShowSolicitudList(currentDay)}
-                    >
-                      {`+ ${ordenesDelDia.length}`}
-                    </button>
-                  )}
+                  <div className="flex flex-col items-center space-y-1">
+                    {ordenesDelDia.map((orden, idx) => (
+                      <button
+                        key={`orden-${idx}`}
+                        className="w-full px-1 py-0.5 text-xs bg-yellow-400 border border-yellow-400 text-black hover:bg-yellow-300 rounded truncate"
+                        onClick={() => {
+                          console.log("Orden ID:", orden.id_orden_movilizacion);
+                          onOrdenClick(orden.id_orden_movilizacion);
+                        }}
+                        title={orden.secuencial_orden_movilizacion}
+                      >
+                        {orden.secuencial_orden_movilizacion.slice(0, 6)}...
+                      </button>
+                    ))}
+                    {solicitudesDelDia.map((solicitud, idx) => (
+                      <button
+                        key={`solicitud-${idx}`}
+                        className="w-full px-1 py-0.5 text-xs bg-blue-400 border border-blue-400 text-white hover:bg-blue-300 rounded truncate"
+                        onClick={() => {
+                          handleShowSolicitud(solicitud.id); // Asegúrate de que aquí coincida con el nombre esperado en MostrarSolicitudAdministrador
+                        }}
+                        title={solicitud["Codigo de Solicitud"]}
+                      >
+                        {solicitud["Codigo de Solicitud"].slice(0, 6)}...
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ) : (
-                ""
+                <div className="text-gray-400 text-xs">{dayOfWeek}</div>
               )}
             </div>
           );
