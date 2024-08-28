@@ -102,6 +102,18 @@ const InformesPendientes = () => {
         <>
           <div className="mb-4">
             <h2 className="text-xl font-light mb-4">Solicitudes con Informes Pendientes</h2>
+            <div className="flex items-center mb-4">
+              <label htmlFor="view-select" className="text-lg font-light mr-4">Ver:</label>
+              <select
+                id="view-select"
+                value={view}
+                onChange={handleViewChange}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="pendientes">Solicitudes con Informes Pendientes</option>
+                <option value="semi-terminados">Informes</option>
+              </select>
+            </div>
             <div className="flex mb-4">
               <input
                 type="text"
@@ -117,16 +129,6 @@ const InformesPendientes = () => {
               >
                 Limpiar
               </button>
-            </div>
-            <div className="mb-4">
-              <select
-                value={view}
-                onChange={handleViewChange}
-                className="p-2 border border-gray-300 rounded"
-              >
-                <option value="pendientes">Solicitudes con Informes Pendientes</option>
-                <option value="semi-terminados">Informes Semi-Terminados</option>
-              </select>
             </div>
           </div>
           <div className="overflow-x-auto">
