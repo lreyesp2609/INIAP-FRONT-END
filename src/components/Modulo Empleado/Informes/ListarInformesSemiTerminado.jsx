@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileEdit } from '@fortawesome/free-solid-svg-icons';
+import { faFileEdit,faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import CrearInformes from './CrearInforme';
-import InformesSemiTerminados from './ListarInformesSemiTerminado'; // Importar el nuevo componente
+import InformesPendientes from './ListarInformesPendientes'; // Importar el componente InformesPendientes
 
-const InformesPendientes = () => {
+const InformesSemiTerminados = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [filteredSolicitudes, setFilteredSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ const InformesPendientes = () => {
   const [itemsPerPage] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
   const [selectedSolicitud, setSelectedSolicitud] = useState(null);
-  const [view, setView] = useState('pendientes'); // Estado para manejar la vista actual
+  const [view, setView] = useState('semi-terminados'); // Estado para manejar la vista actual
 
   const fetchSolicitudes = useCallback(async () => {
     try {
@@ -92,8 +92,8 @@ const InformesPendientes = () => {
     setView(event.target.value);
   };
 
-  if (view === 'semi-terminados') {
-    return <InformesSemiTerminados />;
+  if (view === 'pendientes') {
+    return <InformesPendientes />;
   }
 
   return (
@@ -101,7 +101,7 @@ const InformesPendientes = () => {
       {!isCreating ? (
         <>
           <div className="mb-4">
-            <h2 className="text-xl font-light mb-4">Solicitudes con Informes Pendientes</h2>
+            <h2 className="text-xl font-light mb-4">Informes Semi-Terminados</h2>
             <div className="flex mb-4">
               <input
                 type="text"
@@ -124,8 +124,8 @@ const InformesPendientes = () => {
                 onChange={handleViewChange}
                 className="p-2 border border-gray-300 rounded"
               >
-                <option value="pendientes">Solicitudes con Informes Pendientes</option>
                 <option value="semi-terminados">Informes Semi-Terminados</option>
+                <option value="pendientes">Solicitudes con Informes Pendientes</option>
               </select>
             </div>
           </div>
@@ -154,6 +154,12 @@ const InformesPendientes = () => {
                         onClick={() => handleCreateSolicitud(solicitud.id)}
                       >
                         <FontAwesomeIcon icon={faFileEdit} />
+                      </button>
+                      <button
+                        className="p-2 bg-gray-500 text-white rounded-full mr-2"
+                        title="Cancelar Solicitud de Movilización"
+                      >
+                        <FontAwesomeIcon icon={faFilePdf} />
                       </button>
                     </td>
                   </tr>
@@ -186,4 +192,4 @@ const InformesPendientes = () => {
   );
 };
 
-export default InformesPendientes;
+export default InformesSemiTerminados;
