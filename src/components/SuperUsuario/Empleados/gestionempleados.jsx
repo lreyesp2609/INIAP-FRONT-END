@@ -232,8 +232,9 @@ const GestionEmpleados = () => {
               />
               <button
                 className="
-      bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded
-      mt-2 md:mt-0 md:ml-2"
+                  bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
+                  hover:border-blue-700 rounded
+                  mt-2 md:mt-0 md:ml-2"
                 onClick={handleClear}
                 style={{ minWidth: "80px" }}
               >
