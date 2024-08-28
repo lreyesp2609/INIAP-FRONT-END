@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
-import InformesPendientes from './ListarInformesPendientes'; // Importar el componente InformesPendientes
+import InformesPendientes from './ListarInformesPendientes';
+import DetalleEditarInforme from './EditarInforme';
 
 const InformesSemiTerminados = () => {
     const [informes, setInformes] = useState([]);
@@ -13,6 +14,8 @@ const InformesSemiTerminados = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const [view, setView] = useState('semi-terminados'); // Estado para manejar la vista actual
+    const [isEditing, setIsEditing] = useState(false); // Estado para manejar la vista de edición
+    const [currentInformeId, setCurrentInformeId] = useState(null); // Estado para guardar el ID del informe actual
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -77,6 +80,15 @@ const InformesSemiTerminados = () => {
         setView(event.target.value);
     };
 
+    const handleEditClick = (idInforme) => {
+        setCurrentInformeId(idInforme);
+        setIsEditing(true);
+    };
+
+    if (isEditing) {
+        return <DetalleEditarInforme idInforme={currentInformeId} />;
+    }
+
     if (view === 'pendientes') {
         return <InformesPendientes />;
     }
@@ -86,7 +98,8 @@ const InformesSemiTerminados = () => {
             <div className="mb-4">
                 <h2 className="text-xl font-light mb-4">Informes</h2>
                 <div className="flex items-center mb-4">
-                    <label htmlFor="view-select" className="text-lg font-light mr-4">Ver: </label>                    <select
+                    <label htmlFor="view-select" className="text-lg font-light mr-4">Ver: </label>
+                    <select
                         id="view-select"
                         value={view}
                         onChange={handleViewChange}
@@ -142,6 +155,7 @@ const InformesSemiTerminados = () => {
                                     )}
                                     {informe.estado === 0 && (
                                         <button
+                                            onClick={() => handleEditClick(informe.id_informes)}
                                             className="p-2 bg-yellow-500 text-white rounded-full mr-2"
                                             title="Editar Informe"
                                         >
