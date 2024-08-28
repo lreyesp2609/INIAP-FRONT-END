@@ -7,9 +7,11 @@ const CalendarView = ({
   view,
   date,
   ordenesAprobadas,
+  solicitudesAceptadas,
   onOrdenClick,
   onShowAgenda,
   onShowSolicitudList,
+  handleShowSolicitud,
 }) => {
   return (
     <div>
@@ -17,25 +19,32 @@ const CalendarView = ({
         <MesView
           date={date}
           ordenesAprobadas={ordenesAprobadas}
+          solicitudesAceptadas={solicitudesAceptadas}
           onOrdenClick={onOrdenClick}
           onShowAgenda={onShowAgenda}
           onShowSolicitudList={onShowSolicitudList}
+          handleShowSolicitud={handleShowSolicitud}
+
         />
       )}
       {view === "week" && (
         <SemanaView
           date={date}
           ordenesAprobadas={ordenesAprobadas}
+          solicitudesAceptadas={solicitudesAceptadas}
           onOrdenClick={onOrdenClick}
           onShowAgenda={onShowAgenda}
           onShowSolicitudList={onShowSolicitudList}
+          handleShowSolicitud={handleShowSolicitud}
         />
       )}
       {view === "agenda" && (
         <AgendaView
+          solicitudesAceptadas={solicitudesAceptadas}
           ordenesAprobadas={ordenesAprobadas}
           onOrdenClick={onOrdenClick}
           onShowAgenda={onShowAgenda}
+          handleShowSolicitud={handleShowSolicitud}
         />
       )}
     </div>

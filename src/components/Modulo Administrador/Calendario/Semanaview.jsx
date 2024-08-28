@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 
 const SemanaView = ({
   date,
   ordenesAprobadas,
+  solicitudesAceptadas,
   onOrdenClick,
-  onShowSolicitudList,
+  handleShowSolicitud
 }) => {
+  
   const startOfWeek = new Date(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
   );
-  startOfWeek.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+  startOfWeek.setUTCDate(
+    startOfWeek.getUTCDate() - ((startOfWeek.getUTCDay() + 6) % 7)
+  );
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
 
@@ -48,33 +52,47 @@ const SemanaView = ({
               new Date(o.fecha_viaje).toISOString().split("T")[0] ===
               day.toISOString().split("T")[0]
           );
+          const solicitudesDelDia = solicitudesAceptadas.filter(
+            (s) =>
+              new Date(s["Fecha de Llegada"]).toISOString().split("T")[0] ===
+              day.toISOString().split("T")[0]
+          );
+
+          const totalEvents = ordenesDelDia.length + solicitudesDelDia.length;
 
           return (
             <div
               key={i}
-              className="border p-2 relative min-w-[5rem] sm:min-w-[7rem] lg:min-w-[10rem] h-auto flex flex-col items-center justify-center"
+              className="border p-2 relative min-w-[4rem] sm:min-w-[5rem] lg:min-w-[7rem] h-auto flex flex-col items-center justify-start overflow-hidden"
             >
-              <div className="font-bold mb-1">{dateFormatter.format(day)}</div>
-              {ordenesDelDia.length === 1 && (
-                <button
-                  className="block p-1 rounded bg-yellow-400 border border-yellow-400 text-black text-xs sm:text-sm lg:text-base break-words text-center"
-                  onClick={() => {
-                    onOrdenClick(ordenesDelDia[0].id_orden_movilizacion);
-                  }}
-                >
-                  {ordenesDelDia[0].secuencial_orden_movilizacion}
-                </button>
-              )}
-              {ordenesDelDia.length > 1 && (
-                <button
-                  className="mt-2 p-2 rounded bg-yellow-200 border border-yellow-400 text-black text-xs sm:text-sm lg:text-base cursor-pointer 
-                             hover:bg-yellow-300 transition duration-200 ease-in-out 
-                             text-center overflow-hidden text-ellipsis"
-                  style={{ maxWidth: "100%", whiteSpace: "nowrap" }}
-                  onClick={() => onShowSolicitudList(day)}
-                >
-                  {`+ ${ordenesDelDia.length}`}
-                </button>
+              <div className="font-bold text-xs mb-1">
+                {dateFormatter.format(day)}
+              </div>
+              {totalEvents > 0 && (
+                <div className="w-full flex flex-col items-center space-y-1">
+                  {ordenesDelDia.map((orden, index) => (
+                    <button
+                      key={`orden-${index}`}
+                      className="w-full px-1 py-0.5 text-xs bg-yellow-400 border border-yellow-400 text-black hover:bg-yellow-300 rounded truncate"
+                      onClick={() => onOrdenClick(orden.id_orden_movilizacion)}
+                      title={orden.secuencial_orden_movilizacion}
+                    >
+                      {orden.secuencial_orden_movilizacion.slice(0, 8)}...
+                    </button>
+                  ))}
+                  {solicitudesDelDia.map((solicitud, index) => (
+                    <button
+                      key={`solicitud-${index}`}
+                      className="w-full px-1 py-0.5 text-xs bg-blue-400 border border-blue-400 text-white hover:bg-blue-300 rounded truncate"
+                      onClick={() => {
+                        handleShowSolicitud(solicitud.id); // Asegúrate de que aquí coincida con el nombre esperado en MostrarSolicitudAdministrador
+                      }}
+                      title={solicitud["Codigo de Solicitud"]}
+                    >
+                      {solicitud["Codigo de Solicitud"].slice(0, 6)}...
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           );

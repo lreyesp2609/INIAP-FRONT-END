@@ -3,8 +3,8 @@ import API_URL from "../../../Config";
 import CalendarControls from "./calendarcontrols";
 import CalendarView from "./calendarview";
 import DetalleOrden from "./detalleorden";
-import SolicitudListView from "./solicitudlistview";
 import AgendaView from "./Agendaview";
+import MostrarSolicitudAdministrador from "./MostrarSolicitudDetalleAdmin";
 
 const Calendario = () => {
   const [view, setView] = useState("month");
@@ -15,10 +15,12 @@ const Calendario = () => {
   const [selectedOrden, setSelectedOrden] = useState(null);
   const [showCalendar, setShowCalendar] = useState(true);
   const [showAgenda, setShowAgenda] = useState(false);
-  const [showSolicitudList, setShowSolicitudList] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [ordersForSelectedDate, setOrdersForSelectedDate] = useState([]);
+  const [selectedViajesForSelectedDate, setSelectedViajesForSelectedDate] = useState([]);
   const [prevView, setPrevView] = useState(null);
+  const [solicitudesAceptadas, setSolicitudesAceptadas] = useState([]);
+  const [idSolicitud, setIdSolicitud] = useState(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -58,7 +60,37 @@ const Calendario = () => {
       }
     };
 
-    fetchOrdenesAprobadas();
+    const fetchSolicitudesAceptadas = async () => {
+      if (!id_usuario || !token) {
+        console.log("No user ID or token, skipping API call.");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`
+        );
+        const data = await response.json();
+        const today = new Date().setHours(0, 0, 0, 0);
+        const filteredSolicitudes = data.solicitudes.filter((solicitud) => {
+          const llegadaDate = new Date(solicitud["Fecha de Llegada"]).setHours(
+            0,
+            0,
+            0,
+            0
+          );
+          return llegadaDate >= today;
+        });
+        setSolicitudesAceptadas(filteredSolicitudes);
+      } catch (error) {
+        console.error("Error al obtener las solicitudes aceptadas:", error);
+      }
+    };
+
+    fetchSolicitudesAceptadas();
+    if (id_usuario && token) {
+      fetchOrdenesAprobadas();
+    }
   }, [id_usuario, token, date]);
 
   const handlePrev = () => {
@@ -87,23 +119,7 @@ const Calendario = () => {
 
   const handleOrdenClick = (idOrden) => {
     setSelectedOrden(idOrden);
-    setPrevView(showSolicitudList ? "solicitudList" : "calendar");
-    setShowSolicitudList(false);
-    setShowAgenda(false);
-    setShowCalendar(false);
-  };
-
-  const handleShowSolicitudList = (date) => {
-    const selectedDateString = new Date(date).toISOString().split("T")[0];
-    const ordersForDate = ordenesAprobadas.filter((orden) => {
-      const orderDateString = new Date(orden.fecha_viaje)
-        .toISOString()
-        .split("T")[0];
-      return orderDateString === selectedDateString;
-    });
-    setOrdersForSelectedDate(ordersForDate);
-    setPrevView("calendar");
-    setShowSolicitudList(true);
+    setPrevView(showAgenda ? "agenda" : "calendar");
     setShowAgenda(false);
     setShowCalendar(false);
   };
@@ -117,17 +133,11 @@ const Calendario = () => {
 
   const closeDetalleOrden = () => {
     setSelectedOrden(null);
-    if (prevView === "solicitudList") {
-      setShowSolicitudList(true);
-      setShowAgenda(false);
-      setShowCalendar(false);
-    } else if (prevView === "agenda") {
+    if (prevView === "agenda") {
       setShowAgenda(true);
-      setShowSolicitudList(false);
       setShowCalendar(false);
     } else {
       setShowCalendar(true);
-      setShowSolicitudList(false);
       setShowAgenda(false);
     }
     setPrevView(null);
@@ -138,14 +148,20 @@ const Calendario = () => {
     setShowCalendar(true);
   };
 
-  const closeSolicitudListView = () => {
-    setShowSolicitudList(false);
+  const handleShowSolicitud = (id) => {
+    setIdSolicitud(id);
+    setShowCalendar(false);
+    setShowAgenda(false);
+  };
+
+  const handleCloseSolicitud = () => {
+    setIdSolicitud(null);
     setShowCalendar(true);
   };
 
   return (
     <div className="p-4">
-      {showCalendar && !showAgenda && !showSolicitudList && !selectedOrden && (
+      {showCalendar && !showAgenda && !selectedOrden && (
         <>
           <CalendarControls
             handlePrev={handlePrev}
@@ -158,9 +174,10 @@ const Calendario = () => {
             view={view}
             date={date}
             ordenesAprobadas={ordenesAprobadas}
+            solicitudesAceptadas={solicitudesAceptadas}
             onOrdenClick={handleOrdenClick}
             onShowAgenda={handleShowAgenda}
-            onShowSolicitudList={handleShowSolicitudList}
+            handleShowSolicitud={handleShowSolicitud}
           />
         </>
       )}
@@ -172,6 +189,13 @@ const Calendario = () => {
           onClose={closeDetalleOrden}
         />
       )}
+      {idSolicitud && (
+        <MostrarSolicitudAdministrador
+          id={idSolicitud}
+          onClose={handleCloseSolicitud}
+        />
+      )}
+
       {showAgenda && selectedDate && id_usuario && token && (
         <AgendaView
           ordenesAprobadas={ordenesAprobadas.filter(
@@ -182,18 +206,10 @@ const Calendario = () => {
           idUsuario={id_usuario}
           token={token}
           onOrdenClick={handleOrdenClick}
+          handleShowSolicitud={handleShowSolicitud}
           onClose={closeAgendaView}
         />
       )}
-      {showSolicitudList &&
-        ordersForSelectedDate.length > 0 &&
-        !selectedOrden && (
-          <SolicitudListView
-            ordenes={ordersForSelectedDate}
-            onClose={closeSolicitudListView}
-            onOrdenSelect={handleOrdenClick}
-          />
-        )}
     </div>
   );
 };

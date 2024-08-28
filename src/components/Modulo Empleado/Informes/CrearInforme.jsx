@@ -33,6 +33,31 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [vehiculos, setVehiculos] = useState([]);
+
+  useEffect(() => {
+    const fetchVehiculos = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token no encontrado');
+
+        const response = await fetch(`${API_URL}/Informes/listar-vehiculos-habilitados/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Error al obtener los vehículos');
+
+        const data = await response.json();
+        setVehiculos(data.vehiculos);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchVehiculos();
+  }, []);
 
   useEffect(() => {
     const fetchInformeData = async () => {
@@ -340,7 +365,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
             {formData.transportes.map((transporte, index) => (
               <div key={index} className="mb-4">
                 <div className="mb-4 flex">
-                  <div className="mr-4 w-1/4">
+                  <div className="mr-4 w-1/3">
                     <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE</label>
                     <input
                       type="text"
@@ -349,36 +374,30 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
                       onChange={(e) => handleTransporteChange(index, 'tipo_transporte_info', e.target.value)}
                       className="w-full p-2 mb-2 border rounded" />
                   </div>
-                  <div className="mr-4 w-1/4">
+                  <div className="mr-4 w-1/3">
                     <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE TRANSPORTE</label>
-                    <input
-                      type="text"
+                    <select
                       value={transporte.nombre_transporte_info}
                       onChange={(e) => handleTransporteChange(index, 'nombre_transporte_info', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                    />
+                    >
+                      <option value="">Seleccionar vehículo</option>
+                      {vehiculos.map((vehiculo) => (
+                        <option key={vehiculo.placa} value={vehiculo.placa}>
+                          {vehiculo.placa}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <div className="mr-4 w-1/4">
+                  <div className="mr-4 w-1/3">
                     <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
                     <input
                       type="text"
-                      placeholder="Seleccione una provincia"
                       value={transporte.ruta_info}
                       onChange={(e) => handleTransporteChange(index, 'ruta_info', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
                     />
                   </div>
-                  <div className="mr-4 w-1/4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">{'\u00A0'}</label>
-                    <input
-                      type="text"
-                      placeholder="Seleccione una ciudad"
-                      value={transporte.ruta_info}
-                      onChange={(e) => handleTransporteChange(index, 'ruta_info', e.target.value)}
-                      className="w-full p-2 mb-2 border rounded"
-                    />
-                  </div>
-
                 </div>
                 <div className="mb-4 flex">
                   <div className="mr-4 w-1/4">
@@ -391,7 +410,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
                     />
                   </div>
                   <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA hh:mm</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA hh:mm</label>
                     <input
                       type="time"
                       value={transporte.hora_salida_info}
@@ -400,7 +419,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
                     />
                   </div>
                   <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA dd-mmm-aaaa</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA dd-mmm-aaaa</label>
                     <input
                       type="date"
                       value={transporte.fecha_llegada_info}
@@ -409,7 +428,7 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
                     />
                   </div>
                   <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA hh:mm</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA hh:mm</label>
                     <input
                       type="time"
                       value={transporte.hora_llegada_info}
@@ -450,9 +469,14 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
               />
             </div>
           </div>
-          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-            Crear Informe
-          </button>
+          <div className="flex justify-between">
+            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+              Crear Informe
+            </button>
+            <button type="button" onClick={onClose} className="bg-red-500 text-white px-4 py-2 rounded">
+              Cerrar
+            </button>
+          </div>
         </form>
       </div>
     </div>
