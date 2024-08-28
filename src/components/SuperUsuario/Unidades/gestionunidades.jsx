@@ -28,9 +28,6 @@ const GestionUnidadesPorEstacion = () => {
 
 
 
-  useEffect(() => {
-    fetchUnidades();
-  });
 
   const fetchUnidades = async () => {
     try {
@@ -110,7 +107,7 @@ const GestionUnidadesPorEstacion = () => {
   if (selectedUnidad) {
     return (
       <GestionCargos
-        id_usuario={id_usuario}
+        id_usuario={userId}
         id_unidad={selectedUnidad.id_unidad}
         onClose={() => setSelectedUnidad(null)}
       />
@@ -124,8 +121,8 @@ const GestionUnidadesPorEstacion = () => {
         <h1 className="text-2xl font-light">Gestionar Unidades</h1>
         <button
           onClick={handleAddUnidad}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
+          className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
+          >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
           Agregar Unidad
         </button>
@@ -140,7 +137,9 @@ const GestionUnidadesPorEstacion = () => {
         />
         <button
           onClick={handleClear}
-          className="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+          className="  bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
+                  hover:border-blue-700 rounded
+                  mt-2 md:mt-0 md:ml-2"
         >
           Limpiar
         </button>
@@ -148,19 +147,20 @@ const GestionUnidadesPorEstacion = () => {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <TablaUnidades unidades={currentItems} onAddCargos={handleAddCargos} />
       <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-        >
-          Anterior
-        </button>
-        <span>{`Página ${currentPage} de ${totalPages}`}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-        >
-          Siguiente
-        </button>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="
+              bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+            >
+              Anterior
+            </button>
+            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+            >
+              Siguiente
+            </button>
       </div>
     </div>
   );

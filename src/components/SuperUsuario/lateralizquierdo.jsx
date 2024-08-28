@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
-import { FiUsers, FiMenu, FiTruck, FiList } from "react-icons/fi";
-import { FaBuilding, FaClipboardList } from "react-icons/fa";
-import { IoDocumentAttachOutline } from "react-icons/io5";
+import React, { useState, useRef } from 'react';
+import { FiUsers, FiMenu, FiTruck, FiList } from 'react-icons/fi';
+import { FaBuilding, FaClipboardList,FaUserTie, FaWarehouse  } from 'react-icons/fa';
+import { IoDocumentAttachOutline } from 'react-icons/io5';
 
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -83,7 +83,7 @@ const LeftMenu = ({ user, onNavigate }) => {
                 }}
                 className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
               >
-                <FaBuilding className="w-6 h-6 text-white mx-3" />
+                <FaWarehouse className="w-6 h-6 text-white mx-3" />
                 <span className="text-white text-xs">Gestión de Unidades</span>
               </button>
               <button
@@ -93,7 +93,7 @@ const LeftMenu = ({ user, onNavigate }) => {
                 }}
                 className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
               >
-                <FaBuilding className="w-6 h-6 text-white mx-3" />
+                <FaUserTie  className="w-6 h-6 text-white mx-3" />
                 <span className="text-white text-xs">Gestión de Cargos</span>
               </button>
               <button
@@ -214,19 +214,15 @@ const LeftMenu = ({ user, onNavigate }) => {
             onClick={() => onNavigate("gestion-unidades")}
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FaBuilding className="w-6 h-6 text-white mx-3" />
-            <span className="text-white text-xs hidden md:inline">
-              Gestió de Unidades
-            </span>
+            <FaWarehouse className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestió de Unidades</span>
           </button>
           <button
             onClick={() => onNavigate("gestion-cargos")}
             className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
           >
-            <FaBuilding className="w-6 h-6 text-white mx-3" />
-            <span className="text-white text-xs hidden md:inline">
-              Gestión de Cargos
-            </span>
+            <FaUserTie className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">Gestión de Cargos</span>
           </button>
           <button
             onClick={() => onNavigate("gestion-licencias")}

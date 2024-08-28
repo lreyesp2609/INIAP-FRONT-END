@@ -5,7 +5,7 @@ import TablaGestionCargos from "./Tablas/tablagestioncargos";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
-const GestionCargos = ({ id_usuario, id_unidad, onClose }) => {
+const GestionCargos = () => {
   const [cargos, setCargos] = useState([]);
   const [filteredCargos, setFilteredCargos] = useState([]);
   const [user, setUser] = useState(null);
@@ -19,27 +19,27 @@ const GestionCargos = ({ id_usuario, id_unidad, onClose }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
-      fetchCargos(storedUser.usuario.id_usuario, id_unidad);
+      fetchCargos(storedUser.usuario.id_usuario);
     }
-  }, [id_unidad]);
+  },[]);
 
-  useEffect(() => {
-    forceUpdate.current = forceUpdate.current + 1;
-  }, [cargos]);
 
-  const fetchCargos = async (id_usuario, id_unidad) => {
+  const fetchCargos = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       return;
     }
 
     try {
+      const formData = new FormData();
       const response = await fetch(
-        `${API_URL}/Cargos/cargos-unidad/${id_usuario}/${id_unidad}/`,
+        `${API_URL}/Cargos/cargos/`,
         {
+          method: "POST",
           headers: {
             Authorization: `${token}`,
           },
+          body: formData,
         }
       );
       if (response.ok) {
@@ -97,23 +97,16 @@ const GestionCargos = ({ id_usuario, id_unidad, onClose }) => {
   return (
     <div className="p-4">
       {isAdding ? (
-        <AgregarCargo onClose={handleCloseAddForm} user={user.usuario} id_unidad={id_unidad} />
+        <AgregarCargo onClose={handleCloseAddForm} user={user.usuario} />
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-              Volver
-            </button>
             <h1 className="text-2xl font-light">Gestión de Cargos</h1>
             <div className="flex space-x-4">
               <button
                 onClick={handleAddCargo}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
+                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
+                >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Agregar Cargo
               </button>
@@ -132,14 +125,15 @@ const GestionCargos = ({ id_usuario, id_unidad, onClose }) => {
           <div className="flex justify-between items-center mt-4">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              className="
+              bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
             >
               Anterior
-            </button>
-            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            </button>c:\Users\HP\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\TempState\E16A7577E3B4C37BDEA8A8D99AC27660\Imagen de WhatsApp 2024-08-24 a las 23.43.04_d7eb2a87.jpg
+            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
             >
               Siguiente
             </button>
