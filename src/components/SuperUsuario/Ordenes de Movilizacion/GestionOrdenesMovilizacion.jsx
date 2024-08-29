@@ -151,7 +151,7 @@ const GestionOrdenMovilizacion = () => {
   };
 
   if (showEditarHorario) {
-    return <EditarHorarioMovilizacion onClose={handleCloseEditarHorario} />;
+    return <EditarHorarioMovilizacion onClose={handleCloseEditarHorario} Userid={idUsuario}  />;
   }
 
   const handleDeshabilitarRuta = (ruta) => {
@@ -247,7 +247,7 @@ const GestionOrdenMovilizacion = () => {
                   <td className="border px-4 py-2">{ruta.ruta_origen}</td>
                   <td className="border px-4 py-2">{ruta.ruta_destino}</td>
                   <td className="border px-4 py-2">
-                    {ruta.ruta_estado === 1 ? 'Disponible' : 'No Disponible'}
+                    {ruta.ruta_estado === '1' ? 'Disponible' : 'No Disponible'}
                   </td>
                   <td className="border px-4 py-2 text-sm text-gray-600 flex space-x-2">
                   <button
@@ -257,7 +257,7 @@ const GestionOrdenMovilizacion = () => {
                       >
                         <FaEdit />
                       </button>
-                    {ruta.ruta_estado === 1 ? (
+                    {ruta.ruta_estado === '1' ? (
                         <button 
                         className="p-2 bg-red-500 text-white rounded-full"
                         title="Deshabilitar"

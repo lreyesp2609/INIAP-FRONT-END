@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
 import API_URL from '../../../Config';
 
-const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
-  const navigate = useNavigate();
+const EditarRutaMovilizacion = ({ onClose, Userid }) => {
   const [provincias, setProvincias] = useState([]);
   const [ciudadesOrigen, setCiudadesOrigen] = useState([]);
   const [ciudadesDestino, setCiudadesDestino] = useState([]);
 
-  const [selectedProvinciaOrigen, setSelectedProvinciaOrigen] = useState('');
-  const [selectedCiudadOrigen, setSelectedCiudadOrigen] = useState('');
+  const [selectedProvinciaOrigen, setSelectedProvinciaOrigen] = useState('Los Ríos');
+  const [selectedCiudadOrigen, setSelectedCiudadOrigen] = useState('Mocache');
   const [selectedProvinciaDestino, setSelectedProvinciaDestino] = useState('');
   const [selectedCiudadDestino, setSelectedCiudadDestino] = useState('');
 
@@ -27,7 +25,7 @@ const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
 
       const response = await fetch(`${API_URL}/Informes/listar-provincias-ciudades/`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
       });
 
@@ -46,6 +44,17 @@ const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
   useEffect(() => {
     fetchProvinciasYCiudades();
   }, []);
+
+  useEffect(() => {
+    const provinciaOrigen = provincias.find((p) => p.Provincia === 'Los Ríos');
+    if (provinciaOrigen) {
+      setCiudadesOrigen(provinciaOrigen.Ciudades);
+    }
+  }, [provincias]);
+
+  useEffect(() => {
+    setRutaDescripcion(`${selectedCiudadOrigen} - ${selectedCiudadDestino}`);
+  }, [selectedCiudadOrigen, selectedCiudadDestino]);
 
   const handleProvinciaOrigenChange = (e) => {
     const provincia = e.target.value;
@@ -72,18 +81,18 @@ const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/CrearRuta/${idUsuario}/`, {
+      const formData = new FormData();
+      formData.append('ruta_origen', selectedCiudadOrigen);
+      formData.append('ruta_destino', selectedCiudadDestino);
+      formData.append('ruta_descripcion', rutaDescripcion);
+      formData.append('ruta_estado', rutaEstado);
+
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/crear-ruta/${Userid}/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
-        body: JSON.stringify({
-          ruta_origen: selectedCiudadOrigen,
-          ruta_destino: selectedCiudadDestino,
-          ruta_descripcion: rutaDescripcion,
-          ruta_estado: rutaEstado,
-        }),
+        body: formData,
       });
 
       if (response.ok) {
@@ -100,70 +109,82 @@ const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
 
   return (
     <div className="p-4 sm:p-6">
-      <h2 className="text-2xl font-bold">Crear Ruta</h2>
+      <h2 className="text-2xl font-bold mb-4">Crear Ruta</h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2">Provincia de Origen</label>
-          <select
-            value={selectedProvinciaOrigen}
-            onChange={handleProvinciaOrigenChange}
-            className="block w-full p-2 border"
-          >
-            <option value="">Seleccione una provincia</option>
-            {provincias.map((provincia) => (
-              <option key={provincia.Provincia} value={provincia.Provincia}>
-                {provincia.Provincia}
-              </option>
-            ))}
-          </select>
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Seleccionar Origen</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2">Provincia de Origen</label>
+              <select
+                value={selectedProvinciaOrigen}
+                onChange={handleProvinciaOrigenChange}
+                className="block w-full p-2 border"
+              >
+                <option value="">Seleccione una provincia</option>
+                {provincias.map((provincia) => (
+                  <option key={provincia.Provincia} value={provincia.Provincia}>
+                    {provincia.Provincia}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block mb-2">Ciudad de Origen</label>
+              <select
+                value={selectedCiudadOrigen}
+                onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
+                className="block w-full p-2 border"
+                disabled={!selectedProvinciaOrigen}
+              >
+                <option value="">Seleccione una ciudad</option>
+                {ciudadesOrigen.map((ciudad) => (
+                  <option key={ciudad} value={ciudad}>
+                    {ciudad}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block mb-2">Ciudad de Origen</label>
-          <select
-            value={selectedCiudadOrigen}
-            onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
-            className="block w-full p-2 border"
-            disabled={!selectedProvinciaOrigen}
-          >
-            <option value="">Seleccione una ciudad</option>
-            {ciudadesOrigen.map((ciudad) => (
-              <option key={ciudad} value={ciudad}>
-                {ciudad}
-              </option>
-            ))}
-          </select>
+
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Seleccionar Destino</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2">Provincia de Destino</label>
+              <select
+                value={selectedProvinciaDestino}
+                onChange={handleProvinciaDestinoChange}
+                className="block w-full p-2 border"
+              >
+                <option value="">Seleccione una provincia</option>
+                {provincias.map((provincia) => (
+                  <option key={provincia.Provincia} value={provincia.Provincia}>
+                    {provincia.Provincia}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block mb-2">Ciudad de Destino</label>
+              <select
+                value={selectedCiudadDestino}
+                onChange={(e) => setSelectedCiudadDestino(e.target.value)}
+                className="block w-full p-2 border"
+                disabled={!selectedProvinciaDestino}
+              >
+                <option value="">Seleccione una ciudad</option>
+                {ciudadesDestino.map((ciudad) => (
+                  <option key={ciudad} value={ciudad}>
+                    {ciudad}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block mb-2">Provincia de Destino</label>
-          <select
-            value={selectedProvinciaDestino}
-            onChange={handleProvinciaDestinoChange}
-            className="block w-full p-2 border"
-          >
-            <option value="">Seleccione una provincia</option>
-            {provincias.map((provincia) => (
-              <option key={provincia.Provincia} value={provincia.Provincia}>
-                {provincia.Provincia}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Ciudad de Destino</label>
-          <select
-            value={selectedCiudadDestino}
-            onChange={(e) => setSelectedCiudadDestino(e.target.value)}
-            className="block w-full p-2 border"
-            disabled={!selectedProvinciaDestino}
-          >
-            <option value="">Seleccione una ciudad</option>
-            {ciudadesDestino.map((ciudad) => (
-              <option key={ciudad} value={ciudad}>
-                {ciudad}
-              </option>
-            ))}
-          </select>
-        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Descripción de la Ruta</label>
           <input
@@ -173,18 +194,35 @@ const EditarRutaMovilizacion = ({ onClose, idUsuario }) => {
             className="block w-full p-2 border"
           />
         </div>
+
         <div className="mb-4">
           <label className="block mb-2">Estado de la Ruta</label>
-          <input
-            type="text"
+          <select
             value={rutaEstado}
             onChange={(e) => setRutaEstado(e.target.value)}
             className="block w-full p-2 border"
-          />
+          >
+            <option value="">Seleccione el estado</option>
+            <option value="1">Disponible</option>
+            <option value="0">No disponible</option>
+          </select>
         </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
-          Guardar
-        </button>
+
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Editar Ruta
+          </button>
+        </div>
       </form>
     </div>
   );

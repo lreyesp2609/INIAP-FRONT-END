@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Modal, notification } from 'antd';
 
 const ModalDeshabilitarRuta = ({ ruta, onClose }) => {
+  const [visible, setVisible] = useState(true);
+
   const handleDeshabilitar = () => {
+    setVisible(false);
     onClose();
   };
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <h2>Deshabilitar Ruta</h2>
-        <p>¿Estás seguro de que deseas deshabilitar la ruta "{ruta.ruta_descripcion}"?</p>
-        <button onClick={handleDeshabilitar}>Sí</button>
-        <button onClick={onClose}>No</button>
-      </div>
-    </div>
+    <Modal
+      title="Deshabilitar Ruta"
+      visible={visible}
+      onOk={handleDeshabilitar}
+      onCancel={() => setVisible(false)}
+      okText="Deshabilitar"
+      cancelText="Cancelar"
+    >
+      ¿Estás seguro de que deseas deshabilitar la ruta "{ruta.ruta_descripcion}"?
+    </Modal>
   );
 };
 
