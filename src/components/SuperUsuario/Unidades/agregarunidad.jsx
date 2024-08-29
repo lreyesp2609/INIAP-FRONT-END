@@ -1,13 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { notification } from "antd";
 import API_URL from "../../../Config";
 import FormularioUnidad from "./Formulario/formulariounidad";
 
-const AgregarUnidad = ({ onClose, onUnidadAdded, id_usuario, id_estacion }) => {
+const AgregarUnidad = ({ onClose, onUnidadAdded, id_estacion }) => {
   const [nombre_unidad, setNombreUnidad] = useState("");
+  const [Estaciones, setEstaciones] = useState([]);
+  const [formData, setFormData] = useState({
+    id_Estacion: "",
+  });
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const id_usuario = JSON.parse(atob(token.split(".")[1])).id_usuario;
+      setUserId(id_usuario);
+      fetchEstaciones(id_usuario);
+    }
+  }, []);
+
+  
 
   const handleInputChange = (e) => {
     setNombreUnidad(e.target.value);
+  };
+
+  const fetchEstaciones = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Estaciones/estaciones/${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `${token}`, // Añade 'Bearer' si el token es un JWT
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEstaciones(data);
+      } else {
+        console.error("Error:", response.statusText);
+        notification.error({
+          message: "Error",
+          description: "Error al obtener las estaciones",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      notification.error({
+        message: "Error",
+        description: "Error al obtener las estaciones",
+      });
+    }
   };
 
   const handleSave = async () => {
@@ -77,6 +127,10 @@ const AgregarUnidad = ({ onClose, onUnidadAdded, id_usuario, id_estacion }) => {
         <h2 className="text-2xl font-bold mb-4">Agregar Unidad</h2>
         <FormularioUnidad
           nombre_unidad={nombre_unidad}
+          formData={formData}
+          
+          id_estacion={id_estacion}
+          Estaciones={Estaciones}
           onInputChange={handleInputChange}
         />
         <div className="flex justify-end space-x-4">

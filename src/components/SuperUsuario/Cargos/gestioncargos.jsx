@@ -129,7 +129,7 @@ const GestionCargos = () => {
               bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
             >
               Anterior
-            </button>c:\Users\HP\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\TempState\E16A7577E3B4C37BDEA8A8D99AC27660\Imagen de WhatsApp 2024-08-24 a las 23.43.04_d7eb2a87.jpg
+            </button>
             <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
