@@ -100,7 +100,7 @@ const DetalleOrden = ({ idUsuario, idOrden, token, onClose }) => {
                   {orden.secuencial_orden_movilizacion}
                 </td>
                 <td className="w-1/2">
-                  <strong>Fecha de Emisión:</strong> {orden.fecha_viaje}
+                  <strong>Fecha de Emisión:</strong> {orden.fecha_hora_emision}
                 </td>
               </tr>
               <tr>

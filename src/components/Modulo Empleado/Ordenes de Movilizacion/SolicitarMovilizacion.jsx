@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API_URL from '../../../Config';
-import { notification, Tooltip } from 'antd';
+import { notification } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { QuestionCircleOutlined} from '@ant-design/icons';
 import moment from 'moment-timezone';
 
-
 const SolicitarMovilizacion = ({ onClose }) => {
-  const navigate = useNavigate();
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const idEmpleado = storedUser?.usuario?.id_empleado;
   const idUsuario = storedUser?.usuario?.id_usuario;
-
+  const [horario, setHorario] = useState({});
+  const [rutas, setRutas] = useState([]);
+  const [selectedRuta, setSelectedRuta] = useState('');
+  const [vehiculos, setVehiculos] = useState([]);
+  const [conductores, setConductores] = useState([]);
+  const [error, setError] = useState(null);
   const nowInQuevedo = moment.tz('America/Guayaquil');
   const currentDate = nowInQuevedo.format('YYYY-MM-DD');
   const currentTime = nowInQuevedo.format('HH:mm');
@@ -22,25 +23,128 @@ const SolicitarMovilizacion = ({ onClose }) => {
   const [formData, setFormData] = useState({
     secuencial_orden_movilizacion: '0000', 
     motivo_movilizacion: '',
-    lugar_origen_destino_movilizacion: 'Mocache - Quevedo',
-    duracion_movilizacion: '00:30',
+    lugar_origen_destino_movilizacion: '',
+    duracion_movilizacion: '00:00', 
     id_conductor: '',
     id_vehiculo: '',
     fecha_viaje: currentDate,
     hora_ida: currentTime, 
-    hora_regreso: '',
+    hora_regreso: '', 
     estado_movilizacion: 'Pendiente',
     id_empleado: idEmpleado,
   });
-
-  const [vehiculos, setVehiculos] = useState([]);
-  const [conductores, setConductores] = useState([]);
-  const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     fetchVehiculos();
+    fetchHorario();
     fetchConductores();
+    fetchRutas();
   }, []);
+
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    const hourInt = parseInt(hours, 10);
+    const ampm = hourInt >= 12 ? 'pm' : 'am';
+    const formattedHour = hourInt % 12 || 12;
+    return `${formattedHour}:${minutes}${ampm}`;
+  };
+
+  const formatDuration = (minutes) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hrs}:${mins.toString().padStart(2, '0')}hrs`;
+  };
+
+  const fetchHorario = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      notification.error({
+        message: 'Error',
+        description: 'Token no proporcionado',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/ver-horario/${idUsuario}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHorario(data.horario);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error);
+        notification.error({
+          message: 'Error',
+          description: errorData.error,
+        });
+      }
+    } catch (error) {
+      setError(error.toString());
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener el horario',
+      });
+    }
+  };
+
+  const fetchRutas = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      notification.error({
+        message: 'Error',
+        description: 'Token no proporcionado',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/listar-rutas/${idUsuario}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRutas(data.rutas);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error);
+        notification.error({
+          message: 'Error',
+          description: errorData.error,
+        });
+      }
+    } catch (error) {
+      setError(error.toString());
+      notification.error({
+        message: 'Error',
+        description: 'Error al obtener las rutas',
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Convertir la duración mínima recibida en minutos a formato hh:mm
+    if (horario.duracion_minima) {
+      const hrs = Math.floor(horario.duracion_minima / 60);
+      const mins = horario.duracion_minima % 60;
+      const duracionEnFormatoHHMM = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  
+      // Establecer la duración mínima en el formData al cargar el componente
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        duracion_movilizacion: duracionEnFormatoHHMM,
+      }));
+    }
+  }, [horario.duracion_minima]);
+  
 
   useEffect(() => {
     // Calcular hora de regreso cada vez que cambian la hora de ida o la duración
@@ -104,36 +208,18 @@ const SolicitarMovilizacion = ({ onClose }) => {
     });
   };
 
-  const validateTimeRange = () => {
-    const [idaHoras, idaMinutos] = formData.hora_ida.split(':').map(Number);
-    const [duracionHoras, duracionMinutos] = formData.duracion_movilizacion.split(':').map(Number);
-
-    // Convertir todo a minutos para facilitar el cálculo
-    const idaEnMinutos = idaHoras * 60 + idaMinutos;
-    const duracionEnMinutos = duracionHoras * 60 + duracionMinutos;
-    const regresoEnMinutos = idaEnMinutos + duracionEnMinutos;
-
-    // Horas de inicio y fin en minutos
-    const inicioEnMinutos = 7 * 60; // 7:00 AM
-    const finEnMinutos = 17 * 60; // 5:00 PM
-
-    // Validar que la hora de ida y de regreso están dentro del rango permitido
-    return idaEnMinutos >= inicioEnMinutos && regresoEnMinutos <= finEnMinutos;
+  const handleRutaChange = (e) => {
+    const selectedRutaDescripcion = e.target.value;
+    setSelectedRuta(selectedRutaDescripcion);
+    setFormData({
+      ...formData,
+      lugar_origen_destino_movilizacion: selectedRutaDescripcion,
+    });
   };
 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Validar el rango de horas antes de continuar
-    if (!validateTimeRange()) {
-      notification.error({
-        message: 'Error',
-        description: 'La solicitud debe realizarse entre las 7:00 a.m. y las 5:00 p.m.',
-        placement: 'topRight',
-      });
-      return;
-    }
 
     const token = localStorage.getItem('token');
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -176,42 +262,60 @@ const SolicitarMovilizacion = ({ onClose }) => {
             });
             onClose();
         } else {
-            const errorMessage = await response.text();
-            throw new Error(`Error al crear la solicitud: ${errorMessage}`);
-        }
-    } catch (error) {
-        notification.error({
+          const errorData = await response.json();
+          setError(errorData.error);
+          notification.error({
             message: 'Error',
-            description: error.message || 'Ha ocurrido un error al crear la solicitud.',
-            placement: 'topRight',
-        });
-    }
-  };
+            description: errorData.error,
+          }) }
+        } catch (error) {
+            notification.error({
+                message: 'Error',
+                description: error.message || 'Ha ocurrido un error al crear la solicitud.',
+                placement: 'topRight',
+            });
+        }
+      };
 
   return (
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
         <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+          <div>
+          {Object.keys(horario).length === 0 ? (
+          <p>Horario no asignado. {' '} </p> 
+            ) : (
+              <div>
+                <p>
+                  Las Órdenes de Movilización se pueden realizar desde las{' '}
+                  <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
+                  <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
+                  tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
+                  máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '} 
+                </p>
+                <br></br>
+              </div>
+            )}
+          </div>
         <form id="solicitudForm" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">
 
-            <div className="mb-4 relative">
+           <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">Lugar Origen - Destino:</label>
-                <div className="flex items-center">
-                  <Tooltip title="Una Orden de movilización solo puede ser de Mocache a Quevedo">
-                    <QuestionCircleOutlined className="text-gray-500 cursor-pointer absolute right-0 mr-2" />
-                    </Tooltip>
-                  <input
-                    type="text"
-                    name="lugar_origen_destino_movilizacion"
-                    value={formData.lugar_origen_destino_movilizacion}
-                    onChange={handleInputChange}
-                    required
-                    readOnly // Bloquea la edición del campo
-                    className="w-full p-2 pl-8 pr-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+              <select
+                name="lugar_origen_destino_movilizacion"
+                value={selectedRuta}
+                onChange={handleRutaChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecciona una ruta</option>
+                {rutas.map((ruta) => (
+                  <option key={ruta.id} value={ruta.ruta_descripcion}>
+                    {ruta.ruta_descripcion}
+                  </option>
+                ))}
+              </select>
             </div>
           
             <div className="mb-4">
@@ -246,8 +350,6 @@ const SolicitarMovilizacion = ({ onClose }) => {
                 type="time"
                 name="duracion_movilizacion"
                 value={formData.duracion_movilizacion}
-                min="00:30"
-                max="02:00"
                 onChange={handleInputChange}
                 required
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"

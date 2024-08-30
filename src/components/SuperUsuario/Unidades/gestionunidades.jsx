@@ -9,7 +9,7 @@ import AgregarUnidad from "./agregarunidad";
 const GestionUnidadesPorEstacion = () => {
   const [unidades, setUnidades] = useState([]);
   const [filteredUnidades, setFilteredUnidades] = useState([]);
-  const [isAdding, setIsAdding] = useState(false);
+  const [isAdding, setIsAdding] = useState(false); // Estado para manejar el componente AgregarUnidad
   const [selectedUnidad, setSelectedUnidad] = useState(null);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,9 +25,6 @@ const GestionUnidadesPorEstacion = () => {
       fetchUnidades(id_usuario);
     }
   }, []);
-
-
-
 
   const fetchUnidades = async () => {
     try {
@@ -80,13 +77,16 @@ const GestionUnidadesPorEstacion = () => {
   };
 
   const handleAddUnidad = () => {
-    fetchUnidades(userId);
-    setIsAdding(true);
+    setIsAdding(true); // Activar el modo "Agregar Unidad"
   };
 
   const handleUnidadAdded = () => {
-    setIsAdding(false);
-    fetchUnidades();
+    setIsAdding(false); // Desactivar el modo "Agregar Unidad" después de agregar una unidad
+    fetchUnidades(); // Refrescar la lista de unidades
+  };
+
+  const handleCancelAddUnidad = () => {
+    setIsAdding(false); // Desactivar el modo "Agregar Unidad" si se cancela
   };
 
   const handleAddCargos = (unidad) => {
@@ -102,8 +102,6 @@ const GestionUnidadesPorEstacion = () => {
     setCurrentPage(pageNumber);
   };
 
- 
-
   if (selectedUnidad) {
     return (
       <GestionCargos
@@ -114,15 +112,19 @@ const GestionUnidadesPorEstacion = () => {
     );
   }
 
+  // Mostrar el componente AgregarUnidad si isAdding es true
+  if (isAdding) {
+    return <AgregarUnidad onUnidadAdded={handleUnidadAdded} onCancel={handleCancelAddUnidad} />;
+  }
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-       
         <h1 className="text-2xl font-light">Gestionar Unidades</h1>
         <button
           onClick={handleAddUnidad}
           className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
-          >
+        >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
           Agregar Unidad
         </button>
@@ -137,9 +139,7 @@ const GestionUnidadesPorEstacion = () => {
         />
         <button
           onClick={handleClear}
-          className="  bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
-                  hover:border-blue-700 rounded
-                  mt-2 md:mt-0 md:ml-2"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded mt-2 md:mt-0 md:ml-2"
         >
           Limpiar
         </button>
@@ -147,20 +147,19 @@ const GestionUnidadesPorEstacion = () => {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <TablaUnidades unidades={currentItems} onAddCargos={handleAddCargos} />
       <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="
-              bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-            >
-              Anterior
-            </button>
-            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-            >
-              Siguiente
-            </button>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+        >
+          Anterior
+        </button>
+        <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   );
