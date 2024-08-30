@@ -89,14 +89,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-  const handleTransporteChange = (index, field, value) => {
-    const newTransportes = [...informe.Transportes];
-    newTransportes[index] = { ...newTransportes[index], [field]: value };
-    setInforme((prevState) => ({
-      ...prevState,
-      Transportes: newTransportes,
-    }));
-  };
 
   const addTransporte = () => {
     setInforme((prevState) => ({
@@ -123,68 +115,86 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Token no encontrado');
+// Función para convertir la fecha al formato yyyy-mm-dd para los inputs
+const formatDateForInput = (dateString) => {
+  if (!dateString) return '';
+  const [day, month, year] = dateString.split('-');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+};
 
-      const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const [year, month, day] = dateString.split('-');
-        return `${day}-${month}-${year}`;
-      };
+// Función para convertir la fecha al formato dd-mm-yyyy para enviar al servidor
+const formatDateForServer = (dateString) => {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-');
+  return `${day}-${month}-${year}`;
+};
 
-      const formattedData = {
-        fecha_salida_informe: formatDate(informe['Fecha Salida Informe']),
-        hora_salida_informe: informe['Hora Salida Informe'],
-        fecha_llegada_informe: formatDate(informe['Fecha Llegada Informe']),
-        hora_llegada_informe: informe['Hora Llegada Informe'],
-        observacion: informe['Observacion'],
-        transportes: informe.Transportes.map(t => ({
-          tipo_transporte_info: t['Tipo de Transporte'],
-          nombre_transporte_info: t['Nombre del Transporte'],
-          ruta_info: t['Ruta'],
-          fecha_salida_info: formatDate(t['Fecha de Salida']),
-          hora_salida_info: t['Hora de Salida'],
-          fecha_llegada_info: formatDate(t['Fecha de Llegada']),
-          hora_llegada_info: t['Hora de Llegada'],
-        })),
-        productos: [{ descripcion: informe['Productos Alcanzados'][0] }]
-      };
+// Manejo del cambio en los inputs de fecha
+const handleTransporteChange = (index, field, value) => {
+  const newTransportes = [...informe.Transportes];
+  newTransportes[index] = { ...newTransportes[index], [field]: value };
+  setInforme((prevState) => ({
+    ...prevState,
+    Transportes: newTransportes,
+  }));
+};
 
-      const response = await fetch(`${API_URL}/Informes/editar-informe/${idInforme}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(formattedData),
-      });
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token no encontrado');
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al actualizar el informe');
-      }
+    const formattedData = {
+      fecha_salida_informe: formatDateForServer(informe['Fecha Salida Informe']),
+      hora_salida_informe: informe['Hora Salida Informe'],
+      fecha_llegada_informe: formatDateForServer(informe['Fecha Llegada Informe']),
+      hora_llegada_informe: informe['Hora Llegada Informe'],
+      observacion: informe['Observacion'],
+      transportes: informe.Transportes.map(t => ({
+        tipo_transporte_info: t['Tipo de Transporte'],
+        nombre_transporte_info: t['Nombre del Transporte'],
+        ruta_info: t['Ruta'],
+        hora_salida_info: t['Hora de Salida'],
+        fecha_salida_info: formatDateForServer(t['Fecha de Salida']),
+        fecha_llegada_info: formatDateForServer(t['Fecha de Llegada']),
+        hora_llegada_info: t['Hora de Llegada'],
+      })),
+      productos: [{ descripcion: informe['Productos Alcanzados'][0] }]
+    };
 
-      const data = await response.json();
-      notification.success({
-        message: 'Éxito',
-        description: data.mensaje,
-        placement: 'topRight',
-      });
+    const response = await fetch(`${API_URL}/Informes/editar-informe/${idInforme}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify(formattedData),
+    });
 
-      if (onClose) onClose();
-    } catch (error) {
-      setError(error.message);
-      notification.error({
-        message: 'Error',
-        description: error.message,
-        placement: 'topRight',
-      });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al actualizar el informe');
     }
-  };
+
+    const data = await response.json();
+    notification.success({
+      message: 'Éxito',
+      description: data.mensaje,
+      placement: 'topRight',
+    });
+
+    onClose();
+  } catch (error) {
+    setError(error.message);
+    notification.error({
+      message: 'Error',
+      description: error.message,
+      placement: 'topRight',
+    });
+  }
+};
 
   // Helper function to get CSRF token
   function getCookie(name) {
@@ -364,7 +374,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                     <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA dd-mmm-aaaa</label>
                     <input
                       type="date"
-                      value={transporte['Fecha de Salida']}
+                      value={formatDateForInput(transporte['Fecha de Salida'])}
                       onChange={(e) => handleTransporteChange(index, 'Fecha de Salida', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
                     />
@@ -382,7 +392,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                     <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA dd-mmm-aaaa</label>
                     <input
                       type="date"
-                      value={transporte['Fecha de Llegada']}
+                      value={formatDateForInput(transporte['Fecha de Llegada'])}
                       onChange={(e) => handleTransporteChange(index, 'Fecha de Llegada', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
                     />
@@ -426,15 +436,21 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
               className="w-full p-2 border rounded"
             />
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center space-x-4">
             <button
               type="submit"
               className="bg-green-500 text-white px-4 py-2 rounded"
             >
               Actualizar Informe
             </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Cerrar
+            </button>
           </div>
-
         </form>
       </div>
     </div>

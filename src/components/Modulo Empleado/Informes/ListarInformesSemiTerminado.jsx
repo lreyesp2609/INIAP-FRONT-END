@@ -13,9 +13,9 @@ const InformesSemiTerminados = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
-    const [view, setView] = useState('semi-terminados'); // Estado para manejar la vista actual
-    const [isEditing, setIsEditing] = useState(false); // Estado para manejar la vista de edición
-    const [currentInformeId, setCurrentInformeId] = useState(null); // Estado para guardar el ID del informe actual
+    const [view, setView] = useState('semi-terminados');
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentInformeId, setCurrentInformeId] = useState(null);
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -54,7 +54,7 @@ const InformesSemiTerminados = () => {
             (informe) =>
                 informe.codigo_solicitud.toLowerCase().includes(searchValue) ||
                 informe.fecha_informe.toLowerCase().includes(searchValue) ||
-                informe.estado.toString().includes(searchValue) // Filtrar por estado numérico como texto
+                informe.estado.toString().includes(searchValue)
         );
 
         setFilteredInformes(filtered);
@@ -67,15 +67,6 @@ const InformesSemiTerminados = () => {
         setCurrentPage(1);
     };
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredInformes.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
-
-    const handleClick = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-
     const handleViewChange = (event) => {
         setView(event.target.value);
     };
@@ -85,13 +76,24 @@ const InformesSemiTerminados = () => {
         setIsEditing(true);
     };
 
+    const handleCloseEdit = useCallback(() => {
+        setIsEditing(false);
+        setCurrentInformeId(null);
+        fetchInformes(); // Actualiza la lista de informes después de editar
+    }, [fetchInformes]);
+
     if (isEditing) {
-        return <DetalleEditarInforme idInforme={currentInformeId} />;
+        return <DetalleEditarInforme idInforme={currentInformeId} onClose={handleCloseEdit} />;
     }
 
     if (view === 'pendientes') {
         return <InformesPendientes />;
     }
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredInformes.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
 
     return (
         <div className="p-4">
