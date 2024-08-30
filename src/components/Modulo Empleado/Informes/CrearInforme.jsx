@@ -178,7 +178,6 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     }
   };
   
-
   if (loading) return <div className="text-center">Cargando...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
@@ -282,13 +281,6 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
                   ['clean']
                 ],
               }}
-              formats={[
-                'header',
-                'bold', 'italic', 'underline', 'strike', 'blockquote',
-                'list', 'bullet', 'indent',
-                'link', 'image'
-              ]}
-              className="h-60"
             />
           </div>
           <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
