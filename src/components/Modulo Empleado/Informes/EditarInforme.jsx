@@ -4,9 +4,24 @@ import 'react-quill/dist/quill.snow.css';
 import { notification } from 'antd';
 import API_URL from '../../../Config';
 
+
 const DetalleEditarInforme = ({ idInforme, onClose }) => {
-  const [informe, setInforme] = useState(null);
-  const [editMode, setEditMode] = useState(false);
+  const [informe, setInforme] = useState({
+    'Codigo de Solicitud': '',
+    'Fecha del Informe': '',
+    'Nombre Completo': '',
+    'Cargo': '',
+    'Lugar de Servicio': '',
+    'Nombre de Unidad': '',
+    'Listado de Empleados': '',
+    'Fecha Salida Informe': '',
+    'Hora Salida Informe': '',
+    'Fecha Llegada Informe': '',
+    'Hora Llegada Informe': '',
+    'Observacion': '',
+    'Transportes': [],
+    'Productos Alcanzados': [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [vehiculos, setVehiculos] = useState([]);
@@ -38,6 +53,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }
   };
 
+
   const fetchVehiculos = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -60,47 +76,50 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setInforme(prevState => ({
+    setInforme((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleEditorChange = (content) => {
-    setInforme(prevState => ({
+    setInforme((prevState) => ({
       ...prevState,
-      'Productos Alcanzados': [content]
+      'Productos Alcanzados': [content],
     }));
   };
 
   const handleTransporteChange = (index, field, value) => {
     const newTransportes = [...informe.Transportes];
     newTransportes[index] = { ...newTransportes[index], [field]: value };
-    setInforme(prevState => ({
+    setInforme((prevState) => ({
       ...prevState,
-      Transportes: newTransportes
+      Transportes: newTransportes,
     }));
   };
 
   const addTransporte = () => {
-    setInforme(prevState => ({
+    setInforme((prevState) => ({
       ...prevState,
-      Transportes: [...prevState.Transportes, {
-        'Tipo de Transporte': '',
-        'Nombre del Transporte': '',
-        'Ruta': '',
-        'Fecha de Salida': '',
-        'Hora de Salida': '',
-        'Fecha de Llegada': '',
-        'Hora de Llegada': ''
-      }]
+      Transportes: [
+        ...prevState.Transportes,
+        {
+          'Tipo de Transporte': '',
+          'Nombre del Transporte': '',
+          'Ruta': '',
+          'Fecha de Salida': '',
+          'Hora de Salida': '',
+          'Fecha de Llegada': '',
+          'Hora de Llegada': '',
+        },
+      ],
     }));
   };
 
   const removeTransporte = (index) => {
-    setInforme(prevState => ({
+    setInforme((prevState) => ({
       ...prevState,
-      Transportes: prevState.Transportes.filter((_, i) => i !== index)
+      Transportes: prevState.Transportes.filter((_, i) => i !== index),
     }));
   };
 
@@ -110,30 +129,78 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const [year, month, day] = dateString.split('-');
+        return `${day}-${month}-${year}`;
+      };
+
+      const formattedData = {
+        fecha_salida_informe: formatDate(informe['Fecha Salida Informe']),
+        hora_salida_informe: informe['Hora Salida Informe'],
+        fecha_llegada_informe: formatDate(informe['Fecha Llegada Informe']),
+        hora_llegada_informe: informe['Hora Llegada Informe'],
+        observacion: informe['Observacion'],
+        transportes: informe.Transportes.map(t => ({
+          tipo_transporte_info: t['Tipo de Transporte'],
+          nombre_transporte_info: t['Nombre del Transporte'],
+          ruta_info: t['Ruta'],
+          fecha_salida_info: formatDate(t['Fecha de Salida']),
+          hora_salida_info: t['Hora de Salida'],
+          fecha_llegada_info: formatDate(t['Fecha de Llegada']),
+          hora_llegada_info: t['Hora de Llegada'],
+        })),
+        productos: [{ descripcion: informe['Productos Alcanzados'][0] }]
+      };
+
       const response = await fetch(`${API_URL}/Informes/editar-informe/${idInforme}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify(informe)
+        body: JSON.stringify(formattedData),
       });
 
-      if (!response.ok) throw new Error('Error al actualizar el informe');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al actualizar el informe');
+      }
 
       const data = await response.json();
-
       notification.success({
         message: 'Éxito',
-        description: 'Informe actualizado exitosamente',
+        description: data.mensaje,
         placement: 'topRight',
       });
 
-      setEditMode(false);
+      if (onClose) onClose();
     } catch (error) {
       setError(error.message);
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        placement: 'topRight',
+      });
     }
   };
+
+  // Helper function to get CSRF token
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 
   if (loading) return <div className="text-center">Cargando...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
@@ -142,11 +209,15 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
   return (
     <div className="p-4">
       <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-        <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">INFORME DE SERVICIOS INSTITUCIONALES</h2>
+        <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
+          INFORME DE SERVICIOS INSTITUCIONALES
+        </h2>
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div className="mb-4 flex">
             <div className="mr-4 w-1/2">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Nro. SOLICITUD DE AUTORIZACIÓN PARA CUMPLIMIENTO DE SERVICIOS INSTITUCIONALES
+              </label>
               <input
                 type="text"
                 value={informe['Codigo de Solicitud']}
@@ -155,7 +226,9 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
               />
             </div>
             <div className="mr-4 w-1/2">
-              <label className="block text-gray-700 text-sm font-bold mb-2">FECHA DEL INFORME (dd-mmm-aaa)</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                FECHA DEL INFORME (dd-mmm-aaa)
+              </label>
               <input
                 type="text"
                 value={informe['Fecha del Informe']}
@@ -169,7 +242,9 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div className="mb-4 flex">
             <div className="mr-4 w-1/2">
-              <label className="block text-gray-700 text-sm font-bold mb-2">APELLIDOS - NOMBRES DE LA O EL SERVIDOR</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                APELLIDOS - NOMBRES DE LA O EL SERVIDOR
+              </label>
               <input
                 type="text"
                 value={informe['Nombre Completo']}
@@ -189,7 +264,9 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
           </div>
           <div className="mb-4 flex">
             <div className="mr-4 w-1/2">
-              <label className="block text-gray-700 text-sm font-bold mb-2">CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                CIUDAD - PROVINCIA DEL SERVICIO INSTITUCIONAL
+              </label>
               <input
                 type="text"
                 value={informe['Lugar de Servicio']}
@@ -198,7 +275,9 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
               />
             </div>
             <div className="mr-4 w-1/2">
-              <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                NOMBRE DE LA UNIDAD A LA QUE PERTENECE LA O EL SERVIDOR
+              </label>
               <input
                 type="text"
                 value={informe['Nombre de Unidad']}
@@ -210,7 +289,9 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
         </div>
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN EL SERVICIO INSTITUCIONAL</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              SERVIDORES QUE INTEGRAN EL SERVICIO INSTITUCIONAL
+            </label>
             <input
               type="text"
               value={informe['Listado de Empleados']}
@@ -220,106 +301,23 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">INFORME DE ACTIVIDADES Y PRODUCTOS ALCANZADOS</h2>
+          <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
+            INFORME DE ACTIVIDADES Y PRODUCTOS ALCANZADOS
+          </h2>
           <div className="mb-2 border-2 border-gray-600 rounded-lg p-14">
             <ReactQuill
               value={informe['Productos Alcanzados'][0]}
               onChange={handleEditorChange}
-              readOnly={!editMode}
               modules={{
-                toolbar: editMode ? [
-                  [{ 'header': [1, 2, false] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-                  ['link'],
-                  ['clean']
-                ] : false,
+                toolbar: [
+                  [{ header: [1, 2, false] }],
+                  ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                  [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                  ['link', 'image'],
+                  ['clean'],
+                ],
               }}
-              formats={[
-                'header',
-                'bold', 'italic', 'underline', 'strike', 'blockquote',
-                'list', 'bullet', 'indent',
-                'link', 'image'
-              ]}
-              className="h-60"
             />
-          </div>
-          <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">INTINERARIO</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SALIDA</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">LLEGADA</h2>
-                </div>
-              </div>
-            </div>
-            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">FECHA</h2>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">dd-mmm-aaaa</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="date"
-                    name="Fecha Salida Informe"
-                    value={informe['Fecha Salida Informe']}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    readOnly={!editMode}
-                  />
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="date"
-                    name="Fecha Llegada Informe"
-                    value={informe['Fecha Llegada Informe']}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    readOnly={!editMode}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mb-4 border-2 border-gray-600 rounded-lg p-4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">HORA</h2>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">hh-mm</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="time"
-                    name="Hora Salida Informe"
-                    value={informe['Hora Salida Informe']}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    readOnly={!editMode}
-                  />
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="time"
-                    name="Hora Llegada Informe"
-                    value={informe['Hora Llegada Informe']}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    readOnly={!editMode}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
           <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
           <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
@@ -334,32 +332,22 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Tipo de Transporte']}
                       onChange={(e) => handleTransporteChange(index, 'Tipo de Transporte', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                   <div className="mr-4 w-1/3">
                     <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DE TRANSPORTE</label>
-                    {editMode ? (
-                      <select
-                        value={transporte['Nombre del Transporte']}
-                        onChange={(e) => handleTransporteChange(index, 'Nombre del Transporte', e.target.value)}
-                        className="w-full p-2 mb-2 border rounded"
-                      >
-                        <option value="">Seleccionar vehículo</option>
-                        {vehiculos.map((vehiculo) => (
-                          <option key={vehiculo.placa} value={vehiculo.placa}>
-                            {vehiculo.placa}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={transporte['Nombre del Transporte']}
-                        readOnly
-                        className="w-full p-2 mb-2 border rounded"
-                      />
-                    )}
+                    <select
+                      value={transporte['Nombre del Transporte']}
+                      onChange={(e) => handleTransporteChange(index, 'Nombre del Transporte', e.target.value)}
+                      className="w-full p-2 mb-2 border rounded"
+                    >
+                      <option value="">Seleccionar vehículo</option>
+                      {vehiculos.map((vehiculo) => (
+                        <option key={vehiculo.placa} value={vehiculo.placa}>
+                          {vehiculo.placa}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mr-4 w-1/3">
                     <label className="block text-gray-700 text-sm font-bold mb-2">RUTA</label>
@@ -368,7 +356,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Ruta']}
                       onChange={(e) => handleTransporteChange(index, 'Ruta', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                 </div>
@@ -380,7 +367,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Fecha de Salida']}
                       onChange={(e) => handleTransporteChange(index, 'Fecha de Salida', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                   <div className="mr-4 w-1/4">
@@ -390,7 +376,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Hora de Salida']}
                       onChange={(e) => handleTransporteChange(index, 'Hora de Salida', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                   <div className="mr-4 w-1/4">
@@ -400,7 +385,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Fecha de Llegada']}
                       onChange={(e) => handleTransporteChange(index, 'Fecha de Llegada', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                   <div className="mr-4 w-1/4">
@@ -410,11 +394,10 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                       value={transporte['Hora de Llegada']}
                       onChange={(e) => handleTransporteChange(index, 'Hora de Llegada', e.target.value)}
                       className="w-full p-2 mb-2 border rounded"
-                      readOnly={!editMode}
                     />
                   </div>
                 </div>
-                {editMode && index > 0 && (
+                {index > 0 && (
                   <button
                     type="button"
                     onClick={() => removeTransporte(index)}
@@ -426,48 +409,32 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
                 <div className="border-t border-gray-300 my-4"></div>
               </div>
             ))}
-            {editMode && (
-              <button
-                type="button"
-                onClick={addTransporte}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Agregar Ruta
-              </button>
-            )}
-          </div>
-          <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">OBSERVACIONES</h2>
-          <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-            <div>
-              <textarea
-                name="Observacion"
-                value={informe['Observacion']}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded"
-                rows="4"
-                readOnly={!editMode}
-              />
-            </div>
-          </div>
-          <div className="flex justify-between">
-            {editMode ? (
-              <>
-                <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-                  Guardar Cambios
-                </button>
-                <button type="button" onClick={() => setEditMode(false)} className="bg-yellow-500 text-white px-4 py-2 rounded">
-                  Cancelar Edición
-                </button>
-              </>
-            ) : (
-              <button type="button" onClick={() => setEditMode(true)} className="bg-blue-500 text-white px-4 py-2 rounded">
-                Editar Informe
-              </button>
-            )}
-            <button type="button" onClick={onClose} className="bg-red-500 text-white px-4 py-2 rounded">
-              Cerrar
+            <button
+              type="button"
+              onClick={addTransporte}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Agregar Ruta
             </button>
           </div>
+          <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Observaciones</label>
+            <textarea
+              name="Observacion"
+              value={informe['Observacion'] || ''}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded"
+            >
+              Actualizar Informe
+            </button>
+          </div>
+
         </form>
       </div>
     </div>
