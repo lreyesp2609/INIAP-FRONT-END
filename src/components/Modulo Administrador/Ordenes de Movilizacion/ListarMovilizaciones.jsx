@@ -5,6 +5,7 @@ import VerSolicitudMovilizacion from './VerSolicitudMovilizacion';
 import AprobarSolicitudesModal from './AprobarSolicitudMovilizacion';
 import RechazarSolicitudesModal from './RechazarSolicitudMovilizacion';
 import EditarSolicitudMovilizacion from './EditarMotivoSolicitud';
+import { notification } from 'antd';
 
 const ListarMovilizaciones = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -308,7 +309,6 @@ const ListarMovilizaciones = () => {
                 placement: 'topRight',
             });
         }
-
         window.URL.revokeObjectURL(url);
 
     } catch (error) {
