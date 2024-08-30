@@ -284,19 +284,18 @@ const SolicitarMovilizacion = ({ onClose }) => {
           <div>
           {Object.keys(horario).length === 0 ? (
           <p>Horario no asignado. {' '} </p> 
-          
-        ) : (
-          <div>
-            <p>
-              Las Órdenes de Movilización se pueden realizar desde las{' '}
-              <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
-              <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
-              tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
-              máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '} 
-            </p>
-            <br></br>
-          </div>
-        )}
+            ) : (
+              <div>
+                <p>
+                  Las Órdenes de Movilización se pueden realizar desde las{' '}
+                  <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
+                  <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
+                  tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
+                  máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '} 
+                </p>
+                <br></br>
+              </div>
+            )}
           </div>
         <form id="solicitudForm" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">
