@@ -16,8 +16,6 @@ const Calendario = () => {
   const [showCalendar, setShowCalendar] = useState(true);
   const [showAgenda, setShowAgenda] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [ordersForSelectedDate, setOrdersForSelectedDate] = useState([]);
-  const [selectedViajesForSelectedDate, setSelectedViajesForSelectedDate] = useState([]);
   const [prevView, setPrevView] = useState(null);
   const [solicitudesAceptadas, setSolicitudesAceptadas] = useState([]);
   const [idSolicitud, setIdSolicitud] = useState(null);
@@ -49,10 +47,14 @@ const Calendario = () => {
           }
         );
         const data = await response.json();
-        const today = new Date().setHours(0, 0, 0, 0);
         const filteredOrders = data.ordenes_aprobadas.filter((orden) => {
-          const ordenDate = new Date(orden.fecha_viaje).setHours(0, 0, 0, 0);
-          return ordenDate >= today;
+          const ordenDate = new Date(orden.fecha_hora_emision).setHours(
+            0,
+            0,
+            0,
+            0
+          );
+          return true;
         });
         setOrdenesAprobadas(filteredOrders);
       } catch (error) {
@@ -71,15 +73,14 @@ const Calendario = () => {
           `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`
         );
         const data = await response.json();
-        const today = new Date().setHours(0, 0, 0, 0);
         const filteredSolicitudes = data.solicitudes.filter((solicitud) => {
-          const llegadaDate = new Date(solicitud["Fecha de Llegada"]).setHours(
+          const llegadaDate = new Date(solicitud["Fecha Solicitud"]).setHours(
             0,
             0,
             0,
             0
           );
-          return llegadaDate >= today;
+          return true;
         });
         setSolicitudesAceptadas(filteredSolicitudes);
       } catch (error) {
@@ -91,7 +92,7 @@ const Calendario = () => {
     if (id_usuario && token) {
       fetchOrdenesAprobadas();
     }
-  }, [id_usuario, token, date]);
+  }, [id_usuario, token]);
 
   const handlePrev = () => {
     const newDate = new Date(date);
@@ -200,7 +201,7 @@ const Calendario = () => {
         <AgendaView
           ordenesAprobadas={ordenesAprobadas.filter(
             (o) =>
-              new Date(o.fecha_viaje).toDateString() ===
+              new Date(o.fecha_hora_emision).toDateString() ===
               new Date(selectedDate).toDateString()
           )}
           idUsuario={id_usuario}

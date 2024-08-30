@@ -38,8 +38,24 @@ const AgendaView = ({
       weekday: "long",
       timeZone: "UTC",
     };
-    return new Date(date + "T00:00:00Z").toLocaleDateString("es-ES", options);
+    return new Date(date).toLocaleDateString("es-ES", options);
   };
+  
+  const groupItemsByDate = (items, dateField) => {
+    return items.reduce((acc, item) => {
+      const fecha = item[dateField];
+      if (!fecha) return acc;
+  
+      // Si el campo de fecha incluye hora, usa solo la parte de la fecha
+      const date = new Date(fecha.split("T")[0]); 
+      if (isNaN(date.getTime())) return acc;
+      const formattedDate = date.toISOString().split("T")[0];
+      if (!acc[formattedDate]) acc[formattedDate] = [];
+      acc[formattedDate].push(item);
+      return acc;
+    }, {});
+  };
+  
 
   const formatTime = (time) => {
     return new Date(`1970-01-01T${time}Z`).toLocaleTimeString("es-ES", {
@@ -49,23 +65,10 @@ const AgendaView = ({
     });
   };
 
-  const groupItemsByDate = (items, dateField) => {
-    return items.reduce((acc, item) => {
-      const fecha = item[dateField];
-      if (!fecha) return acc;
-      const date = new Date(fecha);
-      if (isNaN(date.getTime())) return acc;
-      const formattedDate = date.toISOString().split("T")[0];
-      if (!acc[formattedDate]) acc[formattedDate] = [];
-      acc[formattedDate].push(item);
-      return acc;
-    }, {});
-  };
-
-  const ordersByDate = groupItemsByDate(ordenesAprobadas, "fecha_viaje");
+  const ordersByDate = groupItemsByDate(ordenesAprobadas, "fecha_hora_emision");
   const solicitudesAceptadasByDate = groupItemsByDate(
     solicitudesAceptadas,
-    "Fecha de Llegada"
+    "Fecha Solicitud"
   );
 
   const allDates = [
