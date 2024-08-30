@@ -286,7 +286,10 @@ const ListarMovilizaciones = () => {
             },
         });
 
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Error en la respuesta del servidor');
+        }
 
         const contentType = response.headers.get('Content-Type');
         if (!contentType || !contentType.includes('application/pdf')) {
@@ -295,19 +298,29 @@ const ListarMovilizaciones = () => {
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `orden_${idOrden}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        const popup = window.open('', '_blank');
+        if (popup) {
+            popup.location.href = url;
+        } else {
+            notification.error({
+                message: 'Error',
+                description: 'No se pudo abrir la ventana del PDF. Por favor, permite las ventanas emergentes.',
+                placement: 'topRight',
+            });
+        }
 
         window.URL.revokeObjectURL(url);
+
     } catch (error) {
-        console.error('Error al generar o descargar el PDF:', error);
-        alert('Error al descargar el PDF. Revisa la consola para más detalles.');
+        console.error('Error al generar o abrir el PDF:', error);
+        notification.error({
+            message: 'Error',
+            description: `Error al generar o abrir el PDF: ${error.message}`,
+            placement: 'topRight',
+        });
     }
 };
+
 
   return (
     <div className="p-4 sm:p-6">
