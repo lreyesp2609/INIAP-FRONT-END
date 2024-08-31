@@ -50,13 +50,6 @@ const TablaUnidades = ({ unidades, onEditUnidad, onAddCargos }) => {
                   >
                     <FaEdit />
                   </button>
-                  <button
-                    className="p-2 bg-green-500 text-white rounded-full"
-                    title="Añadir cargos"
-                    onClick={() => handleAddCargosClick(unidad)}
-                  >
-                    <FaPlus />
-                  </button>
                 </td>
               </tr>
             ))}
