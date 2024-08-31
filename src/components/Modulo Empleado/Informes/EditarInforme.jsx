@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { notification } from 'antd';
+import { notification, Modal } from 'antd';
 import API_URL from '../../../Config';
-
 
 const DetalleEditarInforme = ({ idInforme, onClose }) => {
   const [informe, setInforme] = useState({
@@ -25,6 +24,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [vehiculos, setVehiculos] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     fetchInforme();
@@ -45,27 +45,24 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
       if (!response.ok) throw new Error('Error al obtener el informe');
 
       const data = await response.json();
-      setInforme(data.detalle_informe);
+      const formattedInforme = {
+        ...data.detalle_informe,
+        'Fecha Salida Informe': formatDateForDisplay(data.detalle_informe['Fecha Salida Informe']),
+        'Fecha Llegada Informe': formatDateForDisplay(data.detalle_informe['Fecha Llegada Informe']),
+        'Transportes': data.detalle_informe.Transportes.map(t => ({
+          ...t,
+          'Fecha de Salida': formatDateForDisplay(t['Fecha de Salida']),
+          'Fecha de Llegada': formatDateForDisplay(t['Fecha de Llegada'])
+        }))
+      };
+
+      setInforme(formattedInforme);
       setLoading(false);
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
-    const formattedInforme = {
-      ...data.detalle_informe,
-      'Fecha Salida Informe': formatDateForDisplay(data.detalle_informe['Fecha Salida Informe']),
-      'Fecha Llegada Informe': formatDateForDisplay(data.detalle_informe['Fecha Llegada Informe']),
-      'Transportes': data.detalle_informe.Transportes.map(t => ({
-        ...t,
-        'Fecha de Salida': formatDateForDisplay(t['Fecha de Salida']),
-        'Fecha de Llegada': formatDateForDisplay(t['Fecha de Llegada'])
-      }))
-    };
-
-    setInforme(formattedInforme);
-    setLoading(false);
   };
-
 
   const fetchVehiculos = async () => {
     try {
@@ -102,7 +99,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-
   const addTransporte = () => {
     setInforme((prevState) => ({
       ...prevState,
@@ -128,28 +124,24 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-  // Función para convertir la fecha al formato yyyy-mm-dd para los inputs
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     const [day, month, year] = dateString.split('-');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  // Función para convertir la fecha al formato dd-mm-yyyy para enviar al servidor
   const formatDateForServer = (dateString) => {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
   };
 
-  // Función para formatear la fecha para mostrar en la interfaz (dd-mm-yyyy)
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
   };
 
-  // Manejo del cambio en los inputs de fecha
   const handleTransporteChange = (index, field, value) => {
     const newTransportes = [...informe.Transportes];
     newTransportes[index] = {
@@ -162,8 +154,20 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const showConfirmModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    handleSubmit();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
@@ -219,7 +223,6 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }
   };
 
-  // Helper function to get CSRF token
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -333,7 +336,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
             />
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); showConfirmModal(); }} className="space-y-4">
           <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">
             INFORME DE ACTIVIDADES Y PRODUCTOS ALCANZADOS
           </h2>
@@ -476,6 +479,18 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
           </div>
         </form>
       </div>
+      <Modal
+        title="Confirmar finalización del informe"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Confirmar"
+        cancelText="Cancelar"
+        okButtonProps={{ style: { backgroundColor: '#22c55e', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}  // Verde (#22c55e)
+        cancelButtonProps={{ style: { backgroundColor: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}  // Rojo (#ef4444)
+      >
+        <p>¿Está seguro que desea terminar el informe? Esta acción no se puede deshacer.</p>
+      </Modal>
     </div>
   );
 };
