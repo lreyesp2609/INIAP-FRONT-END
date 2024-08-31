@@ -101,18 +101,21 @@ const InformesPendientes = () => {
       {!isCreating ? (
         <>
           <div className="mb-4">
-            <h2 className="text-xl font-light mb-4">Solicitudes con Informes Pendientes</h2>
             <div className="flex items-center mb-4">
-              <label htmlFor="view-select" className="text-lg font-light mr-4">Ver:</label>
-              <select
-                id="view-select"
-                value={view}
-                onChange={handleViewChange}
-                className="p-2 border border-gray-300 rounded"
-              >
-                <option value="pendientes">Solicitudes con Informes Pendientes</option>
-                <option value="semi-terminados">Informes</option>
-              </select>
+              <h2 className="text-xl font-medium flex-1">Gestion de Informes</h2>
+              <div className="flex items-center flex-1 justify-center">
+                <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+                <select
+                  id="view-select"
+                  value={view}
+                  onChange={handleViewChange}
+                  className="p-2 border border-gray-300 rounded"
+                >
+                  <option value="semi-terminados">Informes</option>
+                  <option value="pendientes">Solicitudes con Informes Pendientes</option>
+                </select>
+              </div>
+              <div className="flex-1"></div>
             </div>
             <div className="flex mb-4">
               <input

@@ -147,12 +147,12 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
-  
+
       const dataToSend = {
         ...formData,
         productos: [{ descripcion: formData.informeActividades }]
       };
-  
+
       const response = await fetch(`${API_URL}/Informes/crear-informe/${idSolicitud}/`, {
         method: 'POST',
         headers: {
@@ -161,23 +161,23 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
         },
         body: JSON.stringify(dataToSend)
       });
-  
+
       if (!response.ok) throw new Error('Error al crear el informe');
-  
+
       const data = await response.json();
-  
+
       notification.success({
         message: 'Éxito',
         description: 'Informe creado exitosamente',
         placement: 'topRight',
       });
-  
+
       onClose();
     } catch (error) {
       setError(error.message);
     }
   };
-  
+
   if (loading) return <div className="text-center">Cargando...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
