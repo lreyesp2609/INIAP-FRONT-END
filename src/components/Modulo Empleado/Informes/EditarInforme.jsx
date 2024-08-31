@@ -51,6 +51,19 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
       setError(error.message);
       setLoading(false);
     }
+    const formattedInforme = {
+      ...data.detalle_informe,
+      'Fecha Salida Informe': formatDateForDisplay(data.detalle_informe['Fecha Salida Informe']),
+      'Fecha Llegada Informe': formatDateForDisplay(data.detalle_informe['Fecha Llegada Informe']),
+      'Transportes': data.detalle_informe.Transportes.map(t => ({
+        ...t,
+        'Fecha de Salida': formatDateForDisplay(t['Fecha de Salida']),
+        'Fecha de Llegada': formatDateForDisplay(t['Fecha de Llegada'])
+      }))
+    };
+
+    setInforme(formattedInforme);
+    setLoading(false);
   };
 
 
@@ -78,7 +91,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     const { name, value } = e.target;
     setInforme((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: name.includes('Fecha') ? formatDateForDisplay(value) : value,
     }));
   };
 
@@ -115,86 +128,96 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
-// Función para convertir la fecha al formato yyyy-mm-dd para los inputs
-const formatDateForInput = (dateString) => {
-  if (!dateString) return '';
-  const [day, month, year] = dateString.split('-');
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-};
+  // Función para convertir la fecha al formato yyyy-mm-dd para los inputs
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    const [day, month, year] = dateString.split('-');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
 
-// Función para convertir la fecha al formato dd-mm-yyyy para enviar al servidor
-const formatDateForServer = (dateString) => {
-  if (!dateString) return '';
-  const [year, month, day] = dateString.split('-');
-  return `${day}-${month}-${year}`;
-};
+  // Función para convertir la fecha al formato dd-mm-yyyy para enviar al servidor
+  const formatDateForServer = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+  };
 
-// Manejo del cambio en los inputs de fecha
-const handleTransporteChange = (index, field, value) => {
-  const newTransportes = [...informe.Transportes];
-  newTransportes[index] = { ...newTransportes[index], [field]: value };
-  setInforme((prevState) => ({
-    ...prevState,
-    Transportes: newTransportes,
-  }));
-};
+  // Función para formatear la fecha para mostrar en la interfaz (dd-mm-yyyy)
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Token no encontrado');
-
-    const formattedData = {
-      fecha_salida_informe: formatDateForServer(informe['Fecha Salida Informe']),
-      hora_salida_informe: informe['Hora Salida Informe'],
-      fecha_llegada_informe: formatDateForServer(informe['Fecha Llegada Informe']),
-      hora_llegada_informe: informe['Hora Llegada Informe'],
-      observacion: informe['Observacion'],
-      transportes: informe.Transportes.map(t => ({
-        tipo_transporte_info: t['Tipo de Transporte'],
-        nombre_transporte_info: t['Nombre del Transporte'],
-        ruta_info: t['Ruta'],
-        hora_salida_info: t['Hora de Salida'],
-        fecha_salida_info: formatDateForServer(t['Fecha de Salida']),
-        fecha_llegada_info: formatDateForServer(t['Fecha de Llegada']),
-        hora_llegada_info: t['Hora de Llegada'],
-      })),
-      productos: [{ descripcion: informe['Productos Alcanzados'][0] }]
+  // Manejo del cambio en los inputs de fecha
+  const handleTransporteChange = (index, field, value) => {
+    const newTransportes = [...informe.Transportes];
+    newTransportes[index] = {
+      ...newTransportes[index],
+      [field]: field.includes('Fecha') ? formatDateForDisplay(value) : value
     };
+    setInforme((prevState) => ({
+      ...prevState,
+      Transportes: newTransportes,
+    }));
+  };
 
-    const response = await fetch(`${API_URL}/Informes/editar-informe/${idInforme}/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-CSRFToken': getCookie('csrftoken')
-      },
-      body: JSON.stringify(formattedData),
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al actualizar el informe');
+      const formattedData = {
+        fecha_salida_informe: formatDateForServer(informe['Fecha Salida Informe']),
+        hora_salida_informe: informe['Hora Salida Informe'],
+        fecha_llegada_informe: formatDateForServer(informe['Fecha Llegada Informe']),
+        hora_llegada_informe: informe['Hora Llegada Informe'],
+        observacion: informe['Observacion'],
+        transportes: informe.Transportes.map(t => ({
+          tipo_transporte_info: t['Tipo de Transporte'],
+          nombre_transporte_info: t['Nombre del Transporte'],
+          ruta_info: t['Ruta'],
+          hora_salida_info: t['Hora de Salida'],
+          fecha_salida_info: formatDateForServer(t['Fecha de Salida']),
+          fecha_llegada_info: formatDateForServer(t['Fecha de Llegada']),
+          hora_llegada_info: t['Hora de Llegada'],
+        })),
+        productos: [{ descripcion: informe['Productos Alcanzados'][0] }]
+      };
+
+      const response = await fetch(`${API_URL}/Informes/editar-informe/${idInforme}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(formattedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al actualizar el informe');
+      }
+
+      const data = await response.json();
+      notification.success({
+        message: 'Éxito',
+        description: data.mensaje,
+        placement: 'topRight',
+      });
+
+      onClose();
+    } catch (error) {
+      setError(error.message);
+      notification.error({
+        message: 'Error',
+        description: error.message,
+        placement: 'topRight',
+      });
     }
-
-    const data = await response.json();
-    notification.success({
-      message: 'Éxito',
-      description: data.mensaje,
-      placement: 'topRight',
-    });
-
-    onClose();
-  } catch (error) {
-    setError(error.message);
-    notification.error({
-      message: 'Error',
-      description: error.message,
-      placement: 'topRight',
-    });
-  }
-};
+  };
 
   // Helper function to get CSRF token
   function getCookie(name) {
@@ -436,12 +459,12 @@ const handleSubmit = async (e) => {
               className="w-full p-2 border rounded"
             />
           </div>
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-between">
             <button
               type="submit"
               className="bg-green-500 text-white px-4 py-2 rounded"
             >
-              Actualizar Informe
+              Terminar Informe
             </button>
             <button
               type="button"
