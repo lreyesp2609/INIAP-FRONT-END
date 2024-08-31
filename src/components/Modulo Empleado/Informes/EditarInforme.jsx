@@ -4,6 +4,8 @@ import 'react-quill/dist/quill.snow.css';
 import { notification, Modal } from 'antd';
 import API_URL from '../../../Config';
 
+
+
 const DetalleEditarInforme = ({ idInforme, onClose }) => {
   const [informe, setInforme] = useState({
     'Codigo de Solicitud': '',
@@ -45,24 +47,27 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
       if (!response.ok) throw new Error('Error al obtener el informe');
 
       const data = await response.json();
-      const formattedInforme = {
-        ...data.detalle_informe,
-        'Fecha Salida Informe': formatDateForDisplay(data.detalle_informe['Fecha Salida Informe']),
-        'Fecha Llegada Informe': formatDateForDisplay(data.detalle_informe['Fecha Llegada Informe']),
-        'Transportes': data.detalle_informe.Transportes.map(t => ({
-          ...t,
-          'Fecha de Salida': formatDateForDisplay(t['Fecha de Salida']),
-          'Fecha de Llegada': formatDateForDisplay(t['Fecha de Llegada'])
-        }))
-      };
-
-      setInforme(formattedInforme);
+      setInforme(data.detalle_informe);
       setLoading(false);
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
+    const formattedInforme = {
+      ...data.detalle_informe,
+      'Fecha Salida Informe': formatDateForDisplay(data.detalle_informe['Fecha Salida Informe']),
+      'Fecha Llegada Informe': formatDateForDisplay(data.detalle_informe['Fecha Llegada Informe']),
+      'Transportes': data.detalle_informe.Transportes.map(t => ({
+        ...t,
+        'Fecha de Salida': formatDateForDisplay(t['Fecha de Salida']),
+        'Fecha de Llegada': formatDateForDisplay(t['Fecha de Llegada'])
+      }))
+    };
+
+    setInforme(formattedInforme);
+    setLoading(false);
   };
+
 
   const fetchVehiculos = async () => {
     try {
@@ -99,6 +104,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
+
   const addTransporte = () => {
     setInforme((prevState) => ({
       ...prevState,
@@ -124,24 +130,28 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     }));
   };
 
+  // Función para convertir la fecha al formato yyyy-mm-dd para los inputs
   const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     const [day, month, year] = dateString.split('-');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
+  // Función para convertir la fecha al formato dd-mm-yyyy para enviar al servidor
   const formatDateForServer = (dateString) => {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
   };
 
+  // Función para formatear la fecha para mostrar en la interfaz (dd-mm-yyyy)
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
   };
 
+  // Manejo del cambio en los inputs de fecha
   const handleTransporteChange = (index, field, value) => {
     const newTransportes = [...informe.Transportes];
     newTransportes[index] = {
@@ -158,9 +168,15 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleOk = async () => {
     setIsModalVisible(false);
-    handleSubmit();
+    try {
+      await handleSubmit();
+      onClose(); // Cierra el componente después de enviar el informe con éxito
+    } catch (error) {
+      // Si hay un error, no cerramos el componente
+      console.error("Error al enviar el informe:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -212,7 +228,7 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
         placement: 'topRight',
       });
 
-      onClose();
+      // No llamamos a onClose() aquí, se llamará en handleOk
     } catch (error) {
       setError(error.message);
       notification.error({
@@ -220,9 +236,11 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
         description: error.message,
         placement: 'topRight',
       });
+      throw error; // Re-lanzamos el error para que handleOk pueda manejarlo
     }
   };
 
+  // Helper function to get CSRF token
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -486,10 +504,10 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
         onCancel={handleCancel}
         okText="Confirmar"
         cancelText="Cancelar"
-        okButtonProps={{ style: { backgroundColor: '#22c55e', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}  // Verde (#22c55e)
-        cancelButtonProps={{ style: { backgroundColor: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}  // Rojo (#ef4444)
+        okButtonProps={{ style: { backgroundColor: '#22c55e', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}
+        cancelButtonProps={{ style: { backgroundColor: '#ef4444', color: 'white', padding: '8px 16px', borderRadius: '0.375rem' } }}
       >
-        <p>¿Está seguro que desea terminar el informe? Esta acción no se puede deshacer.</p>
+        <p>¿Está seguro que desea terminar el informe? Una vez hecho esto no podras volver a editar el informe.</p>
       </Modal>
     </div>
   );
