@@ -157,17 +157,10 @@ const ListarMovilizaciones = () => {
       setMotivos(motivosData);
       setMotivosLoaded(true);
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: 'Error al obtener motivos',
-      });
       console.error('Error fetching motivos:', error);
     }
   };
   
-  
-  
-
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
