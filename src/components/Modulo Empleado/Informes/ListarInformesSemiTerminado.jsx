@@ -4,6 +4,7 @@ import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import InformesPendientes from './ListarInformesPendientes';
 import DetalleEditarInforme from './EditarInforme';
+import ListarDetallePDF from './ListarDetallePDFs';
 
 const InformesSemiTerminados = () => {
     const [informes, setInformes] = useState([]);
@@ -16,6 +17,7 @@ const InformesSemiTerminados = () => {
     const [view, setView] = useState('semi-terminados');
     const [isEditing, setIsEditing] = useState(false);
     const [currentInformeId, setCurrentInformeId] = useState(null);
+    const [showingPDF, setShowingPDF] = useState(false);
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -76,14 +78,28 @@ const InformesSemiTerminados = () => {
         setIsEditing(true);
     };
 
+    const handlePDFClick = (idInforme) => {
+        setCurrentInformeId(idInforme);
+        setShowingPDF(true);
+    };
+
     const handleCloseEdit = useCallback(() => {
         setIsEditing(false);
         setCurrentInformeId(null);
-        fetchInformes(); // Actualiza la lista de informes después de editar
+        fetchInformes();
     }, [fetchInformes]);
+
+    const handleClosePDF = () => {
+        setShowingPDF(false);
+        setCurrentInformeId(null);
+    };
 
     if (isEditing) {
         return <DetalleEditarInforme idInforme={currentInformeId} onClose={handleCloseEdit} />;
+    }
+
+    if (showingPDF) {
+        return <ListarDetallePDF idInforme={currentInformeId} onClose={handleClosePDF} />;
     }
 
     if (view === 'pendientes') {
@@ -153,8 +169,9 @@ const InformesSemiTerminados = () => {
                                 <td className="py-3 px-6 text-left">
                                     {informe.estado === 1 && (
                                         <button
+                                            onClick={() => handlePDFClick(informe.id_informes)}
                                             className="p-2 bg-gray-500 text-white rounded-full mr-2"
-                                            title="Generar PDF"
+                                            title="Ver Detalle PDF"
                                         >
                                             <FontAwesomeIcon icon={faFilePdf} />
                                         </button>

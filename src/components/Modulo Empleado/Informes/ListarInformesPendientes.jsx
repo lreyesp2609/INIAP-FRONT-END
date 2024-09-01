@@ -111,8 +111,8 @@ const InformesPendientes = () => {
                   onChange={handleViewChange}
                   className="p-2 border border-gray-300 rounded"
                 >
-                  <option value="semi-terminados">Informes</option>
                   <option value="pendientes">Solicitudes con Informes Pendientes</option>
+                  <option value="semi-terminados">Informes</option>
                 </select>
               </div>
               <div className="flex-1"></div>
