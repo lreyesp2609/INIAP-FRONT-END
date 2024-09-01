@@ -8,6 +8,7 @@ import API_URL from '../../Config';
 import { notification } from 'antd';
 import ListarSolicitudes from './Solicitudes/ListaSolicitude';
 import InformesPendientes from './Informes/ListarInformesPendientes';
+import ListarJustificacione from './Jutificacion de Gastos/ListarJustificaciones';
 
 const MenuEmpleados = () => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const MenuEmpleados = () => {
         {view === 'gestion-solicitud' && <ListarSolicitudes />}
         {view === 'gestion-empleados' && <ListarMovilizacion />}
         {view === 'gestion-informe' && <InformesPendientes/>}
-        {view === 'gestion-gastos' && <InformesPendientes/>}
+        {view === 'gestion-gastos' && <ListarJustificacione/>}
       </div>
       <ChangePasswordModal
         visible={isPasswordChangeModalVisible}
