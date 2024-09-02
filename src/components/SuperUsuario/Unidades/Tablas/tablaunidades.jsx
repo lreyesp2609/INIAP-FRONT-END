@@ -1,14 +1,11 @@
 import React from 'react';
 import { FaEdit, FaPlus } from 'react-icons/fa';
 
-const TablaUnidades = ({ unidades, onEditUnidad, onAddCargos }) => {
+const TablaUnidades = ({ unidades, onEditUnidad }) => {
   const handleEditClick = (unidad) => {
     onEditUnidad(unidad);
   };
 
-  const handleAddCargosClick = (unidad) => {
-    onAddCargos(unidad);
-  };
 
   return (
     <div className="w-full">
