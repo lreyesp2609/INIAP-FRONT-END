@@ -1,39 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileEdit } from '@fortawesome/free-solid-svg-icons';
+import { faFileEdit, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
-import CrearJustificacione from './CrearJustificaciones';
-import ListarFacturas from './ListarFactura';
+import ListarJustificacione from './ListarJustificaciones';
 
-const ListarJustificacione = () => {
-    const [informes, setInformes] = useState([]);
-    const [filteredInformes, setFilteredInformes] = useState([]);
+const ListarFacturas = () => {
+    const [facturas, setFacturas] = useState([]);
+    const [filteredFacturas, setFilteredFacturas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
-    const [view, setView] = useState('justificaciones');
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentInformeId, setCurrentInformeId] = useState(null);
+    const [view, setView] = useState('facturas');
 
-    const fetchInformes = useCallback(async () => {
+    const fetchFacturas = useCallback(async () => {
         try {
             const storedUser = JSON.parse(localStorage.getItem('user'));
             const idUsuario = storedUser.usuario.id_usuario;
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token no encontrado');
 
-            const response = await fetch(`${API_URL}/Informes/informes-sin-facturas/${idUsuario}/`, {
+            const response = await fetch(`${API_URL}/Informes/listar-facturas/${idUsuario}/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            if (!response.ok) throw new Error('Error al obtener informes');
+            if (!response.ok) throw new Error('Error al obtener facturas');
 
             const data = await response.json();
-            setInformes(data.informes || []);
-            setFilteredInformes(data.informes || []);
+            setFacturas(data.facturas || []);
+            setFilteredFacturas(data.facturas || []);
             setLoading(false);
         } catch (error) {
             setError(error.message);
@@ -42,57 +39,42 @@ const ListarJustificacione = () => {
     }, []);
 
     useEffect(() => {
-        fetchInformes();
-    }, [fetchInformes]);
+        fetchFacturas();
+    }, [fetchFacturas]);
 
     const handleSearch = (event) => {
         const searchValue = event.target.value.toLowerCase();
         setSearchTerm(event.target.value);
 
-        const filtered = informes.filter(
-            (informe) =>
-                informe['Codigo de Solicitud']?.toLowerCase().includes(searchValue) ||
-                informe['Fecha Solicitud']?.toLowerCase().includes(searchValue)
+        const filtered = facturas.filter(
+            (factura) =>
+                factura.codigo_solicitud?.toLowerCase().includes(searchValue) ||
+                factura.fecha_informe?.toLowerCase().includes(searchValue)
         );
 
-        setFilteredInformes(filtered);
+        setFilteredFacturas(filtered);
         setCurrentPage(1);
     };
 
     const handleClear = () => {
         setSearchTerm('');
-        setFilteredInformes(informes);
+        setFilteredFacturas(facturas);
         setCurrentPage(1);
     };
 
-    const handleEditClick = (idInforme) => {
-        setCurrentInformeId(idInforme);
-        setIsEditing(true);
-    };
-
-    const handleCloseEdit = () => {
-        setIsEditing(false);
-        setCurrentInformeId(null);
-        fetchInformes();
-    };
-
-    if (isEditing) {
-        return <CrearJustificacione idInforme={currentInformeId} onClose={handleCloseEdit} />;
-    }
-
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredInformes.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
+    const currentItems = filteredFacturas.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredFacturas.length / itemsPerPage);
 
-    if (view === 'facturas') {
-        return <ListarFacturas />;
+    if (view === 'justificaciones') {
+        return <ListarJustificacione />;
     }
 
     return (
         <div className="p-4">
             <div className="flex items-center mb-4">
-                <h2 className="text-xl font-medium flex-1">Gestión de Justificaciones de Gasto</h2>
+                <h2 className="text-xl font-medium flex-1">Listado de Facturas</h2>
                 <div className="flex items-center flex-1 justify-center">
                     <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
                     <select
@@ -101,8 +83,8 @@ const ListarJustificacione = () => {
                         onChange={(e) => setView(e.target.value)}
                         className="p-2 border border-gray-300 rounded"
                     >
-                        <option value="justificaciones">Justificaciones</option>
                         <option value="facturas">Facturas</option>
+                        <option value="justificaciones">Justificaciones</option>
                     </select>
                 </div>
             </div>
@@ -114,7 +96,7 @@ const ListarJustificacione = () => {
                         <div className="flex mb-4">
                             <input
                                 type="text"
-                                placeholder="Buscar por código o fecha de solicitud"
+                                placeholder="Buscar por código de solicitud o fecha"
                                 value={searchTerm}
                                 onChange={handleSearch}
                                 className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -133,29 +115,44 @@ const ListarJustificacione = () => {
                                 <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                     <th className="py-3 px-6 text-left">Código de Solicitud</th>
                                     <th className="py-3 px-6 text-left">Fecha Solicitud</th>
+                                    <th className="py-3 px-6 text-left">Estado</th>
                                     <th className="py-3 px-6 text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-600 text-sm font-light">
                                 {currentItems.length > 0 ? (
-                                    currentItems.map((informe) => (
-                                        <tr key={informe.id_informes} className="border-b border-gray-300 hover:bg-gray-100">
-                                            <td className="py-3 px-6 text-left whitespace-nowrap">{informe['Codigo de Solicitud']}</td>
-                                            <td className="py-3 px-6 text-left">{informe['Fecha Solicitud']}</td>
+                                    currentItems.map((factura) => (
+                                        <tr key={factura.id_factura} className="border-b border-gray-300 hover:bg-gray-100">
+                                            <td className="py-3 px-6 text-left whitespace-nowrap">{factura.codigo_solicitud}</td>
+                                            <td className="py-3 px-6 text-left">{factura.fecha_informe}</td>
                                             <td className="py-3 px-6 text-left">
-                                                <button
-                                                    onClick={() => handleEditClick(informe.id_informes)}
-                                                    className="p-2 bg-yellow-500 text-white rounded-full"
-                                                    title="Editar Informe"
-                                                >
-                                                    <FontAwesomeIcon icon={faFileEdit} />
-                                                </button>
+                                                {factura.estado === 0 ? 'Incompleto' : 'Completo'}
+                                            </td>
+                                            <td className="py-3 px-6 text-left">
+                                            {factura.estado === 1 && (
+                                                    <button
+                                                        onClick={() => handlePDFClick(factura.id_factura)}
+                                                        className="p-2 bg-gray-500 text-white rounded-full mr-2"
+                                                        title="Ver Detalle PDF"
+                                                    >
+                                                        <FontAwesomeIcon icon={faFilePdf} />
+                                                    </button>
+                                                )}
+                                                {factura.estado === 0 && (
+                                                    <button
+                                                        onClick={() => handleEditClick(factura.id_factura)}
+                                                        className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                                                        title="Editar Informe"
+                                                    >
+                                                        <FontAwesomeIcon icon={faFileEdit} />
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="3" className="py-3 px-6 text-center">No se encontraron informes</td>
+                                        <td colSpan="4" className="py-3 px-6 text-center">No se encontraron facturas</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -184,4 +181,4 @@ const ListarJustificacione = () => {
     );
 };
 
-export default ListarJustificacione;
+export default ListarFacturas;
