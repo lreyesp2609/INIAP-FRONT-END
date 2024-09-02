@@ -5,6 +5,7 @@ import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import TablaUnidades from "./Tablas/tablaunidades";
 import GestionCargos from "../Cargos/gestioncargos";
 import AgregarUnidad from "./agregarunidad";
+import EditarUnidad from "./editarunidad";
 
 const GestionUnidadesPorEstacion = () => {
   const [unidades, setUnidades] = useState([]);
@@ -16,6 +17,9 @@ const GestionUnidadesPorEstacion = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [userId, setUserId] = useState(null);
+  const [unidadToEdit, setUnidadToEdit] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -84,7 +88,10 @@ const GestionUnidadesPorEstacion = () => {
     setIsAdding(false); // Desactivar el modo "Agregar Unidad" después de agregar una unidad
     fetchUnidades(); // Refrescar la lista de unidades
   };
-
+  const handleEditUnidad = (unidad) => {
+    setUnidadToEdit(unidad);
+    setIsEditing(true);
+  };
   const handleCancelAddUnidad = () => {
     setIsAdding(false); // Desactivar el modo "Agregar Unidad" si se cancela
   };
@@ -116,9 +123,24 @@ const GestionUnidadesPorEstacion = () => {
   if (isAdding) {
     return <AgregarUnidad onUnidadAdded={handleUnidadAdded} onCancel={handleCancelAddUnidad} />;
   }
+  
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setUnidadToEdit(null);
+  };
 
+  const handleActualizacion = () => {
+    fetchUnidades(userId);
+    setIsEditing(false);
+  };
   return (
     <div className="p-4">
+      {isEditing ?(  <EditarUnidad
+          unidad={unidadToEdit}
+          onCancel={handleCancelEdit}
+          onActualizacion={handleActualizacion}
+        /> ):(
+          <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-light">Gestionar Unidades</h1>
         <button
@@ -145,7 +167,7 @@ const GestionUnidadesPorEstacion = () => {
         </button>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <TablaUnidades unidades={currentItems} onAddCargos={handleAddCargos} />
+      <TablaUnidades unidades={currentItems} onEditUnidad={handleEditUnidad} />
       <div className="flex justify-between items-center mt-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -161,6 +183,8 @@ const GestionUnidadesPorEstacion = () => {
           Siguiente
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 };
