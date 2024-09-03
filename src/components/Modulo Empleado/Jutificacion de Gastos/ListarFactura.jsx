@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import ListarJustificacione from './ListarJustificaciones';
+import ListarEditarDetalleFacturas from './ListarEditarFacturas';
 
 const ListarFacturasInformes = () => {
     const [informes, setInformes] = useState([]);
@@ -13,6 +14,7 @@ const ListarFacturasInformes = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const [view, setView] = useState('facturas-informes');
+    const [editingInforme, setEditingInforme] = useState(null);
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -69,13 +71,15 @@ const ListarFacturasInformes = () => {
     };
 
     const handleEditClick = (idInforme) => {
-        // Implementar lógica para editar
-        console.log('Editar informe:', idInforme);
+        setEditingInforme(idInforme);
     };
 
     const handlePDFClick = (idInforme) => {
-        // Implementar lógica para ver PDF
         console.log('Ver PDF del informe:', idInforme);
+    };
+
+    const handleCloseEdit = () => {
+        setEditingInforme(null);
     };
 
     if (loading) return <div>Cargando...</div>;
@@ -83,6 +87,15 @@ const ListarFacturasInformes = () => {
 
     if (view === 'pendientes') {
         return <ListarJustificacione />
+    }
+
+    if (editingInforme !== null) {
+        return (
+            <ListarEditarDetalleFacturas 
+                idInforme={editingInforme}
+                onClose={handleCloseEdit}
+            />
+        );
     }
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -104,7 +117,7 @@ const ListarFacturasInformes = () => {
                             className="p-2 border border-gray-300 rounded"
                         >
                             <option value="facturas-informes">Terminar Justificaciones</option> 
-                            <option value="pendientes">Crear Justificaciones </option>
+                            <option value="pendientes">Crear Justificaciones</option>
                         </select>
                     </div>
                     <div className="flex-1"></div>
