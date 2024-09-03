@@ -91,19 +91,21 @@ const ListarJustificacione = () => {
 
     return (
         <div className="p-4">
-            <div className="flex items-center mb-4">
-                <h2 className="text-xl font-medium flex-1">Gestión de Justificaciones de Gasto</h2>
-                <div className="flex items-center flex-1 justify-center">
-                    <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
-                    <select
-                        id="view-select"
-                        value={view}
-                        onChange={(e) => setView(e.target.value)}
-                        className="p-2 border border-gray-300 rounded"
-                    >
-                        <option value="justificaciones">Justificaciones</option>
-                        <option value="facturas">Facturas</option>
-                    </select>
+            <div className="mb-4">
+                <div className="flex items-center mb-4">
+                    <h2 className="text-xl font-medium flex-1">Gestión de Justificaciones de Gasto</h2>
+                    <div className="flex items-center flex-1 justify-center">
+                        <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+                        <select
+                            id="view-select"
+                            value={view}
+                            onChange={(e) => setView(e.target.value)}
+                            className="p-2 border border-gray-300 rounded"
+                        >
+                            <option value="justificacionses">Crear Justificaciones</option>
+                            <option value="facturas">Terminar Justificaciones</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             {loading && <div className="text-center mt-8">Cargando...</div>}
