@@ -4,6 +4,7 @@ import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import ListarJustificacione from './ListarJustificaciones';
 import ListarEditarDetalleFacturas from './ListarEditarFacturas';
+import ListarDetalleJustificaciones from './ListarDetalleJutificacion';
 
 const ListarFacturasInformes = () => {
     const [informes, setInformes] = useState([]);
@@ -15,6 +16,7 @@ const ListarFacturasInformes = () => {
     const [itemsPerPage] = useState(10);
     const [view, setView] = useState('facturas-informes');
     const [editingInforme, setEditingInforme] = useState(null);
+    const [pdfInforme, setPdfInforme] = useState(null); // Estado para el PDF
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -75,7 +77,7 @@ const ListarFacturasInformes = () => {
     };
 
     const handlePDFClick = (idInforme) => {
-        console.log('Ver PDF del informe:', idInforme);
+        setPdfInforme(idInforme); // Actualiza el estado para el PDF
     };
 
     const handleCloseEdit = () => {
@@ -85,8 +87,17 @@ const ListarFacturasInformes = () => {
     if (loading) return <div>Cargando...</div>;
     if (error) return <div>Error: {error}</div>;
 
+    if (pdfInforme !== null) {
+        return (
+            <ListarDetalleJustificaciones
+                idInforme={pdfInforme} 
+                onClose={() => setPdfInforme(null)} 
+            />
+        );
+    }
+
     if (view === 'pendientes') {
-        return <ListarJustificacione />
+        return <ListarJustificacione />;
     }
 
     if (editingInforme !== null) {
@@ -180,19 +191,18 @@ const ListarFacturasInformes = () => {
                     </tbody>
                 </table>
             </div>
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between mt-4">
                 <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                     disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                     Anterior
                 </button>
-                <span>{`Página ${currentPage} de ${totalPages}`}</span>
                 <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                     disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                     Siguiente
                 </button>
