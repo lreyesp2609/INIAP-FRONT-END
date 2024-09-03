@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
-import { notification, Table, Typography, Card } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { notification } from 'antd';
 import moment from 'moment';
 
-const { Title } = Typography;
-
-const ListarDetalleJustificaciones = ({ idInforme }) => {
+const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
     const [detalle, setDetalle] = useState({
         codigo_solicitud: '',
         rango_fechas: '',
@@ -67,10 +66,10 @@ const ListarDetalleJustificaciones = ({ idInforme }) => {
             key: 'detalle_documento',
         },
         {
-            title: 'Valor',
+            title: 'Valor ($)',
             dataIndex: 'valor',
             key: 'valor',
-            render: value => `$${parseFloat(value).toFixed(2)}`,
+            render: value => `${parseFloat(value).toFixed(2)}`,
         },
     ];
 
@@ -81,25 +80,68 @@ const ListarDetalleJustificaciones = ({ idInforme }) => {
 
     const totalFacturas = parseFloat(detalle.total_factura).toFixed(2);
 
+    const handleClose = () => {
+        if (onClose) onClose(); // Ejecutar la función pasada como prop para cerrar el componente actual
+    };
+
+    const handleGeneratePDF = () => {
+        // Implementar funcionalidad para generar PDF
+    };
+
     return (
-        <div className="p-4">
-            <Card>
-                <Title level={2} className="text-center">{detalle.codigo_solicitud}</Title>
-                <Title level={3} className="text-center">{detalle.rango_fechas}</Title>
-                <Table
-                    dataSource={dataSource}
-                    columns={columns}
-                    pagination={false}
-                    summary={() => (
-                        <Table.Summary.Row>
-                            <Table.Summary.Cell colSpan={4} />
-                            <Table.Summary.Cell>
-                                <Typography.Text strong>Total:</Typography.Text> ${totalFacturas}
-                            </Table.Summary.Cell>
-                        </Table.Summary.Row>
-                    )}
-                />
-            </Card>
+        <div className="p-6 border border-gray-300 rounded-lg shadow-md" style={{ width: '210mm', height: '297mm', margin: '0 auto', backgroundColor: '#fff' }}>
+            <div className="mb-12 text-center"> {/* Añadido mb-12 para más margen inferior */}
+                <h2 className="text-xl font-bold mb-4">
+                    DETALLE DE DOCUMENTOS DE RESPALDO PARA LAS JUSTIFICACIÓN DEL 70% 
+                    <br />
+                    DE GASTOS REALIZADOS EN LA COMISION DE SERVICIOS
+                </h2>
+            </div>
+
+            <div className="mb-8 flex flex-col items-center"> {/* Añadido mb-8 para margen inferior del bloque */}
+                <div className="flex items-center mb-4">
+                    <h2 className="text-lg font-bold mr-4">NUMERO DE INFORME:</h2>
+                    <h2 className="text-medium">{detalle.codigo_solicitud}</h2>
+                </div>
+                <div className="flex items-center mb-4">
+                    <h2 className="text-lg font-bold mr-4">FECHA DE COMISIÓN:</h2>
+                    <h3 className="text-medium">{detalle.rango_fechas}</h3>
+                </div>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr>
+                            {columns.map(col => (
+                                <th key={col.key} className="border-b px-4 py-2 text-left">{col.title}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dataSource.map((factura, index) => (
+                            <tr key={index}>
+                                {columns.map(col => (
+                                    <td key={col.key} className="border-b px-4 py-2">
+                                        {col.render ? col.render(factura[col.dataIndex]) : factura[col.dataIndex]}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                        <tr>
+                            <td className="border-b px-4 py-2"></td>
+                            <td className="border-b px-4 py-2"></td>
+                            <td className="border-b px-4 py-2"></td>
+                            <td className="border-b px-4 py-2 text-right font-semibold">Total($)</td>
+                            <td className="border-b px-4 py-2 text-left font-semibold">{totalFacturas}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div className="mt-4 text-center">
+                <button onClick={handleGeneratePDF} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Generar PDF</button>
+                <button onClick={handleClose} className=" ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cerrar</button>
+            </div>
         </div>
     );
 };
