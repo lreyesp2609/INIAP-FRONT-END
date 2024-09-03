@@ -4,6 +4,7 @@ import AgregarCargo from "./agregarcargos";
 import TablaGestionCargos from "./Tablas/tablagestioncargos";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import EditarCargo from "./EditarCargo";
 
 const GestionCargos = () => {
   const [cargos, setCargos] = useState([]);
@@ -14,6 +15,8 @@ const GestionCargos = () => {
   const [itemsPerPage] = useState(10);
   const [isAdding, setIsAdding] = useState(false);
   const forceUpdate = useRef(0);
+  const [cargoToEdit, setCargoToEdit] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -81,6 +84,18 @@ const GestionCargos = () => {
     fetchCargos(user.usuario.id_usuario, id_unidad);
   };
 
+  const handleEditCargos = (cargo) => {
+    setCargoToEdit(cargo);
+    setIsEditing(true);
+  };
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setCargoToEdit(null);
+  };
+  const handleActualizacion = () => {
+    fetchCargos(userId);
+    setIsEditing(false);
+  };
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredCargos.slice(indexOfFirstItem, indexOfLastItem);
@@ -98,7 +113,13 @@ const GestionCargos = () => {
     <div className="p-4">
       {isAdding ? (
         <AgregarCargo onClose={handleCloseAddForm} user={user.usuario} />
-      ) : (
+      ) : isEditing ? (
+        <EditarCargo
+          cargo={cargoToEdit}
+          onCancel={handleCancelEdit}
+          onActualizacion={handleActualizacion}
+        />
+       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-light">Gestión de Cargos</h1>
@@ -121,7 +142,7 @@ const GestionCargos = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <TablaGestionCargos key={forceUpdate.current} cargos={currentItems} />
+          <TablaGestionCargos key={forceUpdate.current} cargos={currentItems} onEditCargos={handleEditCargos}/>
           <div className="flex justify-between items-center mt-4">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

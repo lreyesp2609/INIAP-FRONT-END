@@ -1,6 +1,6 @@
 import React from "react";
 import { FaEdit, FaPlus } from "react-icons/fa";
-const TablaGestionCargos = ({ cargos }) => {
+const TablaGestionCargos = ({ cargos, onEditCargos }) => {
 
 
   const handleEditClick = (cargo) => {
