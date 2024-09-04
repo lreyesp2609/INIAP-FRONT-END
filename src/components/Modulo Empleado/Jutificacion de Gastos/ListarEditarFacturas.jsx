@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
 import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
-import moment from 'moment';
 
 const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
     const [facturas, setFacturas] = useState([]);
