@@ -58,6 +58,7 @@ const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
     }
   };
 
+  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Editar Estación</h2>
