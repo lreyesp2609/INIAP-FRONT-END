@@ -107,13 +107,6 @@ const TablaEstaciones = ({
               >
                 <FaEdit />
               </button>
-              <button
-                className="p-2 bg-green-500 text-white rounded-full"
-                title="Agregar unidades"
-                onClick={() => handleAgregarUnidadesClick(estacion)}
-              >
-                <FaPlus />
-              </button>
             </div>
           </div>
         ))}

@@ -110,58 +110,63 @@ const GestionCargos = () => {
   }
 
   return (
-    <div className="p-4">
-      {isAdding ? (
-        <AgregarCargo onClose={handleCloseAddForm} user={user.usuario} />
-      ) : isEditing ? (
-        <EditarCargo
-          cargo={cargoToEdit}
-          onCancel={handleCancelEdit}
-          onActualizacion={handleActualizacion}
+    <div className="p-4 mt-16"> {/* Ajusta 'mt-16' según la altura del navbar */}
+    {isAdding ? (
+      <AgregarCargo onClose={handleCloseAddForm} user={user.usuario} />
+    ) : isEditing ? (
+      <EditarCargo
+        cargo={cargoToEdit}
+        onCancel={handleCancelEdit}
+        onActualizacion={handleActualizacion}
+      />
+    ) : (
+      <>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+          <h1 className="text-2xl font-light text-center md:text-left mb-4 md:mb-0">Gestión de Cargos</h1>
+          <div className="flex space-x-2 md:space-x-4">
+            <button
+              onClick={handleAddCargo}
+              className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded w-full md:w-auto text-center"
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Agregar Cargo
+            </button>
+          </div>
+        </div>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Buscar cargo"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <TablaGestionCargos
+          key={forceUpdate.current}
+          cargos={currentItems}
+          onEditCargos={handleEditCargos}
         />
-       ) : (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-light">Gestión de Cargos</h1>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleAddCargo}
-                className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
-                >
-                <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                Agregar Cargo
-              </button>
-            </div>
-          </div>
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Buscar cargo"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <TablaGestionCargos key={forceUpdate.current} cargos={currentItems} onEditCargos={handleEditCargos}/>
-          <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="
-              bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-            >
-              Anterior
-            </button>
-            <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
-            >
-              Siguiente
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+        <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-2 md:space-y-0">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded w-full md:w-auto"
+          >
+            Anterior
+          </button>
+          <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded w-full md:w-auto"
+          >
+            Siguiente
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+  
+
   );
 };
 

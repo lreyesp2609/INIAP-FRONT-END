@@ -83,12 +83,13 @@ const DeshabilitarVehiculo = ({
   return (
     <>
       <button
-        className="p-2 bg-red-500 text-white rounded-full"
+        className="p-2 bg-red-500 text-white rounded-full text-xl md:text-base"
         onClick={handleDeshabilitar}
         title="Deshabilitar vehículo"
       >
         <FaBan />
       </button>
+
       <Modal
         title={`¿Estás seguro de deshabilitar el vehículo con placa ${vehiculoPlaca}?`}
         visible={modalVisible}
@@ -97,6 +98,7 @@ const DeshabilitarVehiculo = ({
         okText="Sí"
         okType="danger"
         cancelText="No"
+        className="max-w-full md:max-w-lg"
       >
         <p>Esta acción deshabilitará el vehículo y no podrá volver a ser usado.</p>
         <Input.TextArea
@@ -104,8 +106,10 @@ const DeshabilitarVehiculo = ({
           placeholder="Ingresa el motivo para deshabilitar el vehículo"
           value={motivo}
           onChange={(e) => setMotivo(e.target.value)}
+          className="w-full"
         />
       </Modal>
+
     </>
   );
 };

@@ -106,39 +106,44 @@ const HabilitarVehiculo = ({ userId, fetchVehiculos, onVolver }) => {
 
   return (
     <div className="w-full p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-light">Vehículos Deshabilitados</h1>
-        <button
-          onClick={onVolver}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Volver a la Lista
-        </button>
-      </div>
-      <TablaVehiculosDeshabilitados
-        vehiculos={vehiculosDeshabilitados}
-        onHabilitarVehiculo={mostrarModalConfirmacion}
+  <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
+    <h1 className="text-2xl font-light text-center md:text-left">Vehículos Deshabilitados</h1>
+    <button
+      onClick={onVolver}
+      className="bg-blue-500 hover:bg-blue-600 text-white font-bold 
+      py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded"
+      >
+      Volver a la Lista
+    </button>
+  </div>
+  <TablaVehiculosDeshabilitados
+    vehiculos={vehiculosDeshabilitados}
+    onHabilitarVehiculo={mostrarModalConfirmacion}
+  />
+  {vehiculoAConfirmar && (
+    <Modal
+      title={`Habilitar Vehículo con Placa ${vehiculoAConfirmar.placa}`}
+      visible={!!vehiculoAConfirmar}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      okText="Habilitar"
+      cancelText="Cancelar"
+      className="ant-modal-confirm"
+    >
+      <p>
+        ¿Estás seguro de que quieres habilitar el vehículo con placa{' '}
+        <strong>{vehiculoAConfirmar.placa}</strong>?
+      </p>
+      <Input
+        value={motivo}
+        onChange={(e) => setMotivo(e.target.value)}
+        placeholder="Motivo por el cual se está habilitando el vehículo"
+        className="mt-4"
       />
-      {vehiculoAConfirmar && (
-        <Modal
-          title={`Habilitar Vehículo con Placa ${vehiculoAConfirmar.placa}`}
-          visible={!!vehiculoAConfirmar}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          okText="Habilitar"
-          cancelText="Cancelar"
-          className="ant-modal-confirm"
-        >
-          <p>¿Estás seguro de que quieres habilitar el vehículo con placa <strong>{vehiculoAConfirmar.placa}</strong>?</p>
-          <Input
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value)}
-            placeholder="Motivo por el cual se está habilitando el vehículo"
-            className="mt-4"
-          />
-        </Modal>
-      )}
-    </div>
+    </Modal>
+  )}
+</div>
+
   );
 };
 

@@ -134,34 +134,36 @@ const GestionUnidadesPorEstacion = () => {
     setIsEditing(false);
   };
   return (
-    <div className="p-4">
-      {isEditing ?(  <EditarUnidad
-          unidad={unidadToEdit}
-          onCancel={handleCancelEdit}
-          onActualizacion={handleActualizacion}
-        /> ):(
-          <>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-light">Gestionar Unidades</h1>
+    <div className="p-4 mt-16">
+  {isEditing ? (
+    <EditarUnidad
+      unidad={unidadToEdit}
+      onCancel={handleCancelEdit}
+      onActualizacion={handleActualizacion}
+    />
+  ) : (
+    <>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h1 className="text-2xl font-light text-center md:text-left">Gestionar Unidades</h1>
         <button
           onClick={handleAddUnidad}
-          className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
+          className="mt-2 md:mt-0 bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
         >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
           Agregar Unidad
         </button>
       </div>
-      <div className="mb-4 flex">
+      <div className="mb-4 flex flex-col md:flex-row">
         <input
           type="text"
           placeholder="Buscar unidad"
           value={searchTerm}
           onChange={handleSearch}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-gray-300 rounded mb-2 md:mb-0 md:mr-2"
         />
         <button
           onClick={handleClear}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded mt-2 md:mt-0 md:ml-2"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded"
         >
           Limpiar
         </button>
@@ -175,7 +177,7 @@ const GestionUnidadesPorEstacion = () => {
         >
           Anterior
         </button>
-        <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+        <span className="text-center">{`Página ${currentPage} de ${totalPages}`}</span>
         <button
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
@@ -183,9 +185,11 @@ const GestionUnidadesPorEstacion = () => {
           Siguiente
         </button>
       </div>
-      </>
-      )}
-    </div>
+    </>
+  )}
+</div>
+
+
   );
 };
 

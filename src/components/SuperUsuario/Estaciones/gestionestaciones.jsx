@@ -119,7 +119,7 @@ const GestionEstaciones = () => {
   const totalPages = Math.ceil(filteredEstaciones.length / itemsPerPage);
 
   return (
-    <div className="p-4">
+    <div className="p-4 mt-16">
       {isAdding ? (
         <AgregarEstacion
           onClose={() => setIsAdding(false)}
@@ -131,16 +131,6 @@ const GestionEstaciones = () => {
           estacion={estacionToEdit}
           onCancel={handleCancelEdit}
           onActualizacion={handleActualizacion}
-        />
-      ) : isAddingUnidad ? (
-        <GestionUnidadesPorEstacion
-          onClose={() => setIsAddingUnidad(false)}
-          onUnidadAdded={() => {
-            setIsAddingUnidad(false);
-            fetchEstaciones(userId);
-          }}
-          id_estacion={estacionToEdit.id_estacion}
-          id_usuario={userId}
         />
       ) : (
         <>

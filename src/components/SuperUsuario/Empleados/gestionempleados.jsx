@@ -176,8 +176,8 @@ const GestionEmpleados = () => {
     setCurrentPage(pageNumber);
   };
 
-  return (
-    <div className="p-4">
+  return ( 
+    <div className="p-4 mt-16">
       {selectedEmpleado ? (
         <EditarUsuario
           empleado={selectedEmpleado}

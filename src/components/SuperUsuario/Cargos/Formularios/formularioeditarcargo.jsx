@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const FormularioEditarUnidad = ({ unidad, onSubmit, onCancel}) => {
-  const [nombreUnidad, setnombreUnidad] = useState(unidad.nombre_unidad);
+const FormularioEditarCargo = ({ cargo, onSubmit, onCancel}) => {
+  const [nombreCargo, setnombreCargo] = useState(cargo.cargo);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     onSubmit({
-      nombre_unidad: nombreUnidad,
+      cargo: nombreCargo,
     });
   };
 
   return (
-    <div className="p-4 mt-16">
+    <div className="p-4">
   <form onSubmit={handleSubmit} className="space-y-4">
-    <h3 className="text-xl font-semibold mb-4">Datos de la Unidad</h3>
+    <h3 className="text-xl font-semibold mb-4">Datos del Cargo</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Nombre de la Unidad</label>
+        <label className="block text-sm font-medium text-gray-700">Nombre del Cargo</label>
         <input
           type="text"
-          value={nombreUnidad}
-          onChange={(e) => setnombreUnidad(e.target.value)}
+          value={nombreCargo}
+          onChange={(e) => setnombreCargo(e.target.value)}
           className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
           required
         />
@@ -52,4 +52,4 @@ const FormularioEditarUnidad = ({ unidad, onSubmit, onCancel}) => {
   );
 };
 
-export default FormularioEditarUnidad;
+export default FormularioEditarCargo;
