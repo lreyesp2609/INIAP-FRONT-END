@@ -9,6 +9,7 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
         codigo_solicitud: '',
         rango_fechas: '',
         nombre_completo: '',
+        cargo: '',  // Agregado el campo para el cargo
         cedula: '',
         facturas: [],
         total_factura: 0
@@ -142,12 +143,15 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
                     <h3 className="text-medium">{detalle.nombre_completo}</h3>
                 </div>
                 <div className="flex items-center mb-2">
+                    <h3 className="text-medium">{detalle.cargo}</h3> {/* Aquí se muestra el cargo */}
+                </div>
+                <div className="flex items-center mb-2">
                     <h3 className="text-medium">{detalle.cedula}</h3>
                 </div>
             </div>
             <div className="text-center">
                 <button onClick={handleGeneratePDF} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Generar PDF</button>
-                <button onClick={handleClose} className=" ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cerrar</button>
+                <button onClick={handleClose} className="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cerrar</button>
             </div>
         </div>
     );
