@@ -3,6 +3,7 @@ import FormularioEditarCargo from '../Cargos/Formularios/formularioeditarcargo';
 import API_URL from "../../../Config";
 import { notification } from "antd";
 
+
 const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
   const [userId, setUserId] = useState(null);
 
