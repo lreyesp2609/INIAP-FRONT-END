@@ -4,7 +4,6 @@ import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import InformesPendientes from './ListarInformesPendientes';
 import DetalleEditarInforme from './EditarInforme';
-import ListarDetallePDF from './ListarDetallePDFs';
 
 const InformesSemiTerminados = () => {
     const [informes, setInformes] = useState([]);
@@ -17,7 +16,6 @@ const InformesSemiTerminados = () => {
     const [view, setView] = useState('semi-terminados');
     const [isEditing, setIsEditing] = useState(false);
     const [currentInformeId, setCurrentInformeId] = useState(null);
-    const [showingPDF, setShowingPDF] = useState(false);
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -78,28 +76,14 @@ const InformesSemiTerminados = () => {
         setIsEditing(true);
     };
 
-    const handlePDFClick = (idInforme) => {
-        setCurrentInformeId(idInforme);
-        setShowingPDF(true);
-    };
-
     const handleCloseEdit = useCallback(() => {
         setIsEditing(false);
         setCurrentInformeId(null);
         fetchInformes();
     }, [fetchInformes]);
 
-    const handleClosePDF = () => {
-        setShowingPDF(false);
-        setCurrentInformeId(null);
-    };
-
     if (isEditing) {
         return <DetalleEditarInforme idInforme={currentInformeId} onClose={handleCloseEdit} />;
-    }
-
-    if (showingPDF) {
-        return <ListarDetallePDF idInforme={currentInformeId} onClose={handleClosePDF} />;
     }
 
     if (view === 'pendientes') {
@@ -110,6 +94,57 @@ const InformesSemiTerminados = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredInformes.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
+
+    const handlePDFClick = async (idInforme) => {
+        try {
+
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            const idUsuario = storedUser?.usuario?.id_usuario;
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado');
+    
+            const response = await fetch(`${API_URL}/Informes/generar_pdf/${idUsuario}/${idInforme}/pdf/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error en la respuesta del servidor');
+            }
+    
+            const contentType = response.headers.get('Content-Type');
+            if (!contentType || !contentType.includes('application/pdf')) {
+                throw new Error('Respuesta inesperada del servidor');
+            }
+    
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.location.href = url;
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'No se pudo abrir la ventana del PDF. Por favor, permite las ventanas emergentes.',
+                    placement: 'topRight',
+                });
+            }
+            window.URL.revokeObjectURL(url);
+    
+        } catch (error) {
+            console.error('Error al generar o abrir el PDF:', error);
+            notification.error({
+                message: 'Error',
+                description: `Error al generar o abrir el PDF: ${error.message}`,
+                placement: 'topRight',
+            });
+        }
+    };
+    
+
 
     return (
         <div className="p-4">
