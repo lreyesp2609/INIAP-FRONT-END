@@ -12,6 +12,7 @@ const FormularioEncabezado = ({ formData, handleFileChange }) => {
           id="encabezado_superior"
           name="encabezado_superior"
           type="file"
+          accept="image/*"
           onChange={handleFileChange}
           className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
@@ -24,6 +25,7 @@ const FormularioEncabezado = ({ formData, handleFileChange }) => {
           id="encabezado_inferior"
           name="encabezado_inferior"
           type="file"
+          accept="image/*"
           onChange={handleFileChange}
           className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
         />
