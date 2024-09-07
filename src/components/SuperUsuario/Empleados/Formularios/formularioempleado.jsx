@@ -13,9 +13,12 @@ const FormularioEmpleado = ({
   const fechaActual = new Date().toISOString().split("T")[0];
   const [esCedulaExtranjera, setEsCedulaExtranjera] = useState(false); // Estado para el checkbox
 
+
   const handleCheckboxChange = (e) => {
-    setCedulaExtranjera(e.target.checked);
+    setEsCedulaExtranjera(e.target.checked); // Actualiza el estado correcto
+    setCedulaExtranjera(e.target.checked); // Mantén esta llamada si es necesario en otro lugar
   };
+  
 
   // Función para manejar el cambio en el campo de número de cédula
   const handleCedulaChange = (event) => {
@@ -37,6 +40,7 @@ const FormularioEmpleado = ({
       }));
     }
   };
+  
 
   // Función para manejar el cambio en el campo de nombres
   const handleNombresChange = (event) => {
