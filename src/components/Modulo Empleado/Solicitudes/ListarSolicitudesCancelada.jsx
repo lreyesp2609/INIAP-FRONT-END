@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faBell } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'antd';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
-import CrearSolicitud from './CrearSolicitud'; // Importar el nuevo componente
-import ListarSolicitudesPendientes from './ListaSolicitude'; // Importar el nuevo componente
+import CrearSolicitud from './CrearSolicitud';
+import ListarSolicitudesPendientes from './ListaSolicitude';
 import API_URL from '../../../Config';
 
 const ListarSolicitudesCanceladas = () => {
@@ -20,7 +21,9 @@ const ListarSolicitudesCanceladas = () => {
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [showSelector, setShowSelector] = useState(true);
-  const [showPendingRequests, setShowPendingRequests] = useState(false); // Nuevo estado para mostrar solicitudes pendientes
+  const [showPendingRequests, setShowPendingRequests] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [motivosCancelados, setMotivosCancelados] = useState([]);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -73,15 +76,6 @@ const ListarSolicitudesCanceladas = () => {
     setCurrentPage(1);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredSolicitudes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
-
-  const handleClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   const handleVer = (id_solicitud) => {
     setSelectedSolicitudId(id_solicitud);
     setShowMostrarSolicitud(true);
@@ -116,6 +110,38 @@ const ListarSolicitudesCanceladas = () => {
     setShowAcceptedRequests(false);
     setIsCreating(false);
   };
+
+  const handleShowMotivoCancelado = async (id_solicitud) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+
+      const url = `${API_URL}/Informes/listar-motivos-cancelados/${id_solicitud}/`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Error al obtener motivos de cancelación');
+
+      const data = await response.json();
+      setMotivosCancelados(data.motivos_cancelados);
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error('Error:', error);
+      // Optionally, you can show an error message to the user
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setMotivosCancelados([]);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSolicitudes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
 
   if (isCreating) {
     return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
@@ -207,6 +233,13 @@ const ListarSolicitudesCanceladas = () => {
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
+                      <button
+                        className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                        title="Ver Motivo de Cancelación"
+                        onClick={() => handleShowMotivoCancelado(solicitud.id)}
+                      >
+                        <FontAwesomeIcon icon={faBell} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -232,6 +265,22 @@ const ListarSolicitudesCanceladas = () => {
           </div>
         </>
       )}
+
+      <Modal
+        title="Motivo de cancelación"
+        visible={isModalVisible}
+        onOk={handleModalClose}
+        onCancel={handleModalClose}
+        footer={[
+          <Button key="close" onClick={handleModalClose}>
+            Cerrar
+          </Button>
+        ]}
+      >
+        {motivosCancelados.map((motivo) => (
+          <p key={motivo.id_motivo_cancelado}>{motivo.motivo_cancelado}</p>
+        ))}
+      </Modal>
     </div>
   );
 };

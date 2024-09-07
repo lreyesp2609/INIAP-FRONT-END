@@ -4,7 +4,7 @@ import AgregarCargo from "./agregarcargos";
 import TablaGestionCargos from "./Tablas/tablagestioncargos";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import EditarCargo from "./EditarCargo";
+
 
 const GestionCargos = () => {
   const [cargos, setCargos] = useState([]);
