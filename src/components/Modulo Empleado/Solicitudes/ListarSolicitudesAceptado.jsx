@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTrash, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { Modal, notification } from 'antd';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
 import ListarSolicitudesPendientes from './ListaSolicitude';
@@ -20,8 +21,9 @@ const ListarSolicitudesAceptadas = () => {
   const [showCancelledRequests, setShowCancelledRequests] = useState(false);
   const [showPendingRequests, setShowPendingRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
+  const [motivoCancelacion, setMotivoCancelacion] = useState('');
 
   const fetchSolicitudes = useCallback(async () => {
     try {
@@ -52,13 +54,14 @@ const ListarSolicitudesAceptadas = () => {
     fetchSolicitudes();
   }, [fetchSolicitudes]);
 
-  const handleCancelarSolicitud = useCallback(async (id_solicitud) => {
+  const handleCancelarSolicitud = useCallback(async (id_solicitud, motivo) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const url = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
-      const response = await fetch(url, {
+      // Primero, actualizar el estado de la solicitud
+      const updateUrl = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
+      const updateResponse = await fetch(updateUrl, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -67,15 +70,34 @@ const ListarSolicitudesAceptadas = () => {
         body: JSON.stringify({ estado_solicitud: 'cancelado' })
       });
 
-      if (!response.ok) throw new Error('Error al cancelar la solicitud');
+      if (!updateResponse.ok) throw new Error('Error al cancelar la solicitud');
 
-      const data = await response.json();
-      console.log(data.mensaje);
+      // Luego, crear el motivo de cancelación
+      const createMotivoUrl = `${API_URL}/Informes/crear-motivo-cancelado/${id_solicitud}/`;
+      const createMotivoResponse = await fetch(createMotivoUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ motivo_cancelado: motivo })
+      });
+
+      if (!createMotivoResponse.ok) throw new Error('Error al crear el motivo de cancelación');
+
+      const data = await createMotivoResponse.json();
+      notification.success({
+        message: 'Solicitud cancelada',
+        description: data.mensaje,
+      });
 
       // Actualizar la lista de solicitudes
       fetchSolicitudes();
     } catch (error) {
-      console.error('Error:', error);
+      notification.error({
+        message: 'Error',
+        description: error.message,
+      });
     }
   }, [fetchSolicitudes]);
 
@@ -141,15 +163,22 @@ const ListarSolicitudesAceptadas = () => {
   };
 
   const handleConfirmCancel = (id_solicitud) => {
-    console.log(`Confirmar cancelación para solicitud ID: ${id_solicitud}`); // Agregado para depuración
     setSolicitudToCancel(id_solicitud);
-    setShowConfirmModal(true);
+    setIsModalVisible(true);
   };
 
   const handleCancelConfirmed = async () => {
-    await handleCancelarSolicitud(solicitudToCancel);
-    setShowConfirmModal(false);
+    if (motivoCancelacion.trim() === '') {
+      notification.warning({
+        message: 'Advertencia',
+        description: 'Por favor, ingrese un motivo de cancelación.',
+      });
+      return;
+    }
+    await handleCancelarSolicitud(solicitudToCancel, motivoCancelacion);
+    setIsModalVisible(false);
     setSolicitudToCancel(null);
+    setMotivoCancelacion('');
   };
 
   if (isCreating) {
@@ -177,26 +206,23 @@ const ListarSolicitudesAceptadas = () => {
               <button
                 className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                 onClick={handleShowPendingRequests}
-                style={{ marginBottom: '16px' }}
               >
                 Solicitudes Pendientes
               </button>
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 onClick={handleShowCancelledRequests}
-                style={{ marginBottom: '16px' }}
               >
                 Solicitudes Canceladas
               </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 onClick={handleCreateSolicitud}
-                style={{ marginBottom: '16px' }}
               >
                 Crear Solicitud
               </button>
             </div>
-            <div className="flex mb-4">
+            <div className="flex mb-4 mt-4">
               <input
                 type="text"
                 placeholder="Buscar por número, motivo o estado"
@@ -207,7 +233,6 @@ const ListarSolicitudesAceptadas = () => {
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
                 onClick={handleClear}
-                style={{ minWidth: '80px' }}
               >
                 Limpiar
               </button>
@@ -216,7 +241,7 @@ const ListarSolicitudesAceptadas = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300">
               <thead>
-                <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                   <th className="py-3 px-6 text-left">Código de Solicitud</th>
                   <th className="py-3 px-6 text-left">Fecha Solicitud</th>
                   <th className="py-3 px-6 text-left">Motivo Movilización</th>
@@ -248,7 +273,7 @@ const ListarSolicitudesAceptadas = () => {
                       </button>
                       <button
                         className="p-2 bg-gray-500 text-white rounded-full mr-2"
-                        title="Cancelar Solicitud de Movilización"
+                        title="Generar PDF"
                       >
                         <FontAwesomeIcon icon={faFilePdf} />
                       </button>
@@ -266,7 +291,7 @@ const ListarSolicitudesAceptadas = () => {
             >
               Anterior
             </button>
-            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <span>Página {currentPage} de {totalPages}</span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
@@ -275,28 +300,26 @@ const ListarSolicitudesAceptadas = () => {
               Siguiente
             </button>
           </div>
-          {showConfirmModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl mb-4">¿Está seguro de cancelar esta solicitud?</h2>
-                <p className="mb-4">Una vez realizada esta acción no se podrá revertir.</p>
-                <div className="flex justify-end">
-                  <button
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded mr-2"
-                    onClick={() => setShowConfirmModal(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded"
-                    onClick={handleCancelConfirmed}
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <Modal
+            title="Confirmar Cancelación"
+            visible={isModalVisible}
+            onOk={handleCancelConfirmed}
+            onCancel={() => {
+              setIsModalVisible(false);
+              setMotivoCancelacion('');
+            }}
+            okText="Confirmar"
+            cancelText="Cancelar"
+          >
+            <p>¿Está seguro de cancelar esta solicitud? Una vez realizada esta acción no se podrá revertir.</p>
+            <textarea
+              className="w-full p-2 mt-4 border border-gray-300 rounded"
+              rows="3"
+              placeholder="Ingrese el motivo de cancelación"
+              value={motivoCancelacion}
+              onChange={(e) => setMotivoCancelacion(e.target.value)}
+            ></textarea>
+          </Modal>
         </>
       )}
     </div>
