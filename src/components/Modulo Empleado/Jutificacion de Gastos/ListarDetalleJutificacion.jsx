@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
-import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
 import moment from 'moment';
 
@@ -8,12 +7,14 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
     const [detalle, setDetalle] = useState({
         codigo_solicitud: '',
         rango_fechas: '',
+        nombre_completo: '',
+        cargo: '',
+        cedula: '',
         facturas: [],
         total_factura: 0
     });
 
     useEffect(() => {
-        // Cargar el detalle de justificaciones cuando se monta el componente
         const fetchDetalle = async () => {
             try {
                 const response = await fetch(`${API_URL}/Informes/listar-detalle-justificaciones/${idInforme}/`);
@@ -84,33 +85,75 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
         if (onClose) onClose(); // Ejecutar la función pasada como prop para cerrar el componente actual
     };
 
-    const handleGeneratePDF = () => {
-        // Implementar funcionalidad para generar PDF
+    const handleGeneratePDF = async () => {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            const idUsuario = storedUser?.usuario?.id_usuario;
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado');
+    
+            const response = await fetch(`${API_URL}/Informes/generar_pdf_facturas/${idUsuario}/${idInforme}/pdf/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error en la respuesta del servidor');
+            }
+    
+            const contentType = response.headers.get('Content-Type');
+            if (!contentType || !contentType.includes('application/pdf')) {
+                throw new Error('Respuesta inesperada del servidor');
+            }
+    
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.location.href = url;
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'No se pudo abrir la ventana del PDF. Por favor, permite las ventanas emergentes.',
+                    placement: 'topRight',
+                });
+            }
+            window.URL.revokeObjectURL(url);
+    
+        } catch (error) {
+            console.error('Error al generar o abrir el PDF:', error);
+            notification.error({
+                message: 'Error',
+                description: `Error al generar o abrir el PDF: ${error.message}`,
+                placement: 'topRight',
+            });
+        }
     };
 
     return (
-        <div className="p-6 border border-gray-300 rounded-lg shadow-md" style={{ width: '210mm', height: '297mm', margin: '0 auto', backgroundColor: '#fff' }}>
-            <div className="mb-12 text-center"> {/* Añadido mb-12 para más margen inferior */}
-                <h2 className="text-xl font-bold mb-4">
-                    DETALLE DE DOCUMENTOS DE RESPALDO PARA LAS JUSTIFICACIÓN DEL 70% 
+        <div className="p-6 border border-gray-300 rounded-lg shadow-md bg-white">
+            <div className="mb-12 text-center">
+                <h2 className="text-lg font-bold mb-2">
+                    DETALLE DE DOCUMENTOS DE RESPALDO PARA LA JUSTIFICACIÓN DEL 70%
                     <br />
-                    DE GASTOS REALIZADOS EN LA COMISION DE SERVICIOS
+                    DE GASTOS REALIZADOS EN LA COMISIÓN DE SERVICIOS
                 </h2>
             </div>
-
-            <div className="mb-8 flex flex-col items-center"> {/* Añadido mb-8 para margen inferior del bloque */}
-                <div className="flex items-center mb-4">
-                    <h2 className="text-lg font-bold mr-4">NUMERO DE INFORME:</h2>
+            <div className="mb-12 flex flex-col items-center">
+                <div className="flex items-center mb-2">
+                    <h2 className="text-medium font-bold mr-2">NUMERO DE INFORME:</h2>
                     <h2 className="text-medium">{detalle.codigo_solicitud}</h2>
                 </div>
-                <div className="flex items-center mb-4">
-                    <h2 className="text-lg font-bold mr-4">FECHA DE COMISIÓN:</h2>
+                <div className="flex items-center mb-2">
+                    <h2 className="text-medium font-bold mr-2">FECHA DE COMISIÓN:</h2>
                     <h3 className="text-medium">{detalle.rango_fechas}</h3>
                 </div>
             </div>
-
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
+                <table className="mb-12 min-w-full bg-white border border-gray-200">
                     <thead>
                         <tr>
                             {columns.map(col => (
@@ -138,9 +181,20 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
                     </tbody>
                 </table>
             </div>
-            <div className="mt-4 text-center">
+            <div className="mb-8 flex flex-col items-center">
+                <div className="flex items-center mb-2">
+                    <h3 className="text-medium">{detalle.nombre_completo}</h3>
+                </div>
+                <div className="flex items-center mb-2">
+                    <h3 className="text-medium">{detalle.cargo}</h3> 
+                </div>
+                <div className="flex items-center mb-2">
+                    <h3 className="text-medium">{detalle.cedula}</h3>
+                </div>
+            </div>
+            <div className="text-center">
                 <button onClick={handleGeneratePDF} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Generar PDF</button>
-                <button onClick={handleClose} className=" ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cerrar</button>
+                <button onClick={handleClose} className="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cerrar</button>
             </div>
         </div>
     );
