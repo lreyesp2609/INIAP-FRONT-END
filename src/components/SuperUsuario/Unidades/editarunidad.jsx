@@ -22,6 +22,7 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
 
     const urlEncodedData = new URLSearchParams();
     urlEncodedData.append("nombre_unidad", formData.nombre_unidad);
+    urlEncodedData.append("siglas_unidad", formData.siglas_unidad);
 ;
 
     try {

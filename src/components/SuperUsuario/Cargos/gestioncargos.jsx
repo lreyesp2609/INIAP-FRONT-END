@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import API_URL from "../../../Config";
 import AgregarCargo from "./agregarcargos";
 import TablaGestionCargos from "./Tablas/tablagestioncargos";
+import EditarCargo from "./EditarCargo"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 

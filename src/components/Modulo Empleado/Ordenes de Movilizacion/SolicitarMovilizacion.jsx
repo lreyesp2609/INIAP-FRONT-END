@@ -278,163 +278,176 @@ const SolicitarMovilizacion = ({ onClose }) => {
       };
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
-        <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
-          <div>
-          {Object.keys(horario).length === 0 ? (
-          <p>Horario no asignado. {' '} </p> 
-            ) : (
-              <div>
-                <p>
-                  Las Órdenes de Movilización se pueden realizar desde las{' '}
-                  <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
-                  <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
-                  tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
-                  máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '} 
-                </p>
-                <br></br>
-              </div>
-            )}
-          </div>
-        <form id="solicitudForm" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
-
-           <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Lugar Origen - Destino:</label>
-              <select
-                name="lugar_origen_destino_movilizacion"
-                value={selectedRuta}
-                onChange={handleRutaChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecciona una ruta</option>
-                {rutas.map((ruta) => (
-                  <option key={ruta.id} value={ruta.ruta_descripcion}>
-                    {ruta.ruta_descripcion}
-                  </option>
-                ))}
-              </select>
-            </div>
-          
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
-              <input
-                type="date"
-                name="fecha_viaje"
-                value={formData.fecha_viaje}
-                min={moment().tz('America/Guayaquil').format('YYYY-MM-DD')}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Motivo de Movilización:</label>
-            <input
-              type="text"
-              name="motivo_movilizacion"
-              value={formData.motivo_movilizacion}
-              onChange={handleInputChange}
-              maxLength="30"
-              required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Duración de la Movilización:</label>
-              <input
-                type="time"
-                name="duracion_movilizacion"
-                value={formData.duracion_movilizacion}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
-              <input
-                type="time"
-                name="hora_ida"
-                value={formData.hora_ida}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
-              <input
-                type="time"
-                name="hora_regreso"
-                value={formData.hora_regreso}
-                readOnly  // Campo no editable
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Conductor:</label>
-              <select
-                name="id_conductor"
-                value={formData.id_conductor}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecciona un conductor</option>
-                {conductores.map((conductor) => (
-                  <option key={conductor.id_empleado} value={conductor.id_empleado}>
-                    {conductor.nombres} {conductor.apellidos}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Vehículo:</label>
-              <select
-                name="id_vehiculo"
-                value={formData.id_vehiculo}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecciona un vehículo</option>
-                {vehiculos.map((vehiculo) => (
-                  <option key={vehiculo.id_vehiculo} value={vehiculo.id_vehiculo}>
-                    {vehiculo.placa}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <input type="hidden" name="estado_movilizacion" value={formData.estado_movilizacion} />
-          <input type="hidden" name="id_empleado" value={idEmpleado} />
-          <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
-            >
-              <FontAwesomeIcon icon={faTimes} className="mr-2" />
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border-b-4 border-blue-400 hover:border-blue-900 rounded"
-            >
-              <FontAwesomeIcon icon={faSave} className="mr-2" />
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
+    <div className="w-full flex justify-center mt-16">
+  <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
+    <h2 className="text-2xl font-bold mb-4 text-center">Solicitar Movilización</h2>
+    <div>
+      {Object.keys(horario).length === 0 ? (
+        <p>Horario no asignado. {' '}</p>
+      ) : (
+        <div>
+          <p>
+            Las Órdenes de Movilización se pueden realizar desde las{' '}
+            <strong>{formatTime(horario.hora_ida_minima)}</strong> hasta las{' '}
+            <strong>{formatTime(horario.hora_llegada_maxima)}</strong>, pueden
+            tener una duración mínima de <strong>{formatDuration(horario.duracion_minima)}</strong> y durar
+            máximo <strong>{formatDuration(horario.duracion_maxima)}</strong>.{' '}
+          </p>
+          <br />
+        </div>
+      )}
     </div>
+    <form id="solicitudForm" onSubmit={handleSubmit}>
+      {/* Lugar Origen - Destino */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Lugar Origen - Destino:</label>
+        <select
+          name="lugar_origen_destino_movilizacion"
+          value={selectedRuta}
+          onChange={handleRutaChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Selecciona una ruta</option>
+          {rutas.map((ruta) => (
+            <option key={ruta.id} value={ruta.ruta_descripcion}>
+              {ruta.ruta_descripcion}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Fecha de Viaje */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
+        <input
+          type="date"
+          name="fecha_viaje"
+          value={formData.fecha_viaje}
+          min={moment().tz('America/Guayaquil').format('YYYY-MM-DD')}
+          onChange={handleInputChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Motivo de Movilización */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Motivo de Movilización:</label>
+        <input
+          type="text"
+          name="motivo_movilizacion"
+          value={formData.motivo_movilizacion}
+          onChange={handleInputChange}
+          maxLength="30"
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Duración de la Movilización */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Duración de la Movilización:</label>
+        <input
+          type="time"
+          name="duracion_movilizacion"
+          value={formData.duracion_movilizacion}
+          onChange={handleInputChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Hora de Ida */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Hora de Ida:</label>
+        <input
+          type="time"
+          name="hora_ida"
+          value={formData.hora_ida}
+          onChange={handleInputChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Hora de Regreso */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Hora de Regreso:</label>
+        <input
+          type="time"
+          name="hora_regreso"
+          value={formData.hora_regreso}
+          readOnly
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Conductor */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Conductor:</label>
+        <select
+          name="id_conductor"
+          value={formData.id_conductor}
+          onChange={handleInputChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Selecciona un conductor</option>
+          {conductores.map((conductor) => (
+            <option key={conductor.id_empleado} value={conductor.id_empleado}>
+              {conductor.nombres} {conductor.apellidos}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Vehículo */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Vehículo:</label>
+        <select
+          name="id_vehiculo"
+          value={formData.id_vehiculo}
+          onChange={handleInputChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Selecciona un vehículo</option>
+          {vehiculos.map((vehiculo) => (
+            <option key={vehiculo.id_vehiculo} value={vehiculo.id_vehiculo}>
+              {vehiculo.placa}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Hidden Fields */}
+      <input type="hidden" name="estado_movilizacion" value={formData.estado_movilizacion} />
+      <input type="hidden" name="id_empleado" value={idEmpleado} />
+
+      {/* Buttons */}
+      <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
+        >
+          <FontAwesomeIcon icon={faTimes} className="mr-2" />
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border-b-4 border-blue-400 hover:border-blue-900 rounded"
+        >
+          <FontAwesomeIcon icon={faSave} className="mr-2" />
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  
   );
 };
 

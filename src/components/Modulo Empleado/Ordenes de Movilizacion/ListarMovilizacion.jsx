@@ -268,188 +268,193 @@ const ListarMovilizacion = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Lista de Solicitudes de Movilización</h2>
-        
-        <div className="flex items-center">
-          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
-          <select
-            id="viewModeSelect"
-            value={viewMode}
-            onChange={(e) => setViewMode(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="pendientes">Solicitudes Pendientes</option>
-            <option value="canceladas">Solicitudes Canceladas</option>
-            <option value="historial">Historial de Solicitudes</option>
-            <option value="historialMovilizaciones">Historial de Movilizaciones</option>
-          </select>
+    <div className="p-4 mt-16">
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-4 sm:space-y-0">
+    <h2 className="text-2xl font-bold">Lista de Solicitudes de Movilización</h2>
+    
+    <div className="flex items-center">
+      <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
+      <select
+        id="viewModeSelect"
+        value={viewMode}
+        onChange={(e) => setViewMode(e.target.value)}
+        className="p-2 border rounded"
+      >
+        <option value="pendientes">Solicitudes Pendientes</option>
+        <option value="canceladas">Solicitudes Canceladas</option>
+        <option value="historial">Historial de Solicitudes</option>
+        <option value="historialMovilizaciones">Historial de Movilizaciones</option>
+      </select>
+    </div>
 
-        </div>
-        
-        <div className="flex items-center">
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={handleClickSolicitarMovilizacion}
-            >
-              Solicitar Movilización
-            </button>
-          </div>
-      </div>
-      <div className="mb-4">
-        <div className="flex">
-          <input
-            type="text"
-            placeholder="Buscar"
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
-            onClick={handleClear}
-            style={{ minWidth: '80px' }}
-          >
-            Limpiar
-          </button>
-        </div>
-      </div>
-      <div className="overflow-x-auto mb-4">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Origen - Destino</th>
-              <th className="py-3 px-6 text-left">Motivo</th>
-              <th className="py-3 px-6 text-left">Estado</th>
-              {currentItems.some(item => item.estado_movilizacion === 'Aprobado') && (
-                <th className="py-3 px-6 text-left">Secuencial</th>
+    <div className="flex items-center">
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
+                  hover:border-blue-700 rounded
+                  mt-2 md:mt-0 md:ml-2"
+        onClick={handleClickSolicitarMovilizacion}
+      >
+        Solicitar Movilización
+      </button>
+    </div>
+  </div>
+
+  <div className="mb-4">
+    <div className="flex flex-col md:flex-row">
+      <input
+        type="text"
+        placeholder="Buscar"
+        value={searchTerm}
+        onChange={handleSearch}
+        className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
+                  hover:border-blue-700 rounded
+                  mt-2 md:mt-0 md:ml-2"
+        onClick={handleClear}
+        style={{ minWidth: '80px' }}
+      >
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <div className="overflow-x-auto mb-4">
+    <table className="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+          <th className="py-3 px-6 text-left">Origen - Destino</th>
+          <th className="py-3 px-6 text-left">Motivo</th>
+          <th className="py-3 px-6 text-left">Estado</th>
+          {currentItems.some(item => item.estado_movilizacion === 'Aprobado') && (
+            <th className="py-3 px-6 text-left">Secuencial</th>
+          )}
+          <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
+          <th className="py-3 px-6 text-left">Duración</th>
+          <th className="py-3 px-6 text-left">Conductor</th>
+          <th className="py-3 px-6 text-left">Placa de Vehículo</th>
+          <th className="py-3 px-6 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody className="text-gray-600 text-sm font-light">
+        {currentItems.length > 0 ? (
+          currentItems.map((solicitud, index) => (
+            <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
+              <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
+              <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
+              <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
+              {solicitud.estado_movilizacion !== 'Aprobado' && viewMode === 'historial' && (
+                <td className="py-3 px-6 text-left">
+                  {solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
+                </td>
               )}
-              <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
-              <th className="py-3 px-6 text-left">Duración</th>
-              <th className="py-3 px-6 text-left">Conductor</th>
-              <th className="py-3 px-6 text-left">Placa de Vehículo</th>
-              <th className="py-3 px-6 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {currentItems.length > 0 ? (
-              currentItems.map((solicitud, index) => (
-                <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
-                  <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud.lugar_origen_destino_movilizacion}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
-                  {solicitud.estado_movilizacion !== 'Aprobado' && viewMode === 'historial' && (
-                    <td className="py-3 px-6 text-left">
-                      {solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
-                    </td>
-                  )}
-
-                  {solicitud.estado_movilizacion === 'Aprobado'  && (
-                    <td className="py-3 px-6 text-left">
-                      {solicitud.secuencial_orden_movilizacion}
-                    </td>
-                  )}
-                  <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
-                  <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
-                  <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
-                  <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
-                  <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
-                  {solicitud.estado_movilizacion === 'Pendiente' && (
-                    <>
-                      <button
-                        className="p-2 bg-blue-500 text-white rounded-full"
-                        title="Editar Solicitud de Movilización"
-                        onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="p-2 bg-green-500 text-white rounded-full"
-                        title="Ver Solicitud de Movilización"
-                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaEye />
-                      </button>
-                      <button
-                        className="p-2 bg-red-500 text-white rounded-full"
-                        title="Cancelar Solicitud de Movilización"
-                        onClick={() => openCancelModal(solicitud.id_orden_movilizacion)}
-                        disabled={solicitud.habilitado === 0}
-                      >
-                        <FaBan />
-                      </button>
-                    </>
-                  )}
-                  {solicitud.estado_movilizacion === 'Cancelado' && (
+              {solicitud.estado_movilizacion === 'Aprobado' && (
+                <td className="py-3 px-6 text-left">
+                  {solicitud.secuencial_orden_movilizacion}
+                </td>
+              )}
+              <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
+              <td className="py-3 px-6 text-left">{solicitud.duracion_movilizacion}</td>
+              <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
+              <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
+              <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
+                {solicitud.estado_movilizacion === 'Pendiente' && (
+                  <>
+                    <button
+                      className="p-2 bg-blue-500 text-white rounded-full"
+                      title="Editar Solicitud de Movilización"
+                      onClick={() => handleEditClick(solicitud.id_orden_movilizacion)}
+                    >
+                      <FaEdit />
+                    </button>
                     <button
                       className="p-2 bg-green-500 text-white rounded-full"
-                      title="Habilitar Solicitud de Movilización"
-                      onClick={() => openHabilitarModal(solicitud.id_orden_movilizacion)}
-                      disabled={solicitud.habilitado === 1}
+                      title="Ver Solicitud de Movilización"
+                      onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
                     >
-                      Habilitar
+                      <FaEye />
                     </button>
-                  )}
-                  {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Finalizado' || solicitud.estado_movilizacion === 'Denegado') && (
-                    <div className="flex flex-col items-start">
-                      <button
-                        className="p-2 bg-green-500 text-white rounded-full"
-                        title="Ver Solicitud de Movilización"
-                        onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaEye />
-                      </button>
-                      <span className="mt-2 text-gray-600">{getMotivoByOrderId(solicitud.id_orden_movilizacion)}</span>
-                    </div>
-                  )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div >
-      {filteredSolicitudes.length > 0 && (
-            <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </button>
-            <span>{`Página ${currentPage} de ${totalPages}`}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-            </button>
-          </div>
-          )}
-      </div>
-      <CancelarSolicitudMovilizacionModal
-        ordenId={selectedOrderId}
-        userId={userId}
-        onCancel={handleCancelarOrden}
-        visible={cancelModalVisible}
-        onClose={closeCancelModal}
-      />
-      <HabilitarSolicitudMovilizacionModal
-        ordenId={selectedOrderId}
-        userId={userId}
-        onHabilitar={handleHabilitarOrden}
-        visible={habilitarModalVisible}
-        onClose={closeHabilitarModal}
-      />
+                    <button
+                      className="p-2 bg-red-500 text-white rounded-full"
+                      title="Cancelar Solicitud de Movilización"
+                      onClick={() => openCancelModal(solicitud.id_orden_movilizacion)}
+                      disabled={solicitud.habilitado === 0}
+                    >
+                      <FaBan />
+                    </button>
+                  </>
+                )}
+                {solicitud.estado_movilizacion === 'Cancelado' && (
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full"
+                    title="Habilitar Solicitud de Movilización"
+                    onClick={() => openHabilitarModal(solicitud.id_orden_movilizacion)}
+                    disabled={solicitud.habilitado === 1}
+                  >
+                    Habilitar
+                  </button>
+                )}
+                {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Finalizado' || solicitud.estado_movilizacion === 'Denegado') && (
+                  <div className="flex flex-col items-start">
+                    <button
+                      className="p-2 bg-green-500 text-white rounded-full"
+                      title="Ver Solicitud de Movilización"
+                      onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                    >
+                      <FaEye />
+                    </button>
+                    <span className="mt-2 text-gray-600">{getMotivoByOrderId(solicitud.id_orden_movilizacion)}</span>
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="6" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+
+  {filteredSolicitudes.length > 0 && (
+    <div className="flex justify-between items-center mt-4">
+      <button
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </button>
+      <span>{`Página ${currentPage} de ${totalPages}`}</span>
+      <button
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </button>
     </div>
+  )}
+
+  <CancelarSolicitudMovilizacionModal
+    ordenId={selectedOrderId}
+    userId={userId}
+    onCancel={handleCancelarOrden}
+    visible={cancelModalVisible}
+    onClose={closeCancelModal}
+  />
+  <HabilitarSolicitudMovilizacionModal
+    ordenId={selectedOrderId}
+    userId={userId}
+    onHabilitar={handleHabilitarOrden}
+    visible={habilitarModalVisible}
+    onClose={closeHabilitarModal}
+  />
+</div>
+
   );
 };
 

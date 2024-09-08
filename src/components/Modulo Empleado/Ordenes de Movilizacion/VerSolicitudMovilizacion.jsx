@@ -124,66 +124,63 @@ const VerSolicitudMovilizacion = ({ orderId, onClose }) => {
 
   return (
     <div className="p-4 sm:p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">Detalle de la Solicitud de Movilización</h2>
-      {detalleOrden ? (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <table className="w-full table-fixed">
-            <tbody>
-              <tr>
-                <td colSpan="2" className="text-center"><strong>ORDEN DE MOVILIZACIÓN</strong></td>
-              </tr>
-              <tr>
-                <td colSpan="2" className="text-center">ESTACIÓN EXPERIMENTAL TROPICAL PICHILINGUE</td>
-              </tr>
-              <tr>
-                <td className="w-1"> </td>
-                <td className="w-1/2"> {detalleOrden.secuencial_orden_movilizacion}/{getYearFromDate(detalleOrden.fecha_hora_emision)}</td>
-              </tr>
-              <tr>
-                <td className="w-1"><strong>Lugar, fecha y hora de emisión de la orden: </strong> Mocache, {detalleOrden.fecha_hora_emision}</td>
-                <td className="w-1/2"><strong>Marca/Tipo: </strong>{vehiculo.marca}</td>
-              </tr>
-              <tr>
-                <td className="w-1"><strong>Motivo de Movilización: </strong>{detalleOrden.motivo_movilizacion}</td>
-                <td className="w-1/2"><strong>Color: </strong>{vehiculo.color_primario}</td>
-              </tr>
-              <tr>
-                <td className="w-1"><strong>Lugar y origen de destino: </strong>{detalleOrden.lugar_origen_destino_movilizacion}</td>
-                <td className="w-1/2"><strong>Placa N°: </strong>{vehiculo.placa}</td>
-              </tr>
-              <tr>
-                <td className="w-1"><strong>Tiempo de duración de la comisión: </strong>{detalleOrden.duracion_movilizacion}</td>
-                <td className="w-1/2"><strong>Matrícula: </strong>{vehiculo.numero_matricula}</td>
-              </tr>
-              <tr>
-                <td className="w-1">
-                  <strong>Nombres y apellidos del conductor: </strong> <br />
-                  {conductor.nombres} {conductor.apellidos}<br />
-                  <strong>N° de cédula de ciudadanía: </strong>{conductor.cedula}
-                </td>
-                <td className="w-1/2"><strong>Motor: </strong>{vehiculo.numero_motor}</td>
-              </tr>
-              <tr>
-                <td className="w-1">
-                  <strong>Nombres y apellidos del funcionario: </strong> <br />
-                  {funcionario.nombres} {funcionario.apellidos} <br />
-                  <strong>N° de cédula de ciudadanía: </strong>{funcionario.cedula}
-                </td>
-                <td className="w-1/2"><strong>Año:</strong>{vehiculo.anio_fabricacion}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p>No se encontraron detalles para esta solicitud.</p>
-      )}
-      <button
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={onClose}
-      >
-        Volver
-      </button>
+  <h2 className="text-2xl font-bold mb-4 text-center">Detalle de la Solicitud de Movilización</h2>
+  {detalleOrden ? (
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto">
+          <tbody>
+            <tr>
+              <td colSpan="2" className="text-center font-semibold">ORDEN DE MOVILIZACIÓN</td>
+            </tr>
+            <tr>
+              <td colSpan="2" className="text-center">ESTACIÓN EXPERIMENTAL TROPICAL PICHILINGUE</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2">Secuencial: {detalleOrden.secuencial_orden_movilizacion}/{getYearFromDate(detalleOrden.fecha_hora_emision)}</td>
+              <td className="w-1/2 p-2"><strong>Marca/Tipo: </strong>{vehiculo.marca}</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2"><strong>Lugar, fecha y hora de emisión: </strong> Mocache, {detalleOrden.fecha_hora_emision}</td>
+              <td className="w-1/2 p-2"><strong>Color: </strong>{vehiculo.color_primario}</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2"><strong>Motivo de Movilización: </strong>{detalleOrden.motivo_movilizacion}</td>
+              <td className="w-1/2 p-2"><strong>Placa N°: </strong>{vehiculo.placa}</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2"><strong>Origen y destino: </strong>{detalleOrden.lugar_origen_destino_movilizacion}</td>
+              <td className="w-1/2 p-2"><strong>Matrícula: </strong>{vehiculo.numero_matricula}</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2">
+                <strong>Conductor: </strong> {conductor.nombres} {conductor.apellidos}<br />
+                <strong>Cédula: </strong>{conductor.cedula}
+              </td>
+              <td className="w-1/2 p-2"><strong>Motor: </strong>{vehiculo.numero_motor}</td>
+            </tr>
+            <tr>
+              <td className="w-1/2 p-2">
+                <strong>Funcionario: </strong> {funcionario.nombres} {funcionario.apellidos}<br />
+                <strong>Cédula: </strong>{funcionario.cedula}
+              </td>
+              <td className="w-1/2 p-2"><strong>Año: </strong>{vehiculo.anio_fabricacion}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  ) : (
+    <p>No se encontraron detalles para esta solicitud.</p>
+  )}
+  <button
+    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    onClick={onClose}
+  >
+    Volver
+  </button>
+</div>
+
   );
 };
 
