@@ -227,13 +227,133 @@ const MostrarSolicitudAceptadoAdmin = ({ id_solicitud, onClose }) => {
                         </div>
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">LUGAR DE SERVICIO</label>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">SERVIDORES QUE INTEGRAN LOS SERVICIOS INSTITUCIONALES:</label>
                         <input
                             type="text"
-                            value={solicitud['Lugar de Servicio']}
+                            value={solicitud['Listado de Empleados']}
                             readOnly
                             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">DESCRIPCIÓN DE LAS ACTIVIDADES A EJECUTARSE</label>
+                        <textarea
+                            value={solicitud['Descripción de Actividades']}
+                            readOnly
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                </div>
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    <div className="mb-3 flex">
+                        <div className="mb-3">
+                            {rutas.map((ruta, index) => (
+                                <div key={index} className="mb-6 border-b pb-4">
+                                    <h3 className="text-lg font-bold mb-2">Ruta {index + 1}</h3>
+                                    <div className="mb-3 grid grid-cols-12 gap-2">
+                                        <div className="col-span-3">
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Tipo de Transporte']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="col-span-3">
+                                            <label className="block text-gray-700 text-sm font-bold mb-2 h-10">NOMBRE DEL TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Nombre del Transporte']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="col-span-6">
+                                            <label className="block text-gray-700 text-sm font-bold mb-2 h-10">RUTA</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Ruta']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Fecha de Salida']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Hora de Salida']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Fecha de Llegada']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+                                            <input
+                                                type="text"
+                                                value={ruta['Hora de Llegada']}
+                                                readOnly
+                                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS PARA TRANSFERENCIA</h2>
+                <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+                    <div className="flex flex-wrap -mx-2">
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL BANCO:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.Banco}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE CUENTA:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.['Tipo de Cuenta']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/3 px-2 mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">No. DE CUENTA:</label>
+                            <input
+                                type="text"
+                                value={cuentaBancaria?.['Número de Cuenta']}
+                                readOnly
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="flex justify-end mt-4">
