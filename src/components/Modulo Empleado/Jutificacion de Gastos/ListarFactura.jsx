@@ -191,18 +191,21 @@ const ListarFacturasInformes = () => {
                     </tbody>
                 </table>
             </div>
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between items-center mt-4">
                 <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(currentPage - 1)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                 >
                     Anterior
                 </button>
+                <span>
+                    Página {currentPage} de {totalPages}
+                </span>
                 <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(currentPage + 1)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                 >
                     Siguiente
                 </button>

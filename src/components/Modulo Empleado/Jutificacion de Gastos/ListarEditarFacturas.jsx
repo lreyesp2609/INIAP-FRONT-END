@@ -1,44 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import API_URL from '../../../Config';
 import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
-import moment from 'moment';
 
-const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
+const ListarEditarDetalleFacturas = ({ idInforme, onClose }) => {
     const [facturas, setFacturas] = useState([]);
     const [total, setTotal] = useState(0);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Cargar las facturas asociadas al informe cuando se monta el componente
-        const fetchFacturas = async () => {
-            try {
-                const response = await fetch(`${API_URL}/Informes/listar-detalle-facturas/${idInforme}/`);
-                const result = await response.json();
+    const handleError = useCallback((errorMessage) => {
+        console.error('Error occurred:', errorMessage);
+        notification.error({
+            message: 'Error',
+            description: errorMessage,
+        });
+        if (errorMessage.toLowerCase().includes('autenticación') || errorMessage.toLowerCase().includes('token')) {
+            console.log('Authentication error detected, redirecting to login');
+            localStorage.removeItem('token');
+            navigate('/login');
+        }
+    }, [navigate]);
 
-                if (response.ok) {
-                    const formattedFacturas = result.facturas.map((factura) => ({
-                        ...factura,
-                        fecha_emision: moment(factura.fecha_emision, 'DD-MM-YYYY').format('DD-MM-YYYY')
-                    }));
-                    setFacturas(formattedFacturas);
-                    calculateTotal(formattedFacturas);
-                } else {
-                    notification.error({
-                        message: 'Error',
-                        description: result.error || 'Error al cargar las facturas.',
-                    });
-                }
-            } catch (error) {
-                notification.error({
-                    message: 'Error',
-                    description: error.message || 'Error al cargar las facturas.',
-                });
+    const fetchFacturas = useCallback(async () => {
+        console.log('Fetching facturas for informe:', idInforme);
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                handleError('No hay token de autenticación');
+                return;
             }
-        };
 
+            const response = await fetch(`${API_URL}/Informes/listar-detalle-facturas/${idInforme}/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    handleError('Sesión expirada. Por favor, inicie sesión nuevamente.');
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Facturas received:', result.facturas);
+            setFacturas(result.facturas);
+            calculateTotal(result.facturas);
+        } catch (error) {
+            handleError(error.message || 'Error al cargar las facturas.');
+        }
+    }, [idInforme, handleError]);
+
+    useEffect(() => {
         fetchFacturas();
-    }, [idInforme]);
+    }, [fetchFacturas]);
 
     const handleInputChange = (index, event) => {
         const values = [...facturas];
@@ -56,7 +73,9 @@ const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
 
     const handleDateChange = (index, event) => {
         const values = [...facturas];
-        values[index].fecha_emision = moment(event.target.value, 'YYYY-MM-DD').format('DD-MM-YYYY');
+        // Convertir de YYYY-MM-DD a DD-MM-YYYY
+        const [year, month, day] = event.target.value.split('-');
+        values[index].fecha_emision = `${day}-${month}-${year}`;
         setFacturas(values);
     };
 
@@ -85,6 +104,7 @@ const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log('Submitting facturas:', facturas);
 
         for (const factura of facturas) {
             if (!factura.tipo_documento || !factura.numero_factura || !factura.fecha_emision || !factura.detalle_documento || !factura.valor) {
@@ -97,38 +117,40 @@ const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
         }
 
         try {
-            const formattedFacturas = facturas.map(factura => ({
-                ...factura,
-                fecha_emision: moment(factura.fecha_emision, 'DD-MM-YYYY').format('DD-MM-YYYY')
-            }));
+            const token = localStorage.getItem('token');
+            if (!token) {
+                handleError('No hay token de autenticación');
+                return;
+            }
 
             const response = await fetch(`${API_URL}/Informes/editar-justificacion/${idInforme}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ facturas: formattedFacturas }),
+                body: JSON.stringify({ facturas }),
             });
 
-            if (response.ok) {
-                notification.success({
-                    message: 'Éxito',
-                    description: 'Justificación actualizada exitosamente.',
-                });
-                if (onClose) onClose();
-                navigate(-1);
-            } else {
-                const error = await response.json();
-                notification.error({
-                    message: 'Error',
-                    description: error.error || 'Error al actualizar la justificación.',
-                });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    handleError('Sesión expirada. Por favor, inicie sesión nuevamente.');
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } catch (error) {
-            notification.error({
-                message: 'Error',
-                description: error.message || 'Error al actualizar la justificación.',
+
+            const result = await response.json();
+            console.log('Submit response:', result);
+
+            notification.success({
+                message: 'Éxito',
+                description: 'Justificación actualizada exitosamente.',
             });
+            if (onClose) onClose();
+            navigate(-1);
+        } catch (error) {
+            handleError(error.message || 'Error al actualizar la justificación.');
         }
     };
 
@@ -172,7 +194,7 @@ const ListarEditarDetalleFacturas= ({ idInforme, onClose }) => {
                                     <input
                                         type="date"
                                         name="fecha_emision"
-                                        value={moment(factura.fecha_emision, 'DD-MM-YYYY').format('YYYY-MM-DD')}
+                                        value={factura.fecha_emision.split('-').reverse().join('-')} // Convertir DD-MM-YYYY a YYYY-MM-DD para el input date
                                         onChange={(e) => handleDateChange(index, e)}
                                         className="w-full p-2 border border-gray-300 rounded"
                                     />
