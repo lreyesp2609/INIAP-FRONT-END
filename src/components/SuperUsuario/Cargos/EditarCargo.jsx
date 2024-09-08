@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import FormularioEditarunidad from '../Unidades/Formulario/formularioeditarunidad';
+import FormularioEditarCargo from '../Cargos/Formularios/formularioeditarcargo';
 import API_URL from "../../../Config";
 import { notification } from "antd";
 
-const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
+
+const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -21,12 +22,12 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
     }
 
     const urlEncodedData = new URLSearchParams();
-    urlEncodedData.append("nombre_unidad", formData.nombre_unidad);
+    urlEncodedData.append("cargo", formData.cargo);
 ;
 
     try {
       const response = await fetch(
-        `${API_URL}/Unidades/editar-unidades/${userId}/${unidad.id_unidad}/`,
+        `${API_URL}/Cargos/editar-cargos/${userId}/${cargo.id_cargo}/`,
         {
           method: 'POST',
           headers: {
@@ -41,7 +42,7 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
         const data = await response.json();
         notification.success({
           message: 'Éxito',
-          description: data.mensaje || 'Estación editada correctamente'
+          description: data.mensaje || 'Cargo editado correctamente'
         });
         onActualizacion();
         onCancel();
@@ -49,7 +50,7 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
         const errorData = await response.json();
         notification.error({
           message: 'Error',
-          description: errorData.error || 'Error al editar la estación'
+          description: errorData.error || 'Error al editar el cargo'
         });
         console.error('Error al actualizar la estación:', response.statusText);
       }
@@ -58,11 +59,12 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
     }
   };
 
+  
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Editar Unidad</h2>
-      <FormularioEditarunidad
-        unidad={unidad}
+      <h2 className="text-2xl font-bold mb-4">Editar Estación</h2>
+      <FormularioEditarCargo
+        cargo={cargo}
         onSubmit={handleSubmit}
         onCancel={onCancel}
       />
@@ -70,4 +72,4 @@ const EditarUnidad = ({ unidad, onCancel, onActualizacion }) => {
   );
 };
 
-export default EditarUnidad;
+export default EditarCargo;

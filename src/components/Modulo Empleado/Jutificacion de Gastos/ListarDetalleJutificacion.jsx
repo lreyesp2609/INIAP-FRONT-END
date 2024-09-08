@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import API_URL from '../../../Config';
-import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
 import moment from 'moment';
 
@@ -9,7 +8,7 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
         codigo_solicitud: '',
         rango_fechas: '',
         nombre_completo: '',
-        cargo: '',  // Agregado el campo para el cargo
+        cargo: '',
         cedula: '',
         facturas: [],
         total_factura: 0
@@ -86,8 +85,52 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
         if (onClose) onClose(); // Ejecutar la función pasada como prop para cerrar el componente actual
     };
 
-    const handleGeneratePDF = () => {
-        // Implementar funcionalidad para generar PDF
+    const handleGeneratePDF = async () => {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            const idUsuario = storedUser?.usuario?.id_usuario;
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado');
+    
+            const response = await fetch(`${API_URL}/Informes/generar_pdf_facturas/${idUsuario}/${idInforme}/pdf/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${token}`,
+                },
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error en la respuesta del servidor');
+            }
+    
+            const contentType = response.headers.get('Content-Type');
+            if (!contentType || !contentType.includes('application/pdf')) {
+                throw new Error('Respuesta inesperada del servidor');
+            }
+    
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.location.href = url;
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'No se pudo abrir la ventana del PDF. Por favor, permite las ventanas emergentes.',
+                    placement: 'topRight',
+                });
+            }
+            window.URL.revokeObjectURL(url);
+    
+        } catch (error) {
+            console.error('Error al generar o abrir el PDF:', error);
+            notification.error({
+                message: 'Error',
+                description: `Error al generar o abrir el PDF: ${error.message}`,
+                placement: 'topRight',
+            });
+        }
     };
 
     return (
@@ -143,7 +186,7 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
                     <h3 className="text-medium">{detalle.nombre_completo}</h3>
                 </div>
                 <div className="flex items-center mb-2">
-                    <h3 className="text-medium">{detalle.cargo}</h3> {/* Aquí se muestra el cargo */}
+                    <h3 className="text-medium">{detalle.cargo}</h3> 
                 </div>
                 <div className="flex items-center mb-2">
                     <h3 className="text-medium">{detalle.cedula}</h3>

@@ -7,16 +7,32 @@ const FormularioEmpleado = ({
   roles = [],
   unidades = [],
   licencias = [],
+  setCedulaExtranjera,
 }) => {
   const [errors, setErrors] = useState({});
   const fechaActual = new Date().toISOString().split("T")[0];
+  const [esCedulaExtranjera, setEsCedulaExtranjera] = useState(false); // Estado para el checkbox
+
+
+  const handleCheckboxChange = (e) => {
+    setEsCedulaExtranjera(e.target.checked); // Actualiza el estado correcto
+    setCedulaExtranjera(e.target.checked); // Mantén esta llamada si es necesario en otro lugar
+  };
+  
 
   // Función para manejar el cambio en el campo de número de cédula
   const handleCedulaChange = (event) => {
     const { value } = event.target;
     if (/^\d*$/.test(value)) {
-      handleInputChange(event); // Llamar a la función para manejar el cambio de datos
-      setErrors((prevErrors) => ({ ...prevErrors, numero_cedula: "" })); // Limpiar el error si es válido
+      if (!esCedulaExtranjera && value.length > 10) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          numero_cedula: "El número de cédula no puede tener más de 10 caracteres",
+        }));
+      } else {
+        handleInputChange(event); // Llamar a la función para manejar el cambio de datos
+        setErrors((prevErrors) => ({ ...prevErrors, numero_cedula: "" })); // Limpiar el error si es válido
+      }
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -24,6 +40,7 @@ const FormularioEmpleado = ({
       }));
     }
   };
+  
 
   // Función para manejar el cambio en el campo de nombres
   const handleNombresChange = (event) => {
@@ -170,7 +187,7 @@ const FormularioEmpleado = ({
   };
 
   return (
-    <form id="employeeForm" className="space-y-8">
+   <form id="employeeForm" className="space-y-8">
       <div>
         <h3 className="text-xl font-semibold mb-4">Datos del Usuario</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -191,6 +208,18 @@ const FormularioEmpleado = ({
               <p className="text-red-500 text-sm">{errors.numero_cedula}</p>
             )}
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              ¿Cédula extranjera?
+            </label>
+            <input
+              type="checkbox"
+              id="cedulaExtranjera"
+              name="cedulaExtranjera"
+              onChange={handleCheckboxChange}
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Nombres

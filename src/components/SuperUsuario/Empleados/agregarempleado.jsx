@@ -12,6 +12,8 @@ const AgregarEmpleados = (props) => {
   const [unidades, setUnidades] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [licencias, setLicencias] = useState([]);
+  const [cedulaExtranjera, setCedulaExtranjera] = useState(false); // Estado para el checkbox
+
   const [formData, setFormData] = useState({
     id_estacion: "",
     id_unidad: "",
@@ -329,6 +331,13 @@ const AgregarEmpleados = (props) => {
 
   const handleSave = async () => {
     try {
+      if (!cedulaExtranjera && formData.numero_cedula.length !== 10) {
+        notification.error({
+          message: "Error",
+          description: "El número de cédula debe tener 10 dígitos.",
+        });
+        return; // Detiene la ejecución si la cédula no es válida
+      }
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("Token not found");
@@ -396,6 +405,7 @@ const AgregarEmpleados = (props) => {
           estaciones={estaciones}
           unidades={unidades}
           licencias={licencias} 
+          setCedulaExtranjera={setCedulaExtranjera}
         />
         <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
           <button

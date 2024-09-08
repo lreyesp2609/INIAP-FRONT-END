@@ -106,7 +106,7 @@ const GestionLicencias = () => {
   const totalPages = Math.ceil(filteredLicencias.length / itemsPerPage);
 
   return (
-    <div className="p-4">
+    <div className="p-4 mt-16">
       {selectedLicencia ? (
         <div className="bg-white p-4 border rounded shadow-lg">
           <EditarLicencia
