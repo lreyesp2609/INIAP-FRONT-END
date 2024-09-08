@@ -393,6 +393,8 @@ const AgregarEmpleados = (props) => {
     }
   };
 
+
+  
   return (
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">

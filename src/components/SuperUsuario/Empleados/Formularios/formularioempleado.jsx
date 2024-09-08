@@ -17,6 +17,8 @@ const FormularioEmpleado = ({
   const handleCheckboxChange = (e) => {
     setEsCedulaExtranjera(e.target.checked); // Actualiza el estado correcto
     setCedulaExtranjera(e.target.checked); // Mantén esta llamada si es necesario en otro lugar
+
+    
   };
   
 
