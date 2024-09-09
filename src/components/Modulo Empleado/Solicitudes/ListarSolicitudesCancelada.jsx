@@ -271,6 +271,7 @@ const ListarSolicitudesCanceladas = () => {
         visible={isModalVisible}
         onOk={handleModalClose}
         onCancel={handleModalClose}
+        placeholder="Ingrese el motivo de cancelación"
         footer={[
           <Button key="close" onClick={handleModalClose}>
             Cerrar

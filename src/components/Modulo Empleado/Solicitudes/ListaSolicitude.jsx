@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTrash, faFileEdit, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Input } from 'antd';
 import MostrarSolicitud from './MostrarSolicitudDetalle';
 import ListarSolicitudesAceptadas from './ListarSolicitudesAceptado';
 import ListarSolicitudesCanceladas from './ListarSolicitudesCancelada';
@@ -22,6 +23,8 @@ const ListarSolicitudesPendientes = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [motivoCancelacion, setMotivoCancelacion] = useState('');
 
   useEffect(() => {
     fetchSolicitudes();
@@ -52,13 +55,14 @@ const ListarSolicitudesPendientes = () => {
     }
   };
 
-  const handleCancelarSolicitud = useCallback(async (id_solicitud) => {
+  const handleCancelarSolicitud = useCallback(async (id_solicitud, motivo) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const url = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
-      const response = await fetch(url, {
+      // Primero, actualizar el estado de la solicitud
+      const updateUrl = `${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`;
+      const updateResponse = await fetch(updateUrl, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -67,11 +71,22 @@ const ListarSolicitudesPendientes = () => {
         body: JSON.stringify({ estado_solicitud: 'cancelado' })
       });
 
-      if (!response.ok) throw new Error('Error al cancelar la solicitud');
+      if (!updateResponse.ok) throw new Error('Error al cancelar la solicitud');
 
-      const data = await response.json();
-      console.log(data.mensaje);
+      // Luego, crear el motivo de cancelación
+      const createMotivoUrl = `${API_URL}/Informes/crear-motivo-cancelado/${id_solicitud}/`;
+      const createMotivoResponse = await fetch(createMotivoUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ motivo_cancelado: motivo })
+      });
 
+      if (!createMotivoResponse.ok) throw new Error('Error al crear el motivo de cancelación');
+
+      console.log('Solicitud cancelada y motivo registrado con éxito');
       fetchSolicitudes();
     } catch (error) {
       console.error('Error:', error);
@@ -145,13 +160,14 @@ const ListarSolicitudesPendientes = () => {
 
   const handleConfirmCancel = (id_solicitud) => {
     setSolicitudToCancel(id_solicitud);
-    setShowConfirmModal(true);
+    setShowCancelModal(true);
   };
 
   const handleCancelConfirmed = async () => {
-    await handleCancelarSolicitud(solicitudToCancel);
-    setShowConfirmModal(false);
+    await handleCancelarSolicitud(solicitudToCancel, motivoCancelacion);
+    setShowCancelModal(false);
     setSolicitudToCancel(null);
+    setMotivoCancelacion('');
   };
 
   if (isCreating) {
@@ -262,7 +278,7 @@ const ListarSolicitudesPendientes = () => {
           </div>
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={handlePreviousPage}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               disabled={currentPage === 1}
             >
@@ -270,35 +286,32 @@ const ListarSolicitudesPendientes = () => {
             </button>
             <span>{`Página ${currentPage} de ${totalPages}`}</span>
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={handleNextPage}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               disabled={currentPage === totalPages}
             >
               Siguiente
             </button>
           </div>
-          {showConfirmModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl mb-4">¿Está seguro de cancelar esta solicitud?</h2>
-                <p className="mb-4">Una vez realizada esta acción no se podrá revertir.</p>
-                <div className="flex justify-end">
-                  <button
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded mr-2"
-                    onClick={() => setShowConfirmModal(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded"
-                    onClick={handleCancelConfirmed}
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <Modal
+            title="Motivo de cancelación"
+            visible={showCancelModal}
+            onOk={handleCancelConfirmed}
+            onCancel={() => {
+              setShowCancelModal(false);
+              setMotivoCancelacion('');
+            }}
+            okText="Confirmar"
+            cancelText="Cancelar"
+          >
+            <p>¿Está seguro de cancelar esta solicitud? Una vez realizada esta acción no se podrá revertir.</p>
+            <Input.TextArea
+              value={motivoCancelacion}
+              onChange={(e) => setMotivoCancelacion(e.target.value)}
+              rows={4}
+              placeholder="Ingrese el motivo de cancelación"
+            />
+          </Modal>
         </>
       )}
     </div>
