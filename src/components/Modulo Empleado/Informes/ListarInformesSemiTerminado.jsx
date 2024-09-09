@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
+import { faFilePdf, faFileEdit, faEye } from '@fortawesome/free-solid-svg-icons';
 import API_URL from '../../../Config';
 import InformesPendientes from './ListarInformesPendientes';
 import DetalleEditarInforme from './EditarInforme';
+import ListarDetallePDF from './ListarDetallePDFs';
 
 const InformesSemiTerminados = () => {
     const [informes, setInformes] = useState([]);
@@ -16,6 +17,7 @@ const InformesSemiTerminados = () => {
     const [view, setView] = useState('semi-terminados');
     const [isEditing, setIsEditing] = useState(false);
     const [currentInformeId, setCurrentInformeId] = useState(null);
+    const [showDetallePDF, setShowDetallePDF] = useState(false);
 
     const fetchInformes = useCallback(async () => {
         try {
@@ -82,8 +84,22 @@ const InformesSemiTerminados = () => {
         fetchInformes();
     }, [fetchInformes]);
 
+    const handleDetallePDFClick = (idInforme) => {
+        setCurrentInformeId(idInforme);
+        setShowDetallePDF(true);
+    };
+
+    const handleCloseDetallePDF = () => {
+        setShowDetallePDF(false);
+        setCurrentInformeId(null);
+    };
+
     if (isEditing) {
         return <DetalleEditarInforme idInforme={currentInformeId} onClose={handleCloseEdit} />;
+    }
+
+    if (showDetallePDF) {
+        return <ListarDetallePDF idInforme={currentInformeId} onClose={handleCloseDetallePDF} />;
     }
 
     if (view === 'pendientes') {
@@ -97,7 +113,6 @@ const InformesSemiTerminados = () => {
 
     const handlePDFClick = async (idInforme) => {
         try {
-
             const storedUser = JSON.parse(localStorage.getItem('user'));
             const idUsuario = storedUser?.usuario?.id_usuario;
             const token = localStorage.getItem('token');
@@ -133,7 +148,6 @@ const InformesSemiTerminados = () => {
                 });
             }
             window.URL.revokeObjectURL(url);
-    
         } catch (error) {
             console.error('Error al generar o abrir el PDF:', error);
             notification.error({
@@ -143,8 +157,6 @@ const InformesSemiTerminados = () => {
             });
         }
     };
-    
-
 
     return (
         <div className="p-4">
@@ -206,9 +218,18 @@ const InformesSemiTerminados = () => {
                                         <button
                                             onClick={() => handlePDFClick(informe.id_informes)}
                                             className="p-2 bg-gray-500 text-white rounded-full mr-2"
-                                            title="Ver Detalle PDF"
+                                            title="Generar PDF"
                                         >
                                             <FontAwesomeIcon icon={faFilePdf} />
+                                        </button>
+                                    )}
+                                    {informe.estado === 1 && (
+                                        <button
+                                            onClick={() => handleDetallePDFClick(informe.id_informes)}
+                                            className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                                            title="Ver Detalle de Informes"
+                                        >
+                                            <FontAwesomeIcon icon={faEye} />
                                         </button>
                                     )}
                                     {informe.estado === 0 && (
