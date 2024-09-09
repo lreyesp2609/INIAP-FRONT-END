@@ -256,6 +256,25 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
     return cookieValue;
   }
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'align': ['', 'center', 'right', 'justify'] }],  // Opciones explícitas de alineación
+      ['link'],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'indent',
+    'align',  // Asegúrate de incluir 'align' en los formatos permitidos
+    'link'
+  ];
+
   if (loading) return <div className="text-center">Cargando...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
   if (!informe) return null;
@@ -362,15 +381,8 @@ const DetalleEditarInforme = ({ idInforme, onClose }) => {
             <ReactQuill
               value={informe['Productos Alcanzados'][0]}
               onChange={handleEditorChange}
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, false] }],
-                  ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                  [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-                  ['link', 'image'],
-                  ['clean'],
-                ],
-              }}
+              modules={modules}
+              formats={formats}
             />
           </div>
           <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
