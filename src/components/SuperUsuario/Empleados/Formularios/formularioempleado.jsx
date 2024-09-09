@@ -13,14 +13,10 @@ const FormularioEmpleado = ({
   const fechaActual = new Date().toISOString().split("T")[0];
   const [esCedulaExtranjera, setEsCedulaExtranjera] = useState(false); // Estado para el checkbox
 
-
   const handleCheckboxChange = (e) => {
     setEsCedulaExtranjera(e.target.checked); // Actualiza el estado correcto
     setCedulaExtranjera(e.target.checked); // Mantén esta llamada si es necesario en otro lugar
-
-    
   };
-  
 
   // Función para manejar el cambio en el campo de número de cédula
   const handleCedulaChange = (event) => {
@@ -29,7 +25,8 @@ const FormularioEmpleado = ({
       if (!esCedulaExtranjera && value.length > 10) {
         setErrors((prevErrors) => ({
           ...prevErrors,
-          numero_cedula: "El número de cédula no puede tener más de 10 caracteres",
+          numero_cedula:
+            "El número de cédula no puede tener más de 10 caracteres",
         }));
       } else {
         handleInputChange(event); // Llamar a la función para manejar el cambio de datos
@@ -42,7 +39,6 @@ const FormularioEmpleado = ({
       }));
     }
   };
-  
 
   // Función para manejar el cambio en el campo de nombres
   const handleNombresChange = (event) => {
@@ -135,13 +131,16 @@ const FormularioEmpleado = ({
   // Función para manejar el cambio en el campo de dirección
   const handleDireccionChange = (event) => {
     const { value } = event.target;
-    if (/^[a-zA-Z0-9\s,.\-áéíóúÁÉÍÓÚñÑ]*$/.test(value)) {
+
+    // Permitir una cadena vacía, letras, números, espacios y los caracteres especiales permitidos
+    if (/^[a-zA-Z0-9\s,.\-áéíóúÁÉÍÓÚñÑ]*$/.test(value) || value === "") {
       handleInputChange(event); // Llamar a la función para manejar el cambio de datos
       setErrors((prevErrors) => ({ ...prevErrors, direccion: "" })); // Limpiar el error si es válido
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        direccion: "La dirección debe contener solo letras y números",
+        direccion:
+          "La dirección debe contener solo letras, números y caracteres permitidos",
       }));
     }
   };
@@ -189,7 +188,7 @@ const FormularioEmpleado = ({
   };
 
   return (
-   <form id="employeeForm" className="space-y-8">
+    <form id="employeeForm" className="space-y-8">
       <div>
         <h3 className="text-xl font-semibold mb-4">Datos del Usuario</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -365,27 +364,27 @@ const FormularioEmpleado = ({
           </div>
         </div>
         <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Tipo de Licencia
-            </label>
-            <select
-              name="id_tipo_licencia"
-              value={formData.id_tipo_licencia}
-              onChange={handleInputChange}
-              className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
-            >
-              <option value="">Seleccione licencia</option>
-              {licencias &&
-                licencias.map((licencia) => (
-                  <option
-                    key={licencia.id_tipo_licencia}
-                    value={licencia.id_tipo_licencia}
-                  >
-                    {licencia.tipo_licencia}
-                  </option>
-                ))}
-            </select>
-          </div>
+          <label className="block text-sm font-medium text-gray-700">
+            Tipo de Licencia
+          </label>
+          <select
+            name="id_tipo_licencia"
+            value={formData.id_tipo_licencia}
+            onChange={handleInputChange}
+            className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
+          >
+            <option value="">Seleccione licencia</option>
+            {licencias &&
+              licencias.map((licencia) => (
+                <option
+                  key={licencia.id_tipo_licencia}
+                  value={licencia.id_tipo_licencia}
+                >
+                  {licencia.tipo_licencia}
+                </option>
+              ))}
+          </select>
+        </div>
       </div>
       <div>
         <h3 className="text-xl font-semibold mb-4">Datos de la Empresa</h3>
