@@ -24,6 +24,8 @@ const ListarSolicitudesCanceladas = () => {
   const [showPendingRequests, setShowPendingRequests] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [motivosCancelados, setMotivosCancelados] = useState([]);
+  const [view, setView] = useState('canceladas'); // Estado para manejar la vista actual  
+
 
   useEffect(() => {
     fetchSolicitudes();
@@ -147,13 +149,18 @@ const ListarSolicitudesCanceladas = () => {
     return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
   }
 
-  if (showAcceptedRequests) {
+
+  if (view === 'aceptadas') {
     return <ListarSolicitudesAceptadas />;
   }
 
-  if (showPendingRequests) {
+  if (view === 'pendientes') {
     return <ListarSolicitudesPendientes />;
   }
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
 
   return (
     <div className="p-4">
@@ -163,22 +170,20 @@ const ListarSolicitudesCanceladas = () => {
       {!showMostrarSolicitud && !showAcceptedRequests && !showPendingRequests && (
         <>
           <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
-              <button
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
-                onClick={handleShowPendingRequests}
-              >
-                Solicitudes Pendientes
-              </button>
-              <button
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                onClick={handleShowAcceptedRequests}
-                style={{ marginBottom: '16px' }}
-              >
-                Solicitudes Aceptadas
-              </button>
-            </div>
+              <h1 className="text-xl font-medium flex-1">Gestión de Solicitudes</h1>
+              <div className="flex items-center flex-1 justify-center">
+                <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+                <select
+                  id="view-select"
+                  value={view}
+                  onChange={handleViewChange}
+                  className="p-2 border border-gray-300 rounded"
+                >
+                  <option value="canceladas">Solicitudes Canceladas</option>
+                  <option value="pendientes">Solicitudes Pendientes</option>
+                  <option value="aceptadas">Solicitudes Aceptadas</option>
+                </select>
+              </div>
             <div className="flex space-x-2">
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -189,7 +194,6 @@ const ListarSolicitudesCanceladas = () => {
             </div>
           </div>
           <div className="mb-4">
-            <h2 className="text-xl font-light mb-4">Solicitudes Canceladas del Usuario</h2>
             <div className="flex mb-4">
               <input
                 type="text"

@@ -21,6 +21,7 @@ const ListarSolicitudesPendientesAdmin = () => {
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
   const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Nuevo estado para solicitudes canceladas
   const [isCreating, setIsCreating] = useState(false);
+  const [view, setView] = useState('pendientes');
 
 
   useEffect(() => {
@@ -101,13 +102,19 @@ const ListarSolicitudesPendientesAdmin = () => {
     setShowCancelledRequests(true);
   };
 
-  if (showAcceptedRequests) {
+
+  if (view === 'aceptadas') {
     return <ListarSolicitudesAceptadasAdmin />;
   }
 
-  if (showCancelledRequests) {
+
+  if (view === 'canceladas') {
     return <ListarSolicitudesCanceladasAdmin />;
   }
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
 
   return (
     <div className="p-4">
@@ -118,24 +125,21 @@ const ListarSolicitudesPendientesAdmin = () => {
         <>
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
-
+            <div className="flex items-center flex-1 justify-center">
+              <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+              <select
+                id="view-select"
+                value={view}
+                onChange={handleViewChange}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="pendientes">Solicitudes Pendientes</option>
+                <option value="aceptadas">Solicitudes Aceptadas</option>
+                <option value="canceladas">Solicitudes Canceladas</option>
+              </select>
+            </div>
           </div>
           <div className="mb-4">
-            <button
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-              onClick={handleShowAcceptedRequests}
-              style={{ marginBottom: '16px' }}
-            >
-              Solicitudes Aceptadas
-            </button>
-            <button
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
-              onClick={handleShowCancelledRequests}
-              style={{ marginBottom: '16px' }}
-            >
-              Solicitudes Canceladas
-            </button>
-            <h2 className="text-xl font-light mb-4">Solicitudes Pendientes del Usuario</h2>
             <div className="flex mb-4">
               <input
                 type="text"

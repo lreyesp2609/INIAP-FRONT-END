@@ -19,6 +19,7 @@ const ListarSolicitudesAceptadasAdmin = () => {
   const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Estado para solicitudes canceladas
   const [showPendingRequests, setShowPendingRequests] = useState(false); // Estado para solicitudes pendientes
   const [isCreating, setIsCreating] = useState(false); // Estado para crear solicitud
+  const [view, setView] = useState('aceptadas'); // Estado para manejar la vista actual  
 
   useEffect(() => {
     fetchSolicitudes();
@@ -99,13 +100,17 @@ const ListarSolicitudesAceptadasAdmin = () => {
   };
 
 
-  if (showCancelledRequests) {
+  if (view === 'canceladas') {
     return <ListarSolicitudesCanceladasAdmin />;
   }
 
-  if (showPendingRequests) {
+  if (view === 'pendientes') {
     return <ListarSolicitudesPendientesAdmin />;
   }
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
 
   return (
     <div className="p-4">
@@ -115,22 +120,21 @@ const ListarSolicitudesAceptadasAdmin = () => {
       {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
         <>
           <div className="mb-4">
-            <h2 className="text-xl font-light mb-4">Solicitudes Aceptadas del Usuario</h2>
-            <div className="flex space-x-2">
-              <button
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                onClick={handleShowPendingRequests}
-                style={{ marginBottom: '16px' }}
-              >
-                Solicitudes Pendientes
-              </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={handleShowCancelledRequests}
-                style={{ marginBottom: '16px' }}
-              >
-                Solicitudes Canceladas
-              </button>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-light mb-4">Gestión de Solicitudes</h2>
+              <div className="flex items-center flex-1 justify-center">
+                <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+                <select
+                  id="view-select"
+                  value={view}
+                  onChange={handleViewChange}
+                  className="p-2 border border-gray-300 rounded"
+                >
+                  <option value="aceptadas">Solicitudes Aceptadas</option>
+                  <option value="pendientes">Solicitudes Pendientes</option>
+                  <option value="canceladas">Solicitudes Canceladas</option>
+                </select>
+              </div>
             </div>
             <div className="flex mb-4">
               <input
