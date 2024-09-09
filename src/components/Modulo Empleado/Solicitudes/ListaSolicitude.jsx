@@ -227,7 +227,8 @@ const ListarSolicitudesPendientes = () => {
       {!showMostrarSolicitud &&
         !showAcceptedRequests &&
         !showCancelledRequests &&
-        !isCreating && (
+        !isCreating && 
+        !showEditModal && (
           <>
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-xl font-medium flex-1">
