@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Modal, Input } from 'antd';
 import API_URL from '../../../Config';
 
 const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
@@ -8,8 +9,9 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
     const [cuentaBancaria, setCuentaBancaria] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [showModal, setShowModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalAction, setModalAction] = useState('');
+    const [motivoCancelacion, setMotivoCancelacion] = useState('');
 
     useEffect(() => {
         const fetchSolicitud = async () => {
@@ -55,8 +57,13 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
         fetchSolicitud();
     }, [id_solicitud]);
 
-    const handleAction = async (action) => {
-        setShowModal(false);
+    const handleAction = async () => {
+        setIsModalVisible(false);
+
+        if (modalAction === 'cancelado' && !motivoCancelacion.trim()) {
+            setError('Por favor, ingrese un motivo de cancelación');
+            return;
+        }
 
         try {
             const token = localStorage.getItem('token');
@@ -65,26 +72,47 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                 return;
             }
 
-            const response = await fetch(`${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`, {
+            // Actualizamos el estado de la solicitud
+            const updateResponse = await fetch(`${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ estado_solicitud: action }),
+                body: JSON.stringify({
+                    estado_solicitud: modalAction,
+                }),
             });
 
-            if (response.ok) {
-                console.log(`Solicitud ${action} exitosamente`);
-                onClose(); // Close the component
-            } else {
-                const errorData = await response.json();
-                console.log(`Error al ${action} la solicitud:`, errorData);
-                setError(errorData.error || `Error al ${action} la solicitud`);
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json();
+                throw new Error(errorData.error || `Error al ${modalAction === 'aceptado' ? 'aceptar' : 'cancelar'} la solicitud`);
             }
+
+            if (modalAction === 'cancelado') {
+                // Si es cancelación, creamos el motivo de cancelación
+                const createMotivoCanceladoResponse = await fetch(`${API_URL}/Informes/crear-motivo-cancelado/${id_solicitud}/`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        motivo_cancelado: motivoCancelacion
+                    }),
+                });
+
+                if (!createMotivoCanceladoResponse.ok) {
+                    const errorData = await createMotivoCanceladoResponse.json();
+                    throw new Error(errorData.error || 'Error al crear el motivo de cancelación');
+                }
+            }
+
+            console.log(`Solicitud ${modalAction} exitosamente`);
+            onClose(); // Cerrar el componente
         } catch (error) {
-            console.log(`Error al ${action} la solicitud:`, error);
-            setError(`Error al ${action} la solicitud: ` + error.message);
+            console.log(`Error al ${modalAction} la solicitud:`, error);
+            setError(`Error al ${modalAction} la solicitud: ` + error.message);
         }
     };
 
@@ -359,13 +387,13 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                 <div className="flex justify-end mt-4">
                     <button
                         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-                        onClick={() => { setShowModal(true); setModalAction('aceptado'); }}
+                        onClick={() => { setIsModalVisible(true); setModalAction('aceptado'); }}
                     >
                         Aceptar
                     </button>
                     <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => { setShowModal(true); setModalAction('cancelado'); }}
+                        onClick={() => { setIsModalVisible(true); setModalAction('cancelado'); }}
                     >
                         Cancelar
                     </button>
@@ -377,29 +405,26 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                     </button>
                 </div>
             </div>
-            {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-black opacity-50 absolute inset-0"></div>
-                    <div className="bg-white p-8 rounded-lg shadow-lg z-10">
-                        <h2 className="text-2xl font-bold mb-4">Confirmación</h2>
-                        <p>¿Estás seguro de que deseas marcar como '{modalAction}' esta solicitud?</p>
-                        <div className="flex justify-end mt-4">
-                            <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                                onClick={() => handleAction(modalAction)}
-                            >
-                                Confirmar
-                            </button>
-                            <button
-                                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                                onClick={() => setShowModal(false)}
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal
+                title={modalAction === 'aceptado' ? "Confirmar Aceptación" : "Confirmar Cancelación"}
+                visible={isModalVisible}
+                onOk={handleAction}
+                onCancel={() => setIsModalVisible(false)}
+                okText="Confirmar"
+                cancelText="Cancelar"
+            >
+                <p>¿Estás seguro de que deseas {modalAction === 'aceptado' ? 'aceptar' : 'cancelar'} esta solicitud?</p>
+                {modalAction === 'cancelado' && (
+                    <Input.TextArea
+                        value={motivoCancelacion}
+                        onChange={(e) => setMotivoCancelacion(e.target.value)}
+                        placeholder="Ingrese el motivo de cancelación"
+                        rows={4}
+                        className="mt-4"
+                    />
+                )}
+                {error && <p className="text-red-500 mt-2">{error}</p>}
+            </Modal>
         </div>
     );
 };

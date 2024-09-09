@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEye, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faBell } from '@fortawesome/free-solid-svg-icons';
+import { Modal } from 'antd';
 import API_URL from '../../../Config';
 import MostrarSolicitudAdmin from './MostrarSolicitudDetalleAdmin';
 import ListarSolicitudesPendientesAdmin from './ListarSolicitudesAdmin';
@@ -19,7 +20,10 @@ const ListarSolicitudesCanceladasAdmin = () => {
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [showSelector, setShowSelector] = useState(true);
-  const [showPendingRequests, setShowPendingRequests] = useState(false); // Nuevo estado para mostrar solicitudes pendientes
+  const [showPendingRequests, setShowPendingRequests] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [motivosCancelados, setMotivosCancelados] = useState([]);
+  const [selectedSolicitudIdForModal, setSelectedSolicitudIdForModal] = useState(null);
 
   useEffect(() => {
     fetchSolicitudes();
@@ -102,6 +106,34 @@ const ListarSolicitudesCanceladasAdmin = () => {
     setIsCreating(false);
   };
 
+  const handleShowModal = async (id_solicitud) => {
+    setSelectedSolicitudIdForModal(id_solicitud);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+
+      const url = `${API_URL}/Informes/listar-motivos-cancelados/${id_solicitud}/`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Error al obtener motivos de cancelación');
+
+      const data = await response.json();
+      setMotivosCancelados(data.motivos_cancelados);
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error('Error:', error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedSolicitudIdForModal(null);
+    setMotivosCancelados([]);
+  };
 
   if (showAcceptedRequests) {
     return <ListarSolicitudesAceptadasAdmin />;
@@ -181,6 +213,13 @@ const ListarSolicitudesCanceladasAdmin = () => {
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
+                      <button
+                        className="p-2 bg-yellow-500 text-white rounded-full mr-2"
+                        title="Ver Motivos de Cancelación"
+                        onClick={() => handleShowModal(solicitud.id)}
+                      >
+                        <FontAwesomeIcon icon={faBell} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -206,6 +245,31 @@ const ListarSolicitudesCanceladasAdmin = () => {
           </div>
         </>
       )}
+      <Modal
+        title="Motivos de Cancelación"
+        visible={isModalVisible}
+        onOk={handleCloseModal}
+        onCancel={handleCloseModal}
+        footer={[
+          <button
+            key="close"
+            onClick={handleCloseModal}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Cerrar
+          </button>
+        ]}
+      >
+        {motivosCancelados.length > 0 ? (
+          <ul>
+            {motivosCancelados.map((motivo) => (
+              <li key={motivo.id_motivo_cancelado}>{motivo.motivo_cancelado}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No se encontraron motivos de cancelación para esta solicitud.</p>
+        )}
+      </Modal>
     </div>
   );
 };
