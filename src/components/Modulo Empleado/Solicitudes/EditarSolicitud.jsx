@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import API_URL from '../../../Config';
 
-const EditarSolicitudEmpleado = ({ onClose }) => {
-  const { id_solicitud } = useParams();
-  const navigate = useNavigate();
-
+const EditarSolicitudEmpleado = ({ onClose, id_solicitud }) => {
   const [motivo, setMotivo] = useState('');
   const [motivos, setMotivos] = useState([]);
   const [fechaSalida, setFechaSalida] = useState('');
@@ -452,12 +449,7 @@ const EditarSolicitudEmpleado = ({ onClose }) => {
               <div className="flex flex-wrap mb-2">
                 {empleadosSeleccionados.map((empleado, index) => (
                   <span key={index} className="mr-2 p-2 bg-gray-200 rounded flex items-center">
-                    {empleado}
-                    {empleado !== `${empleadoSesion.distintivo} ${empleadoSesion.nombres} ${empleadoSesion.apellidos}` && (
-                      <button type="button" onClick={() => handleRemoveEmpleado(index)} className="ml-2 px-2 text-red-500 hover:text-red-700">
-                        &times;
-                      </button>
-                    )}
+
                   </span>
                 ))}
               </div>
@@ -529,11 +521,7 @@ const EditarSolicitudEmpleado = ({ onClose }) => {
                           required
                         >
                           <option value="">Selecciona un transporte...</option>
-                          {transportes.map((transporte, idx) => (
-                            <option key={idx} value={transporte.placa}>
-                              {transporte.placa}
-                            </option>
-                          ))}
+
                         </select>
                       </div>
                       <div>
