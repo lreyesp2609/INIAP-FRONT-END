@@ -74,7 +74,6 @@ const CrearJustificacione = ({ idInforme, onClose }) => {
                     description: 'Justificación creada exitosamente.',
                 });
                 if (onClose) onClose(); // Cerrar el componente y regresar al anterior
-                navigate(-1); // Regresar a la página anterior
             } else {
                 const error = await response.json();
                 notification.error({

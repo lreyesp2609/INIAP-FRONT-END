@@ -3,8 +3,6 @@ import { FiUsers, FiMenu, FiTruck, FiList, FiMap } from 'react-icons/fi';
 import { MdEmojiTransportation } from "react-icons/md";
 import { IoDocumentText, IoCash ,IoDocumentAttachOutline,IoDocumentTextSharp,IoDocumentAttachSharp  } from "react-icons/io5";
 
-
-
 const LeftMenu = ({ user, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
 
