@@ -106,18 +106,16 @@ const InformesPendientes = () => {
             <h2 className="text-xl font-medium flex-1 text-center md:text-left mb-2 md:mb-0">
               Gestión de Informes
             </h2>
-            <div className="flex flex-col md:flex-row items-center md:justify-center flex-1">
-              <label htmlFor="view-select" className="mr-2 text-lg font-light">
-                Ver:
-              </label>
+            <div className="flex flex-col md:flex-row items-center md:items-center mb-2 md:mb-0">
+              <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
               <select
                 id="view-select"
                 value={view}
                 onChange={handleViewChange}
-                className="p-2 border border-gray-300 rounded mb-2 md:mb-0"
+                className="p-2 border border-gray-300 rounded"
               >
-                <option value="pendientes">Solicitudes con Informes Pendientes</option>
                 <option value="semi-terminados">Informes</option>
+                <option value="pendientes">Solicitudes con Informes Pendientes</option>
               </select>
             </div>
           </div>

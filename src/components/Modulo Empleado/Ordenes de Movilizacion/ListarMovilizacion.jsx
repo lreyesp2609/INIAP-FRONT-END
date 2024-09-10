@@ -269,34 +269,35 @@ const ListarMovilizacion = () => {
 
   return (
     <div className="p-4 mt-16">
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-4 sm:space-y-0">
-    <h2 className="text-2xl font-bold">Lista de Solicitudes de Movilización</h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+        <h2 className="text-xl font-medium mb-2 md:mb-0">Lista de Solicitudes de Movilización</h2>
 
-    <div className="flex items-center">
-      <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
-      <select
-        id="viewModeSelect"
-        value={viewMode}
-        onChange={(e) => setViewMode(e.target.value)}
-        className="p-2 border rounded"
-      >
-        <option value="pendientes">Solicitudes Pendientes</option>
-        <option value="canceladas">Solicitudes Canceladas</option>
-        <option value="historial">Historial de Solicitudes</option>
-        <option value="historialMovilizaciones">Historial de Movilizaciones</option>
-      </select>
-    </div>
+        <div className="flex flex-col md:flex-row items-center md:items-center mb-2 md:mb-0">
+          <label htmlFor="viewModeSelect" className="text-lg font-light mb-2 md:mb-0 md:mr-2">Ver:</label>
+          <select
+            id="viewModeSelect"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="p-2 border border-gray-300 rounded mb-2 md:mb-0"
+          >
+            <option value="pendientes">Solicitudes Pendientes</option>
+            <option value="canceladas">Solicitudes Canceladas</option>
+            <option value="historial">Historial de Solicitudes</option>
+            <option value="historialMovilizaciones">Historial de Movilizaciones</option>
+          </select>
+        </div>
 
-    <div className="flex items-center">
-      <button
-        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
-                  hover:border-blue-700 rounded"
-        onClick={handleClickSolicitarMovilizacion}
-      >
-        Solicitar Movilización
-      </button>
+     
+          <button
+            className="w-full md:w-auto bg-blue-500 
+            hover:bg-blue-600 text-white font-bold py-2 px-4 
+            border-b-4 border-blue-300 hover:border-blue-700 
+            rounded mt-2 md:mt-0"
+            onClick={handleClickSolicitarMovilizacion}
+          >
+            Solicitar Movilización
+          </button>
     </div>
-  </div>
 
   <div className="mb-4">
     <div className="flex flex-col md:flex-row">

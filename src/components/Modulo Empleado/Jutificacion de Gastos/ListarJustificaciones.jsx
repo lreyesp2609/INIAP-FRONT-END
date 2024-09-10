@@ -97,7 +97,7 @@ const ListarJustificacione = () => {
       <h2 className="text-xl font-medium flex-1 text-center md:text-left mb-2 md:mb-0">
         Gestión de Justificaciones de Gastos
       </h2>
-      <div className="flex flex-col md:flex-row items-center md:justify-center flex-1">
+      <div className="flex flex-col md:flex-row items-center md:items-center mb-2 md:mb-0">
         <label htmlFor="view-select" className="mr-2 text-lg font-light">
           Ver:
         </label>
