@@ -16,6 +16,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
   const [empleadoManual, setEmpleadoManual] = useState('');
   const [empleadoSesion, setEmpleadoSesion] = useState(null);
   const [vehiculos, setVehiculos] = useState([]);
+  const [bancos, setBancos] = useState([]);
 
   useEffect(() => {
     const fetchSolicitud = async () => {
@@ -121,10 +122,70 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
       }
     };
 
+    const fetchVehiculos = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Token no encontrado');
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/Informes/listar-vehiculos-habilitados/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setVehiculos(data.vehiculos);
+        } else {
+          const errorData = await response.json();
+          setError(errorData.error || 'Error al obtener los vehículos');
+        }
+      } catch (error) {
+        console.log('Error al obtener los vehículos:', error);
+        setError('Error al obtener los vehículos: ' + error.message);
+      }
+    };
+
+
+
+
+
+    const fetchBancos = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Token no encontrado');
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/Informes/listar-bancos/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setBancos(data.bancos);
+        } else {
+          const errorData = await response.json();
+          console.log('Error al obtener los bancos:', errorData);
+          setError(errorData.error || 'Error al obtener los bancos');
+        }
+      } catch (error) {
+        console.log('Error al obtener los bancos:', error);
+        setError('Error al obtener los bancos: ' + error.message);
+      }
+    };
+
     fetchSolicitud();
     fetchMotivos();
     fetchEmpleados();
     fetchVehiculos();
+    fetchBancos();
   }, [id_solicitud]);
 
   const handleInputChange = (e, field) => {
@@ -149,12 +210,10 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
   };
 
   const handleRemoveEmpleado = (index) => {
-    // Verificar si es el último empleado en la lista
     if (empleadosSeleccionados.length > 1) {
       const newEmpleados = empleadosSeleccionados.filter((_, i) => i !== index);
       setEmpleadosSeleccionados(newEmpleados);
     } else {
-      // Si es el último empleado, mostrar un mensaje de error
       setError("No se puede eliminar el último empleado de la lista.");
     }
   };
@@ -166,34 +225,6 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
       setMostrarInputManual(false);
     }
   };
-
-  const fetchVehiculos = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('Token no encontrado');
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/Informes/listar-vehiculos-habilitados/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setVehiculos(data.vehiculos);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al obtener los vehículos');
-      }
-    } catch (error) {
-      console.log('Error al obtener los vehículos:', error);
-      setError('Error al obtener los vehículos: ' + error.message);
-    }
-  };
-
 
   const addRuta = () => {
     setRutas([...rutas, {
@@ -594,21 +625,30 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
           <div className="flex flex-wrap -mx-2">
             <div className="w-full md:w-1/3 px-2 mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL BANCO:</label>
-              <input
-                type="text"
-                value={cuentaBancaria?.Banco}
-                onChange={(e) => handleCuentaBancariaChange('Banco', e.target.value)}
+              <select
+                value={cuentaBancaria?.id_banco || ''}
+                onChange={(e) => handleCuentaBancariaChange('id_banco', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="">Seleccione un banco</option>
+                {bancos.map((banco) => (
+                  <option key={banco.id_banco} value={banco.id_banco}>
+                    {banco.nombre_banco}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="w-full md:w-1/3 px-2 mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE CUENTA:</label>
-              <input
-                type="text"
-                value={cuentaBancaria?.['Tipo de Cuenta']}
+              <select
+                value={cuentaBancaria?.['Tipo de Cuenta'] || ''}
                 onChange={(e) => handleCuentaBancariaChange('Tipo de Cuenta', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="">Seleccione el tipo de cuenta</option>
+                <option value="Ahorros">Ahorros</option>
+                <option value="Corriente">Corriente</option>
+              </select>
             </div>
             <div className="w-full md:w-1/3 px-2 mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">No. DE CUENTA:</label>
