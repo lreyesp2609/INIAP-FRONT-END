@@ -13,6 +13,8 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
         facturas: [],
         total_factura: 0
     });
+    
+    const [includeHeaderFooter, setIncludeHeaderFooter] = useState(true); // Nuevo estado para el checkbox
 
     useEffect(() => {
         const fetchDetalle = async () => {
@@ -46,43 +48,19 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
     }, [idInforme]);
 
     const columns = [
-        {
-            title: 'Tipo de Documento',
-            dataIndex: 'tipo_documento',
-            key: 'tipo_documento',
-        },
-        {
-            title: 'Número de Factura',
-            dataIndex: 'numero_factura',
-            key: 'numero_factura',
-        },
-        {
-            title: 'Fecha de Emisión',
-            dataIndex: 'fecha_emision',
-            key: 'fecha_emision',
-        },
-        {
-            title: 'Detalle del Documento',
-            dataIndex: 'detalle_documento',
-            key: 'detalle_documento',
-        },
-        {
-            title: 'Valor ($)',
-            dataIndex: 'valor',
-            key: 'valor',
-            render: value => `${parseFloat(value).toFixed(2)}`,
-        },
+        { title: 'Tipo de Documento', dataIndex: 'tipo_documento', key: 'tipo_documento' },
+        { title: 'Número de Factura', dataIndex: 'numero_factura', key: 'numero_factura' },
+        { title: 'Fecha de Emisión', dataIndex: 'fecha_emision', key: 'fecha_emision' },
+        { title: 'Detalle del Documento', dataIndex: 'detalle_documento', key: 'detalle_documento' },
+        { title: 'Valor ($)', dataIndex: 'valor', key: 'valor', render: value => `${parseFloat(value).toFixed(2)}` },
     ];
 
-    const dataSource = detalle.facturas.map((factura, index) => ({
-        key: index,
-        ...factura,
-    }));
+    const dataSource = detalle.facturas.map((factura, index) => ({ key: index, ...factura }));
 
     const totalFacturas = parseFloat(detalle.total_factura).toFixed(2);
 
     const handleClose = () => {
-        if (onClose) onClose(); // Ejecutar la función pasada como prop para cerrar el componente actual
+        if (onClose) onClose();
     };
 
     const handleGeneratePDF = async () => {
@@ -91,24 +69,22 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
             const idUsuario = storedUser?.usuario?.id_usuario;
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token no encontrado');
-    
-            const response = await fetch(`${API_URL}/Informes/generar_pdf_facturas/${idUsuario}/${idInforme}/pdf/`, {
+
+            const response = await fetch(`${API_URL}/Informes/generar_pdf_facturas/${idUsuario}/${idInforme}/pdf/?includeHeaderFooter=${includeHeaderFooter}`, {
                 method: 'GET',
-                headers: {
-                    'Authorization': `${token}`,
-                },
+                headers: { 'Authorization': `${token}` },
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'Error en la respuesta del servidor');
             }
-    
+
             const contentType = response.headers.get('Content-Type');
             if (!contentType || !contentType.includes('application/pdf')) {
                 throw new Error('Respuesta inesperada del servidor');
             }
-    
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const popup = window.open('', '_blank');
@@ -122,7 +98,7 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
                 });
             }
             window.URL.revokeObjectURL(url);
-    
+
         } catch (error) {
             console.error('Error al generar o abrir el PDF:', error);
             notification.error({
@@ -191,6 +167,15 @@ const ListarDetalleJustificaciones = ({ idInforme, onClose }) => {
                 <div className="flex items-center mb-2">
                     <h3 className="text-medium">{detalle.cedula}</h3>
                 </div>
+            </div>
+            <div className="mb-12 flex items-center">
+                <input
+                    type="checkbox"
+                    checked={includeHeaderFooter}
+                    onChange={() => setIncludeHeaderFooter(!includeHeaderFooter)}
+                    className="mr-2"
+                />
+                <label>Incluir encabezado y pie de página</label>
             </div>
             <div className="text-center">
                 <button onClick={handleGeneratePDF} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Generar PDF</button>
