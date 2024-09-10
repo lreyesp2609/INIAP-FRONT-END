@@ -25,6 +25,7 @@ const ListarSolicitudesAceptadas = () => {
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
   const [motivoCancelacion, setMotivoCancelacion] = useState('');
   const [view, setView] = useState('aceptadas'); // Estado para manejar la vista actual  
+  const [includeHeaderFooter, setIncludeHeaderFooter] = useState(true); // Estado para incluir encabezado y pie de página
 
 
   const fetchSolicitudes = useCallback(async () => {
@@ -207,7 +208,7 @@ const ListarSolicitudesAceptadas = () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Token no encontrado');
 
-        const response = await fetch(`${API_URL}/Informes/generar_pdf_solicitud/${idUsuario}/${idSolicitud}/pdf/`, {
+        const response = await fetch(`${API_URL}/Informes/generar_pdf_solicitud/${idUsuario}/${idSolicitud}/pdf/?include_header_footer=${includeHeaderFooter}`, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`,
@@ -249,137 +250,198 @@ const ListarSolicitudesAceptadas = () => {
 
 
   return (
-    <div className="p-4">
-      {showMostrarSolicitud && selectedSolicitudId && (
-        <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
-      )}
-      {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
-        <>
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-medium flex-1">Gestión de Solicitudes</h2>
-              <div className="flex items-center flex-1 justify-center">
-                <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
-                <select
-                  id="view-select"
-                  value={view}
-                  onChange={handleViewChange}
-                  className="p-2 border border-gray-300 rounded"
-                >
-                  <option value="aceptadas">Solicitudes Aceptadas</option>
-                  <option value="pendientes">Solicitudes Pendientes</option>
-                  <option value="canceladas">Solicitudes Canceladas</option>
-                </select>
-              </div>
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleCreateSolicitud}
-              >
-                Crear Solicitud
-              </button>
+    <div className="p-4 mt-16">
+  {showMostrarSolicitud && selectedSolicitudId && (
+    <MostrarSolicitud id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+  )}
+  {!showMostrarSolicitud && !showCancelledRequests && !showPendingRequests && !isCreating && (
+    <>
+     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+        <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
+        <button
+          className="mt-2 md:mt-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
+                      hover:border-blue-700 rounded"
+          onClick={handleCreateSolicitud}
+        >
+          Crear Solicitud
+        </button>
+      </div>
+
+      
+
+      <div className="mb-4">
+             
+          <div className="mt-8 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+            <button
+              className="bg-yellow-600 hover:bg-yellow-500 
+              text-white font-bold py-2 px-4 
+              border-b-4 border-yellow-700 
+              hover:border-yellow-300 rounded"
+              onClick={handleShowPendingRequests}
+            >
+              Solicitudes Pendientes
+            </button>
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
+              onClick={handleShowCancelledRequests}
+            >
+              Solicitudes Canceladas
+            </button>
+          </div>
+        </div>
+        <div className="mb-4">
+        <h2 className="text-xl font-light mb-4">Solicitudes Aceptadas del Usuario</h2>   
+          <div className="flex flex-col md:flex-row items-start md:items-center">
+            
+            <input
+              type="text"
+              placeholder="Buscar por nombres, apellidos o cédula"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded mt-2 md:mt-0 md:ml-2"
+              onClick={handleClear}
+              style={{ minWidth: "80px" }}
+            >
+              Limpiar
+            </button>
             </div>
-            <div className="flex mb-4 mt-4">
-              <input
-                type="text"
-                placeholder="Buscar por número, motivo o estado"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          </div>
+
+      {/* formato movil */}
+      <div className="block lg:hidden">
+        {currentItems.map((solicitud) => (
+          <div key={solicitud['Codigo de Solicitud']} className="bg-white shadow-md rounded p-4 mb-4 border border-gray-300">
+            <p><strong>Código de Solicitud:</strong> {solicitud['Codigo de Solicitud']}</p>
+            <p><strong>Fecha Solicitud:</strong> {solicitud['Fecha Solicitud']}</p>
+            <p><strong>Motivo Movilización:</strong> {solicitud['Motivo']}</p>
+            <p><strong>Estado Solicitud:</strong> {solicitud['Estado']}</p>
+            <div className="mt-4 flex space-x-2">
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
-                onClick={handleClear}
+                className="p-2 bg-blue-500 text-white rounded-full"
+                title="Ver Solicitud de Movilización"
+                onClick={() => handleVer(solicitud.id)}
               >
-                Limpiar
+                <FontAwesomeIcon icon={faEye} />
+              </button>
+              <button
+                className="p-2 bg-red-500 text-white rounded-full"
+                title="Cancelar Solicitud de Movilización"
+                onClick={() => handleConfirmCancel(solicitud.id)}
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+              <button
+                className="p-2 bg-gray-500 text-white rounded-full"
+                title="Generar PDF"
+              >
+                <FontAwesomeIcon icon={faFilePdf} />
               </button>
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">Código de Solicitud</th>
-                  <th className="py-3 px-6 text-left">Fecha Solicitud</th>
-                  <th className="py-3 px-6 text-left">Motivo Movilización</th>
-                  <th className="py-3 px-6 text-left">Estado Solicitud</th>
-                  <th className="py-3 px-6 text-left">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm font-light">
-                {currentItems.map((solicitud) => (
-                  <tr key={solicitud['Codigo de Solicitud']} className="border-b border-gray-300 hover:bg-gray-100">
-                    <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud['Codigo de Solicitud']}</td>
-                    <td className="py-3 px-6 text-left">{solicitud['Fecha Solicitud']}</td>
-                    <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
-                    <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
-                    <td className="py-3 px-6 text-left">
-                      <button
-                        className="p-2 bg-blue-500 text-white rounded-full mr-2"
-                        title="Ver Solicitud de Movilización"
-                        onClick={() => handleVer(solicitud.id)}
-                      >
-                        <FontAwesomeIcon icon={faEye} />
-                      </button>
-                      <button
-                        className="p-2 bg-red-500 text-white rounded-full mr-2"
-                        title="Cancelar Solicitud de Movilización"
-                        onClick={() => handleConfirmCancel(solicitud.id)}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                      <button
-                        className="p-2 bg-gray-500 text-white rounded-full mr-2"
+        ))}
+      </div>
+
+      {/* Tabla para escritorio */}
+      <div className="hidden lg:block">
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th className="py-3 px-6 text-left">Código de Solicitud</th>
+                <th className="py-3 px-6 text-left">Fecha Solicitud</th>
+                <th className="py-3 px-6 text-left">Motivo Movilización</th>
+                <th className="py-3 px-6 text-left">Estado Solicitud</th>
+                <th className="py-3 px-6 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-600 text-sm font-light">
+              {currentItems.map((solicitud) => (
+                <tr key={solicitud['Codigo de Solicitud']} className="border-b border-gray-300 hover:bg-gray-100">
+                  <td className="py-3 px-6 text-left whitespace-nowrap">{solicitud['Codigo de Solicitud']}</td>
+                  <td className="py-3 px-6 text-left">{solicitud['Fecha Solicitud']}</td>
+                  <td className="py-3 px-6 text-left">{solicitud['Motivo']}</td>
+                  <td className="py-3 px-6 text-left">{solicitud['Estado']}</td>
+                  <td className="py-3 px-6 text-left">
+                    <button
+                      className="p-2 bg-blue-500 text-white rounded-full mr-2"
+                      title="Ver Solicitud de Movilización"
+                      onClick={() => handleVer(solicitud.id)}
+                    >
+                      <FontAwesomeIcon icon={faEye} />
+                    </button>
+                    <button
+                      className="p-2 bg-red-500 text-white rounded-full mr-2"
+                      title="Cancelar Solicitud de Movilización"
+                      onClick={() => handleConfirmCancel(solicitud.id)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                    <button
+                      className="p-2 bg-gray-500 text-white rounded-full mr-2"
                         onClick={() => handlePDF(solicitud.id)}
-                        title="Generar PDF"
-                      >
-                        <FontAwesomeIcon icon={faFilePdf} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-            </button>
-          </div>
-          <Modal
-            title="Motivo de cancelación"
-            visible={isModalVisible}
-            onOk={handleCancelConfirmed}
-            onCancel={() => {
-              setIsModalVisible(false);
-              setMotivoCancelacion('');
-            }}
-            okText="Confirmar"
-            cancelText="Cancelar"
-          >
-            <p>¿Está seguro de cancelar esta solicitud? Una vez realizada esta acción no se podrá revertir.</p>
-            <textarea
-              className="w-full p-2 mt-4 border border-gray-300 rounded"
-              rows="3"
-              placeholder="Ingrese el motivo de cancelación"
-              value={motivoCancelacion}
-              onChange={(e) => setMotivoCancelacion(e.target.value)}
-            ></textarea>
-          </Modal>
-        </>
-      )}
-    </div>
+                      title="Generar PDF"
+                    >
+                      <FontAwesomeIcon icon={faFilePdf} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          className="
+          bg-gray-500 hover:bg-gray-700 
+          text-white font-bold py-2 px-4 
+          border-b-4 border-gray-600 hover:border-gray-500 rounded"
+        >
+          Anterior
+        </button>
+        <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          className="bg-gray-500 hover:bg-gray-700 
+          text-white font-bold py-2 px-4 
+          border-b-4 border-gray-600 
+          hover:border-gray-500 rounded"
+        >
+          Siguiente
+        </button>
+      </div>
+
+      <Modal
+        title="Motivo de cancelación"
+        visible={isModalVisible}
+        onOk={handleCancelConfirmed}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setMotivoCancelacion('');
+        }}
+        okText="Confirmar"
+        cancelText="Cancelar"
+      >
+        <p>¿Está seguro de cancelar esta solicitud? Una vez realizada esta acción no se podrá revertir.</p>
+        <textarea
+          className="w-full p-2 mt-4 border border-gray-300 rounded"
+          rows="3"
+          placeholder="Ingrese el motivo de cancelación"
+          value={motivoCancelacion}
+          onChange={(e) => setMotivoCancelacion(e.target.value)}
+        ></textarea>
+      </Modal>
+    </>
+  )}
+</div>
+
   );
 };
 

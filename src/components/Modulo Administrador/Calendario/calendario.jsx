@@ -161,7 +161,7 @@ const Calendario = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 mt-16">
       {showCalendar && !showAgenda && !selectedOrden && (
         <>
           <CalendarControls

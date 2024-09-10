@@ -316,202 +316,280 @@ const ListarMovilizaciones = () => {
 
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Lista de Movilizaciones</h2>
-        
-        <div className="flex items-center">
-          <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
-          <select
-            id="viewModeSelect"
-            value={viewMode}
-            onChange={(e) => setViewMode(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="pendientes">Solicitudes Pendientes</option>
-            <option value="aprobadas">Solicitudes Aprobadas</option>
-            <option value="rechazadas">Solicitudes Rechazadas</option>
-            <option value="historial">Historial de Acciones</option>
-          </select>
-        </div>
-      </div>
+    <div className="p-4 mt-16">
+  <div className="flex items-center justify-between mb-4 flex-col sm:flex-row">
+    <h2 className="text-2xl font-bold">Lista de Movilizaciones</h2>
+    
+    <div className="flex items-center mt-4 sm:mt-0">
+      <label htmlFor="viewModeSelect" className="mr-2">Ver:</label>
+      <select
+        id="viewModeSelect"
+        value={viewMode}
+        onChange={(e) => setViewMode(e.target.value)}
+        className="p-2 border rounded"
+      >
+        <option value="pendientes">Solicitudes Pendientes</option>
+        <option value="aprobadas">Solicitudes Aprobadas</option>
+        <option value="rechazadas">Solicitudes Rechazadas</option>
+        <option value="historial">Historial de Acciones</option>
+      </select>
+    </div>
+  </div>
+
+  {error && <div className="text-red-500 mb-4">{error}</div>}
   
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <div className="mb-4">
-        <div className="flex">
-          <input
-            type="text"
-            placeholder="Buscar"
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
-            onClick={handleClear}
-            style={{ minWidth: '80px' }}
-          >
-            Limpiar
-          </button>
-        </div>
-      </div>
-  
-      <div className="overflow-x-auto mb-4">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-            {(viewMode !== 'pendientes') && (
+  <div className="mb-4">
+    <div className="flex flex-col sm:flex-row">
+      <input
+        type="text"
+        placeholder="Buscar"
+        value={searchTerm}
+        onChange={handleSearch}
+        className="w-full sm:w-auto p-2 border border-gray-300 rounded-l sm:rounded-l-none sm:rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded mt-2 sm:mt-0 sm:ml-2"
+        onClick={handleClear}
+        style={{ minWidth: '80px' }}
+      >
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  {/* Vista en tarjetas para dispositivos móviles */}
+  <div className="block md:hidden">
+    {filteredSolicitudes.length > 0 ? (
+      filteredSolicitudes.map((solicitud, index) => {
+        const motivosOrden = getMotivos(solicitud.id_orden_movilizacion);
+        return (
+          <div key={index} className="bg-white border border-gray-300 rounded-lg p-4 mb-4">
+            <div className="font-bold mb-2">Estado: {solicitud.estado_movilizacion}</div>
+            {viewMode !== 'pendientes' && (
+              <>
+                <div className="mb-2">Fecha: {motivosOrden.fecha}</div>
+                <div className="mb-2">Administrador: {getConductorName(motivosOrden.id_empleado)}</div>
+                <div className="mb-2">Observación: {motivosOrden.motivo}</div>
+              </>
+            )}
+            {viewMode !== 'pendientes' && viewMode !== 'rechazadas' && (
+              <div className="mb-2">Secuencial: {solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}</div>
+            )}
+            <div className="mb-2">Origen - Destino: {solicitud.lugar_origen_destino_movilizacion}</div>
+            <div className="mb-2">Motivo: {solicitud.motivo_movilizacion}</div>
+            <div className="mb-2">Fecha y hora de salida: {`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</div>
+            <div className="mb-2">Funcionario: {getConductorName(solicitud.id_empleado)}</div>
+            <div className="mb-2">Conductor: {getConductorName(solicitud.id_conductor)}</div>
+            <div className="mb-2">Placa de Vehículo: {getVehiculoPlaca(solicitud.id_vehiculo)}</div>
+            <div className="flex space-x-2 mt-2">
+              <button
+                className="p-2 bg-yellow-500 text-white rounded-full"
+                title="Ver"
+                onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+              >
+                <FaEye />
+              </button>
+              {solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1 && (
                 <>
-                  <th className="py-3 px-6 text-left">Fecha</th>
-                  <th className="py-3 px-6 text-left">Administrador</th>
-                  <th className="py-3 px-6 text-left">Observación</th>
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full"
+                    title="Aceptar"
+                    onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
+                  >
+                    <FaCheck />
+                  </button>
+                  <button
+                    className="p-2 bg-red-500 text-white rounded-full"
+                    title="Rechazar"
+                    onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                  >
+                    <FaBan />
+                  </button>
                 </>
               )}
-              <th className="py-3 px-6 text-left">Estado</th>
-              {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
-                <>
-                  <th className="py-3 px-6 text-left">Secuencial</th>
-                </>
+              {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Denegado') && (
+                <button
+                  className="p-2 bg-blue-500 text-white rounded-full"
+                  title="Editar Motivo"
+                  onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
+                >
+                  <FaEdit />
+                </button>
               )}
-              <th className="py-3 px-6 text-left">Origen - Destino</th>
-              <th className="py-3 px-6 text-left">Motivo</th>
-              <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
-              <th className="py-3 px-6 text-left">Funcionario</th>
-              <th className="py-3 px-6 text-left">Conductor</th>
-              <th className="py-3 px-6 text-left">Placa de Vehículo</th>
-              <th className="py-3 px-6 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {filteredSolicitudes.length > 0 ? (
-              filteredSolicitudes.map((solicitud, index) => {
-            
-                const motivosOrden = getMotivos(solicitud.id_orden_movilizacion);
-                return (
-                  <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
-                    {(viewMode !== 'pendientes') && (
-                      <>
-                        <td className="py-3 px-6 text-left">{motivosOrden.fecha}</td>
-                        <td className="py-3 px-6 text-left">{getConductorName(motivosOrden.id_empleado)}</td>
-                        <td className="py-3 px-6 text-left">{motivosOrden.motivo}</td>
-                      </>
-                    )}
-                    <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
-                    {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
-                      <>
-                        <td className="py-3 px-6 text-left">{solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
-                        </td>
-                      </>
-                    )}
-                    <td className="py-3 px-6 text-left">{solicitud.lugar_origen_destino_movilizacion}</td>
-                    <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
-                    <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
-                    <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_empleado)}</td>
-                    <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
-                    <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
-                    <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
+              {solicitud.estado_movilizacion === 'Aprobado' && (
+                <button
+                  className="p-2 bg-red-500 text-white rounded-full"
+                  title="Exportar PDF"
+                  onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
+                >
+                  <FaFilePdf />
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <div className="py-3 px-6 text-center">No se encontraron solicitudes.</div>
+    )}
+  </div>
+
+  {/* Vista en tabla para pantallas grandes */}
+  <div className="hidden md:block overflow-x-auto mb-4">
+    <table className="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr className="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+          {(viewMode !== 'pendientes') && (
+            <>
+              <th className="py-3 px-6 text-left">Fecha</th>
+              <th className="py-3 px-6 text-left">Administrador</th>
+              <th className="py-3 px-6 text-left">Observación</th>
+            </>
+          )}
+          <th className="py-3 px-6 text-left">Estado</th>
+          {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
+            <th className="py-3 px-6 text-left">Secuencial</th>
+          )}
+          <th className="py-3 px-6 text-left">Origen - Destino</th>
+          <th className="py-3 px-6 text-left">Motivo</th>
+          <th className="py-3 px-6 text-left">Fecha y hora de salida</th>
+          <th className="py-3 px-6 text-left">Funcionario</th>
+          <th className="py-3 px-6 text-left">Conductor</th>
+          <th className="py-3 px-6 text-left">Placa de Vehículo</th>
+          <th className="py-3 px-6 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody className="text-gray-600 text-sm font-light">
+        {filteredSolicitudes.length > 0 ? (
+          filteredSolicitudes.map((solicitud, index) => {
+            const motivosOrden = getMotivos(solicitud.id_orden_movilizacion);
+            return (
+              <tr key={index} className="border-b border-gray-300 hover:bg-gray-100">
+                {(viewMode !== 'pendientes') && (
+                  <>
+                    <td className="py-3 px-6 text-left">{motivosOrden.fecha}</td>
+                    <td className="py-3 px-6 text-left">{getConductorName(motivosOrden.id_empleado)}</td>
+                    <td className="py-3 px-6 text-left">{motivosOrden.motivo}</td>
+                  </>
+                )}
+                <td className="py-3 px-6 text-left">{solicitud.estado_movilizacion}</td>
+                {(viewMode !== 'pendientes') && (viewMode !== 'rechazadas') && (
+                  <td className="py-3 px-6 text-left">
+                    {solicitud.secuencial_orden_movilizacion === '0000' ? 'No asignado' : solicitud.secuencial_orden_movilizacion}
+                  </td>
+                )}
+                <td className="py-3 px-6 text-left">{solicitud.lugar_origen_destino_movilizacion}</td>
+                <td className="py-3 px-6 text-left">{solicitud.motivo_movilizacion}</td>
+                <td className="py-3 px-6 text-left">{`${solicitud.fecha_viaje} ${solicitud.hora_ida}`}</td>
+                <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_empleado)}</td>
+                <td className="py-3 px-6 text-left">{getConductorName(solicitud.id_conductor)}</td>
+                <td className="py-3 px-6 text-left">{getVehiculoPlaca(solicitud.id_vehiculo)}</td>
+                <td className="px-4 py-2 text-sm text-gray-600 flex space-x-2">
+                  <button 
+                    className="p-2 bg-yellow-500 text-white rounded-full"
+                    title="Ver"
+                    onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                  >
+                    <FaEye />
+                  </button>
+                  {solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1 && (
+                    <>
                       <button 
-                      className="p-2 bg-yellow-500 text-white rounded-full"
-                      title="Ver"
-                      onClick={() => handleVerClick(solicitud.id_orden_movilizacion)}
+                        className="p-2 bg-green-500 text-white rounded-full"
+                        title="Aceptar"
+                        onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
                       >
-                        <FaEye />
+                        <FaCheck />
                       </button>
-                      {solicitud.estado_movilizacion === 'Pendiente' && solicitud.habilitado === 1 && (
-                        <>
-                          <button 
-                          className="p-2 bg-green-500 text-white rounded-full"
-                          title="Aceptar"
-                          onClick={() => handleAccept(solicitud.id_orden_movilizacion)}
-                          >
-                            <FaCheck />
-                          </button>
-                          <button 
-                          className="p-2 bg-red-500 text-white rounded-full"
-                          title="Rechazar"
-                          onClick={() => handleReject(solicitud.id_orden_movilizacion)}
-                          >
-                            <FaBan />
-                          </button>
-                        </>
-                      )}
-                      {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Denegado') && (
-                      <button
+                      <button 
+                        className="p-2 bg-red-500 text-white rounded-full"
+                        title="Rechazar"
+                        onClick={() => handleReject(solicitud.id_orden_movilizacion)}
+                      >
+                        <FaBan />
+                      </button>
+                    </>
+                  )}
+                  {(solicitud.estado_movilizacion === 'Aprobado' || solicitud.estado_movilizacion === 'Denegado') && (
+                    <button
                       className="p-2 bg-blue-500 text-white rounded-full"
                       title="Editar Motivo"
                       onClick={() => handleEdit(solicitud.id_orden_movilizacion, motivosOrden.id_motivo_orden)}
-                      >
-                        <FaEdit />
-                      </button>
-                    )}
-                    {solicitud.estado_movilizacion === 'Aprobado' && (
-                      <button
+                    >
+                      <FaEdit />
+                    </button>
+                  )}
+                  {solicitud.estado_movilizacion === 'Aprobado' && (
+                    <button
                       className="p-2 bg-red-500 text-white rounded-full"
                       title="Exportar PDF"
                       onClick={() => handlePDF(solicitud.id_orden_movilizacion)}
-                      >
-                        <FaFilePdf />
-                      </button>
-                    )}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="10" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
+                    >
+                      <FaFilePdf />
+                    </button>
+                  )}
+                </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div>
-        {filteredSolicitudes.length > 0 && (
-          <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </button>
-            <span>{`Página ${currentPage} de ${totalPages}`}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-            </button>
-          </div>
+            );
+          })
+        ) : (
+          <tr>
+            <td colSpan="10" className="py-3 px-6 text-center">No se encontraron solicitudes.</td>
+          </tr>
         )}
-      </div>
-  
-      <AprobarSolicitudesModal
-        ordenId={selectedOrderId}
-        userId={userId}
-        visible={showAprobarModal}
-        onAprobar={handleConfirmAprobar}
-        onClose={handleCancelModal}
-      />
-      <RechazarSolicitudesModal
-        ordenId={selectedOrderId}
-        userId={userId}
-        visible={showRechazarModal}
-        onRechazar={handleConfirmRechazar}
-        onClose={handleCancelModal}
-      />
+      </tbody>
+    </table>
+  </div>
 
-      <EditarSolicitudMovilizacion
-        ordenId={selectedOrderId}
-        userId={userId}
-        motivoId={selectedMotivoId}
-        visible={showEditarModal}
-        onClose={handleCloseEditarModal}
-        onEditar={fetchSolicitudes}
-      />
+  <div>
+    {filteredSolicitudes.length > 0 && (
+       <div className="flex flex-col md:flex-row justify-between items-center mt-4 space-y-4 md:space-y-0">
+       <button
+         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+         className="
+           bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+       >
+         Anterior
+       </button>
+       <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+       <button
+         onClick={() =>
+           setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+         }
+         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
+       >
+         Siguiente
+       </button>
+     </div>
+    )}
+  </div>
 
-    </div>
+  <AprobarSolicitudesModal
+    ordenId={selectedOrderId}
+    userId={userId}
+    visible={showAprobarModal}
+    onAprobar={handleConfirmAprobar}
+    onClose={handleCancelModal}
+  />
+  <RechazarSolicitudesModal
+    ordenId={selectedOrderId}
+    userId={userId}
+    visible={showRechazarModal}
+    onRechazar={handleConfirmRechazar}
+    onClose={handleCancelModal}
+  />
+
+  <EditarSolicitudMovilizacion
+    ordenId={selectedOrderId}
+    userId={userId}
+    motivoId={selectedMotivoId}
+    visible={showEditarModal}
+    onClose={handleCloseEditarModal}
+    onEditar={fetchSolicitudes}
+  />
+</div>
+
+
   );
   
 };
