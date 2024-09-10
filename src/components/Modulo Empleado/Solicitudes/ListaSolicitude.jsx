@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faTrash,
-  faFileEdit,
-  faEdit,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye,faTrash,faFileEdit } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Input } from "antd";
 import MostrarSolicitud from "./MostrarSolicitudDetalle";
 import ListarSolicitudesAceptadas from "./ListarSolicitudesAceptado";
@@ -27,7 +22,6 @@ const ListarSolicitudesPendientes = () => {
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
   const [showCancelledRequests, setShowCancelledRequests] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [motivoCancelacion, setMotivoCancelacion] = useState("");
