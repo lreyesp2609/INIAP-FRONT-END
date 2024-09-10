@@ -1,118 +1,126 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf, faFileEdit } from '@fortawesome/free-solid-svg-icons';
-import API_URL from '../../../Config';
-import ListarJustificacione from './ListarJustificaciones';
-import ListarEditarDetalleFacturas from './ListarEditarFacturas';
-import ListarDetalleJustificaciones from './ListarDetalleJutificacion';
+import React, { useState, useEffect, useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilePdf, faFileEdit } from "@fortawesome/free-solid-svg-icons";
+import API_URL from "../../../Config";
+import ListarJustificacione from "./ListarJustificaciones";
+import ListarEditarDetalleFacturas from "./ListarEditarFacturas";
+import ListarDetalleJustificaciones from "./ListarDetalleJutificacion";
 
 const ListarFacturasInformes = () => {
-    const [informes, setInformes] = useState([]);
-    const [filteredInformes, setFilteredInformes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
-    const [view, setView] = useState('facturas-informes');
-    const [editingInforme, setEditingInforme] = useState(null);
-    const [pdfInforme, setPdfInforme] = useState(null); // Estado para el PDF
+  const [informes, setInformes] = useState([]);
+  const [filteredInformes, setFilteredInformes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [view, setView] = useState("facturas-informes");
+  const [editingInforme, setEditingInforme] = useState(null);
+  const [pdfInforme, setPdfInforme] = useState(null); // Estado para el PDF
 
-    const fetchInformes = useCallback(async () => {
-        try {
-            const storedUser = JSON.parse(localStorage.getItem('user'));
-            const idUsuario = storedUser.usuario.id_usuario;
-            const token = localStorage.getItem('token');
-            if (!token) throw new Error('Token no encontrado');
+  const fetchInformes = useCallback(async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const idUsuario = storedUser.usuario.id_usuario;
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token no encontrado");
 
-            const url = `${API_URL}/Informes/listar-facturas/${idUsuario}/`;
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!response.ok) throw new Error('Error al obtener informes');
+      const url = `${API_URL}/Informes/listar-facturas/${idUsuario}/`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Error al obtener informes");
 
-            const data = await response.json();
-            setInformes(data.informes);
-            setFilteredInformes(data.informes);
-            setLoading(false);
-        } catch (error) {
-            setError(error.message);
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchInformes();
-    }, [fetchInformes]);
-
-    const handleSearch = (event) => {
-        const searchValue = event.target.value.toLowerCase();
-        setSearchTerm(searchValue);
-
-        const filtered = informes.filter(
-            (informe) =>
-                informe.codigo_solicitud.toLowerCase().includes(searchValue) ||
-                informe.fecha_informe.toLowerCase().includes(searchValue) ||
-                informe.estado_factura.toString().includes(searchValue)
-        );
-
-        setFilteredInformes(filtered);
-        setCurrentPage(1);
-    };
-
-    const handleClear = () => {
-        setSearchTerm('');
-        setFilteredInformes(informes);
-        setCurrentPage(1);
-    };
-
-    const handleViewChange = (event) => {
-        setView(event.target.value);
-    };
-
-    const handleEditClick = (idInforme) => {
-        setEditingInforme(idInforme);
-    };
-
-    const handlePDFClick = (idInforme) => {
-        setPdfInforme(idInforme); // Actualiza el estado para el PDF
-    };
-
-    const handleCloseEdit = () => {
-        setEditingInforme(null);
-    };
-
-    if (loading) return <div>Cargando...</div>;
-    if (error) return <div>Error: {error}</div>;
-
-    if (pdfInforme !== null) {
-        return (
-            <ListarDetalleJustificaciones
-                idInforme={pdfInforme} 
-                onClose={() => setPdfInforme(null)} 
-            />
-        );
+      const data = await response.json();
+      setInformes(data.informes);
+      setFilteredInformes(data.informes);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
     }
+  }, []);
 
-    if (view === 'pendientes') {
-        return <ListarJustificacione />;
-    }
+  useEffect(() => {
+    fetchInformes();
+  }, [fetchInformes]);
 
-    if (editingInforme !== null) {
-        return (
-            <ListarEditarDetalleFacturas 
-                idInforme={editingInforme}
-                onClose={handleCloseEdit}
-            />
-        );
-    }
+  const handleSearch = (event) => {
+    const searchValue = event.target.value.toLowerCase();
+    setSearchTerm(searchValue);
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredInformes.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
+    const filtered = informes.filter(
+      (informe) =>
+        informe.codigo_solicitud.toLowerCase().includes(searchValue) ||
+        informe.fecha_informe.toLowerCase().includes(searchValue) ||
+        informe.estado_factura.toString().includes(searchValue)
+    );
+
+    setFilteredInformes(filtered);
+    setCurrentPage(1);
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    setFilteredInformes(informes);
+    setCurrentPage(1);
+  };
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
+
+  const handleEditClick = (idInforme) => {
+    setEditingInforme(idInforme);
+  };
+
+  const handlePDFClick = (idInforme) => {
+    setPdfInforme(idInforme); // Actualiza el estado para el PDF
+  };
+
+  const handleCloseEdit = () => {
+    setEditingInforme(null);
+  };
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  if (pdfInforme !== null) {
+    return (
+      <ListarDetalleJustificaciones
+        idInforme={pdfInforme}
+        onClose={() => setPdfInforme(null)}
+      />
+    );
+  }
+
+  const handleUpdate = () => {
+    fetchInformes(); // Vuelve a cargar los informes después de una justificación
+  };
+
+  if (view === "pendientes") {
+    return <ListarJustificacione />;
+  }
+
+  if (editingInforme !== null) {
+    return (
+      <ListarEditarDetalleFacturas
+        idInforme={editingInforme}
+        onClose={handleCloseEdit}
+        onUpdate={handleUpdate}
+      />
+    );
+  }
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredInformes.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredInformes.length / itemsPerPage);
 
     return (
         <div className="p-4 mt-16">

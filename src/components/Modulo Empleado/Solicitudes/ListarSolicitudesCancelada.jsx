@@ -24,6 +24,8 @@ const ListarSolicitudesCanceladas = () => {
   const [showPendingRequests, setShowPendingRequests] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [motivosCancelados, setMotivosCancelados] = useState([]);
+  const [view, setView] = useState('canceladas'); // Estado para manejar la vista actual  
+
 
   useEffect(() => {
     fetchSolicitudes();
@@ -147,13 +149,18 @@ const ListarSolicitudesCanceladas = () => {
     return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
   }
 
-  if (showAcceptedRequests) {
+
+  if (view === 'aceptadas') {
     return <ListarSolicitudesAceptadas />;
   }
 
-  if (showPendingRequests) {
+  if (view === 'pendientes') {
     return <ListarSolicitudesPendientes />;
   }
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
 
   return (
     <div className="p-4 mt-16">
@@ -315,6 +322,7 @@ const ListarSolicitudesCanceladas = () => {
     visible={isModalVisible}
     onOk={handleModalClose}
     onCancel={handleModalClose}
+        placeholder="Ingrese el motivo de cancelación"
     footer={[
       <Button key="close" onClick={handleModalClose}>
         Cerrar

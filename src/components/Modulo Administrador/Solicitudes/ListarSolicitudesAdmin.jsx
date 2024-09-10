@@ -21,6 +21,7 @@ const ListarSolicitudesPendientesAdmin = () => {
   const [showAcceptedRequests, setShowAcceptedRequests] = useState(false);
   const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Nuevo estado para solicitudes canceladas
   const [isCreating, setIsCreating] = useState(false);
+  const [view, setView] = useState('pendientes');
 
 
   useEffect(() => {
@@ -101,59 +102,59 @@ const ListarSolicitudesPendientesAdmin = () => {
     setShowCancelledRequests(true);
   };
 
-  if (showAcceptedRequests) {
+
+  if (view === 'aceptadas') {
     return <ListarSolicitudesAceptadasAdmin />;
   }
 
-  if (showCancelledRequests) {
+
+  if (view === 'canceladas') {
     return <ListarSolicitudesCanceladasAdmin />;
   }
 
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
+
   return (
-    <div className="p-4 mt-16">
-  {showMostrarSolicitud && selectedSolicitudId && (
-    <MostrarSolicitudPendienteAdmin
-      id_solicitud={selectedSolicitudId}
-      onClose={handleCloseMostrarSolicitud}
-    />
-  )}
-  {!showMostrarSolicitud && !showAcceptedRequests && !showCancelledRequests && !isCreating && (
-    <>
-     <div className="mb-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
-      </div>
-      <div className="mt-8 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
-            <button
-            className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded"
-            onClick={handleShowAcceptedRequests}
-            >
-              Solicitudes Aceptadas
-            </button>
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded"
-              onClick={handleShowCancelledRequests}
-            >
-              Solicitudes Canceladas
-            </button>
+    <div className="p-4">
+      {showMostrarSolicitud && selectedSolicitudId && (
+        <MostrarSolicitudPendienteAdmin id_solicitud={selectedSolicitudId} onClose={handleCloseMostrarSolicitud} />
+      )}
+      {!showMostrarSolicitud && !showAcceptedRequests && !showCancelledRequests && !isCreating && (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
+            <div className="flex items-center flex-1 justify-center">
+              <label htmlFor="view-select" className="mr-2 text-lg font-light">Ver:</label>
+              <select
+                id="view-select"
+                value={view}
+                onChange={handleViewChange}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="pendientes">Solicitudes Pendientes</option>
+                <option value="aceptadas">Solicitudes Aceptadas</option>
+                <option value="canceladas">Solicitudes Canceladas</option>
+              </select>
+            </div>
           </div>
-        </div>
           <div className="mb-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center">
-            <input
-              type="text"
-              placeholder="Buscar por nombres, apellidos o cédula"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 hover:border-blue-700 rounded mt-2 md:mt-0 md:ml-2"
-              onClick={handleClear}
-              style={{ minWidth: "80px" }}
-            >
-              Limpiar
-            </button>
+            <div className="flex mb-4">
+              <input
+                type="text"
+                placeholder="Buscar por número, motivo o estado"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
+                onClick={handleClear}
+                style={{ minWidth: '80px' }}
+              >
+                Limpiar
+              </button>
             </div>
           </div>
       

@@ -24,6 +24,9 @@ const ListarSolicitudesAceptadas = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
   const [motivoCancelacion, setMotivoCancelacion] = useState('');
+  const [view, setView] = useState('aceptadas'); // Estado para manejar la vista actual  
+  const [includeHeaderFooter, setIncludeHeaderFooter] = useState(true); // Estado para incluir encabezado y pie de página
+
 
   const fetchSolicitudes = useCallback(async () => {
     try {
@@ -185,13 +188,66 @@ const ListarSolicitudesAceptadas = () => {
     return <CrearSolicitud onClose={handleCloseCreateSolicitud} />;
   }
 
-  if (showCancelledRequests) {
+
+  if (view === 'pendientes') {
+    return <ListarSolicitudesPendientes />;
+  }
+
+  if (view === 'canceladas') {
     return <ListarSolicitudesCanceladas />;
   }
 
-  if (showPendingRequests) {
-    return <ListarSolicitudesPendientes />;
-  }
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
+
+  const handlePDF = async (idSolicitud) => {
+    try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const idUsuario = storedUser?.usuario?.id_usuario;
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token no encontrado');
+
+        const response = await fetch(`${API_URL}/Informes/generar_pdf_solicitud/${idUsuario}/${idSolicitud}/pdf/?include_header_footer=${includeHeaderFooter}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Error en la respuesta del servidor');
+        }
+
+        const contentType = response.headers.get('Content-Type');
+        if (!contentType || !contentType.includes('application/pdf')) {
+            throw new Error('Respuesta inesperada del servidor');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const popup = window.open('', '_blank');
+        if (popup) {
+            popup.location.href = url;
+        } else {
+            notification.error({
+                message: 'Error',
+                description: 'No se pudo abrir la ventana del PDF. Por favor, permite las ventanas emergentes.',
+                placement: 'topRight',
+            });
+        }
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error al generar o abrir el PDF:', error);
+        notification.error({
+            message: 'Error',
+            description: `Error al generar o abrir el PDF: ${error.message}`,
+            placement: 'topRight',
+        });
+    }
+};
+
 
   return (
     <div className="p-4 mt-16">
@@ -325,6 +381,7 @@ const ListarSolicitudesAceptadas = () => {
                     </button>
                     <button
                       className="p-2 bg-gray-500 text-white rounded-full mr-2"
+                        onClick={() => handlePDF(solicitud.id)}
                       title="Generar PDF"
                     >
                       <FontAwesomeIcon icon={faFilePdf} />
@@ -362,7 +419,7 @@ const ListarSolicitudesAceptadas = () => {
       </div>
 
       <Modal
-        title="Confirmar Cancelación"
+        title="Motivo de cancelación"
         visible={isModalVisible}
         onOk={handleCancelConfirmed}
         onCancel={() => {

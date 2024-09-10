@@ -19,6 +19,7 @@ const ListarSolicitudesAceptadasAdmin = () => {
   const [showCancelledRequests, setShowCancelledRequests] = useState(false); // Estado para solicitudes canceladas
   const [showPendingRequests, setShowPendingRequests] = useState(false); // Estado para solicitudes pendientes
   const [isCreating, setIsCreating] = useState(false); // Estado para crear solicitud
+  const [view, setView] = useState('aceptadas'); // Estado para manejar la vista actual  
 
   useEffect(() => {
     fetchSolicitudes();
@@ -99,13 +100,17 @@ const ListarSolicitudesAceptadasAdmin = () => {
   };
 
 
-  if (showCancelledRequests) {
+  if (view === 'canceladas') {
     return <ListarSolicitudesCanceladasAdmin />;
   }
 
-  if (showPendingRequests) {
+  if (view === 'pendientes') {
     return <ListarSolicitudesPendientesAdmin />;
   }
+
+  const handleViewChange = (event) => {
+    setView(event.target.value);
+  };
 
   return (
     <div className="p-4 mt-16">

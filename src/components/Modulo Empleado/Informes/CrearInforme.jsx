@@ -178,6 +178,25 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
     }
   };
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'align': ['', 'center', 'right', 'justify'] }],  // Opciones explícitas de alineación
+      ['link'],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'indent',
+    'align',  // Asegúrate de incluir 'align' en los formatos permitidos
+    'link'
+  ];
+
   if (loading) return <div className="text-center">Cargando...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
@@ -272,91 +291,78 @@ const CrearInformes = ({ idSolicitud, onClose }) => {
             <ReactQuill
               value={formData.informeActividades}
               onChange={handleEditorChange}
-              modules={{
-                toolbar: [
-                  [{ 'header': [1, 2, false] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-                  ['link'],
-                  ['clean']
-                ],
-              }}
+              modules={modules}
+              formats={formats}
             />
           </div>
           <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-            <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">INTINERARIO</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SALIDA</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">LLEGADA</h2>
-                </div>
+            <div className="mb-4 flex">
+              <div className="mr-4 w-1/4">
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">INTINERARIO</h2>
+              </div>
+              <div className="mr-4 w-1/2">
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">SALIDA</h2>
+              </div>
+              <div className="mr-4 w-1/2">
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">LLEGADA</h2>
               </div>
             </div>
-            <div className="mb-6 border-2 border-gray-600 rounded-lg p -4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <h2 className="block text-gray-700 text -sm font-bold mb-2 text-center">FECHA</h2>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">dd-mmm-aaaa</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="date"
-                    name="fecha_salida_informe"
-                    value={formData.fecha_salida_informe}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="date"
-                    name="fecha_llegada_informe"
-                    value={formData.fecha_llegada_informe}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
+            <div className="mb-4 flex">
+              <div className="mr-4 w-1/4">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <h2 className="block text-gray-700 text -sm font-bold mb-2 text-center">FECHA</h2>
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">dd-mmm-aaaa</h2>
+              </div>
+              <div className="mr-4 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <input
+                  type="date"
+                  name="fecha_salida_informe"
+                  value={formData.fecha_salida_informe}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+              <div className="mr-4 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <input
+                  type="date"
+                  name="fecha_llegada_informe"
+                  value={formData.fecha_llegada_informe}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
               </div>
             </div>
-            <div className="mb-4 border-2 border-gray-600 rounded-lg p-4">
-              <div className="mb-4 flex">
-                <div className="mr-4 w-1/4">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">HORA</h2>
-                  <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">hh-mm</h2>
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="time"
-                    name="hora_salida_informe"
-                    value={formData.hora_salida_informe}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div className="mr-4 w-1/2">
-                  <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
-                  <input
-                    type="time"
-                    name="hora_llegada_informe"
-                    value={formData.hora_llegada_informe}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
+            <div className="mb-4 flex">
+              <div className="mr-4 w-1/4">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">HORA</h2>
+                <h2 className="block text-gray-700 text-sm font-bold mb-2 text-center">hh-mm</h2>
+              </div>
+              <div className="mr-4 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <input
+                  type="time"
+                  name="hora_salida_informe"
+                  value={formData.hora_salida_informe}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+              <div className="mr-4 w-1/2">
+                <label className="block text-gray-700 text-sm font-bold mb-1">{'\u00A0'}</label>
+                <input
+                  type="time"
+                  name="hora_llegada_informe"
+                  value={formData.hora_llegada_informe}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
               </div>
             </div>
           </div>
