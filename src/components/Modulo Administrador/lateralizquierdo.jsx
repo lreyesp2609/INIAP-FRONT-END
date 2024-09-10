@@ -41,32 +41,23 @@ const LeftMenu = ({ user, onNavigate }) => {
 
   return (
     <div>
-      <div className="md:hidden fixed top-0 left-0 w-full z-50 bg-[#169658]">
-        <div className="flex items-center justify-between px-4 py-3">
-          <button 
+      {/* Mobile view */}
+      <div className="md:hidden fixed top-0 left-0 w-full z-50">
+        {/* Circle button on the left of the screen */}
+        {!isOpen && (
+          <button
             onClick={() => setIsOpen(!isOpen)} 
-            className="fixed top-40 left-2 z-5 bg-[#169658] p-2 rounded-full focus:outline-none"
+            className="fixed top-1/2 left-2 transform -translate-y-1/2 z-50 bg-[#169658] p-4 rounded-full focus:outline-none shadow-lg"
           >
             <FiMenu className="w-8 h-8 text-white" />
           </button>
-          <div className="flex flex-col items-start space-y-2">
-            {menuItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  item.onClick();
-                  setIsOpen(false);
-                }}
-                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
-              >
-                {item.icon}
-                <span className="text-white text-sm">{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 overflow-y-auto pt-16`}>
-          <div className="flex flex-col items-center space-y-6 w-full">
+        )}
+
+        {/* Sidebar */}
+        <div 
+          className={`fixed inset-0 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} z-40 bg-[#169658] w-3/4 h-full`}
+        >
+          <div className="flex flex-col items-center space-y-6 w-full pt-16">
             {menuItems.map((item, index) => (
               <button
                 key={index}
@@ -83,6 +74,7 @@ const LeftMenu = ({ user, onNavigate }) => {
           </div>
         </div>
 
+        {/* Dark overlay to close sidebar */}
         {isOpen && (
           <div 
             className="fixed inset-0 bg-black opacity-50 z-30" 
@@ -91,6 +83,7 @@ const LeftMenu = ({ user, onNavigate }) => {
         )}
       </div>
 
+      {/* Desktop view */}
       <div className="hidden md:flex md:flex-col md:w-1/6 p-4 text-white justify-start items-center fixed left-0 top-0 h-full z-40 bg-[#169658]">
         <div className="flex flex-col items-center space-y-6 mt-20 w-full">
           {menuItems.map((item, index) => (

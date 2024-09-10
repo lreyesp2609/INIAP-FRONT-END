@@ -28,7 +28,7 @@ const LeftMenu = ({ user, onNavigate }) => {
           <div className="flex flex-col items-center space-y-6 w-full">
             <button 
               onClick={() => {
-                onNavigate('gestion-movilizaciones');
+                onNavigate('gestion-empleados');
                 setIsOpen(false);
               }} 
               className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out"
