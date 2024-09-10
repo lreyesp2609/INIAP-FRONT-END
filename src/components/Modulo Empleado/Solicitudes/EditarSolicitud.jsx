@@ -15,6 +15,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
   const [mostrarInputManual, setMostrarInputManual] = useState(false);
   const [empleadoManual, setEmpleadoManual] = useState('');
   const [empleadoSesion, setEmpleadoSesion] = useState(null);
+  const [vehiculos, setVehiculos] = useState([]);
 
   useEffect(() => {
     const fetchSolicitud = async () => {
@@ -123,6 +124,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
     fetchSolicitud();
     fetchMotivos();
     fetchEmpleados();
+    fetchVehiculos();
   }, [id_solicitud]);
 
   const handleInputChange = (e, field) => {
@@ -162,6 +164,55 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
       setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoManual]);
       setEmpleadoManual('');
       setMostrarInputManual(false);
+    }
+  };
+
+  const fetchVehiculos = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Informes/listar-vehiculos-habilitados/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setVehiculos(data.vehiculos);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al obtener los vehículos');
+      }
+    } catch (error) {
+      console.log('Error al obtener los vehículos:', error);
+      setError('Error al obtener los vehículos: ' + error.message);
+    }
+  };
+
+
+  const addRuta = () => {
+    setRutas([...rutas, {
+      'Tipo de Transporte': '',
+      'Nombre del Transporte': '',
+      'Ruta': '',
+      'Fecha de Salida': '',
+      'Hora de Salida': '',
+      'Fecha de Llegada': '',
+      'Hora de Llegada': ''
+    }]);
+  };
+
+  const removeRuta = (index) => {
+    if (rutas.length > 1) {
+      const updatedRutas = rutas.filter((_, i) => i !== index);
+      setRutas(updatedRutas);
+    } else {
+      setError("Debe haber al menos una ruta.");
     }
   };
 
@@ -438,81 +489,104 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
         </div>
         <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">TRANSPORTE</h2>
         <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
-          <div className="mb-3 flex">
-            <div className="mb-3">
-              {rutas.map((ruta, index) => (
-                <div key={index} className="mb-6 border-b pb-4">
-                  <h3 className="text-lg font-bold mb-2">Ruta {index + 1}</h3>
-                  <div className="mb-3 grid grid-cols-12 gap-2">
-                    <div className="col-span-3">
-                      <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
-                      <input
-                        type="text"
-                        value={ruta['Tipo de Transporte']}
-                        onChange={(e) => handleRutaChange(index, 'Tipo de Transporte', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      <label className="block text-gray-700 text-sm font-bold mb-2 h-10">NOMBRE DEL TRANSPORTE</label>
-                      <input
-                        type="text"
-                        value={ruta['Nombre del Transporte']}
-                        onChange={(e) => handleRutaChange(index, 'Nombre del Transporte', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="col-span-6">
-                      <label className="block text-gray-700 text-sm font-bold mb-2 h-10">RUTA</label>
-                      <input
-                        type="text"
-                        value={ruta['Ruta']}
-                        onChange={(e) => handleRutaChange(index, 'Ruta', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+          <div className="mb-3">
+            {rutas.map((ruta, index) => (
+              <div key={index} className="mb-6 border-b pb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-bold">Ruta {index + 1}</h3>
+                  {rutas.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeRuta(index)}
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Eliminar Ruta
+                    </button>
+                  )}
+                </div>
+                <div className="mb-3 grid grid-cols-12 gap-2">
+                  <div className="col-span-3">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE TRANSPORTE (Aéreo, terrestre, marítimo, otros)</label>
+                    <input
+                      type="text"
+                      value={ruta['Tipo de Transporte']}
+                      onChange={(e) => handleRutaChange(index, 'Tipo de Transporte', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
-                  <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div>
-                      <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
-                      <input
-                        type="date"
-                        value={ruta['Fecha de Salida']}
-                        onChange={(e) => handleRutaChange(index, 'Fecha de Salida', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
-                      <input
-                        type="time"
-                        value={ruta['Hora de Salida']}
-                        onChange={(e) => handleRutaChange(index, 'Hora de Salida', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
-                      <input
-                        type="date"
-                        value={ruta['Fecha de Llegada']}
-                        onChange={(e) => handleRutaChange(index, 'Fecha de Llegada', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
-                      <input
-                        type="time"
-                        value={ruta['Hora de Llegada']}
-                        onChange={(e) => handleRutaChange(index, 'Hora de Llegada', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                  <div className="col-span-3">
+                    <label className="block text-gray-700 text-sm font-bold mb-2 h-10">NOMBRE DEL TRANSPORTE</label>
+                    <select
+                      value={ruta['Nombre del Transporte']}
+                      onChange={(e) => handleRutaChange(index, 'Nombre del Transporte', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Seleccione un vehículo</option>
+                      <option value="OFICIAL">OFICIAL</option>
+                      {vehiculos.map((vehiculo, vIndex) => (
+                        <option key={vIndex} value={vehiculo.placa}>
+                          {vehiculo.placa}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2 h-10">RUTA</label>
+                    <input
+                      type="text"
+                      value={ruta['Ruta']}
+                      onChange={(e) => handleRutaChange(index, 'Ruta', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">FECHA SALIDA TRANSPORTE</label>
+                    <input
+                      type="date"
+                      value={ruta['Fecha de Salida']}
+                      onChange={(e) => handleRutaChange(index, 'Fecha de Salida', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA SALIDA TRANSPORTE</label>
+                    <input
+                      type="time"
+                      value={ruta['Hora de Salida']}
+                      onChange={(e) => handleRutaChange(index, 'Hora de Salida', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">FECHA LLEGADA TRANSPORTE</label>
+                    <input
+                      type="date"
+                      value={ruta['Fecha de Llegada']}
+                      onChange={(e) => handleRutaChange(index, 'Fecha de Llegada', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">HORA LLEGADA TRANSPORTE</label>
+                    <input
+                      type="time"
+                      value={ruta['Hora de Llegada']}
+                      onChange={(e) => handleRutaChange(index, 'Hora de Llegada', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addRuta}
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Agregar Nueva Ruta
+            </button>
           </div>
         </div>
         <h2 className="mb-6 border-2 border-gray-600 rounded-lg p-4 text-center font-bold">DATOS PARA TRANSFERENCIA</h2>
