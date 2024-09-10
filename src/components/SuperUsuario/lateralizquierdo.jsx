@@ -25,7 +25,8 @@ const LeftMenu = ({ user, onNavigate }) => {
         <div
           className={`transform ${
             isOpen ? "translate-x-0" : "-translate-x-full"
-          } transition-transform duration-300 ease-in-out fixed top-0 left-0 w-3/4 h-full bg-[#169658] z-40 pt-16`}
+          } transition-transform duration-300 ease-in-out fixed top-0 
+          left-0 w-3/4 h-full bg-[#169658] z-40 pt-16`}
         >
           <div className="relative h-full flex flex-col">
             <div
@@ -166,7 +167,9 @@ const LeftMenu = ({ user, onNavigate }) => {
         )}
       </div>
 
-      <div className="hidden md:flex md:flex-col md:w-1/6 p-4 text-white justify-start items-center fixed left-0 top-0 h-full z-40 bg-[#169658]">
+      <div className="hidden md:flex md:flex-col 
+      md:w-1/6 p-4 text-white justify-start 
+      items-center fixed left-0 top-0 h-full z-40 bg-[#169658]">
         <div
           className="flex flex-col items-center space-y-6 mt-20 w-full overflow-y-auto max-h-full"
           style={{
