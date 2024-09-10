@@ -15,9 +15,11 @@ const GestionOrdenMovilizacion = () => {
   const [showCrearRuta, setShowCrearRuta] = useState(false);
   const [showEditarRuta, setShowEditarRuta] = useState(false);
   const [showEditarHorario, setShowEditarHorario] = useState(false);
-  const [showModalDeshabilitar, setShowModalDeshabilitar] = useState(false);
-  const [showModalHabilitar, setShowModalHabilitar] = useState(false);
+  const [deshabilitarModalVisible, setDeshabilitarModalVisible] = useState(false);
+  const [habilitarModalVisible, setHabilitarModalVisible] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
+  const [selectedRutaDescripcion, setSelectedRutaDescripcion] = useState('');
+
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const idUsuario = storedUser?.usuario?.id_usuario;
@@ -154,23 +156,25 @@ const GestionOrdenMovilizacion = () => {
     return <EditarHorarioMovilizacion onClose={handleCloseEditarHorario} Userid={idUsuario}  />;
   }
 
-  const handleDeshabilitarRuta = (ruta) => {
+  const handleDeshabilitarRuta = (ruta, descripcion) => {
     setSelectedRuta(ruta);
-    setShowModalDeshabilitar(true);
+    setSelectedRutaDescripcion(descripcion)
+    setDeshabilitarModalVisible(true);
   };
 
-  const handleHabilitarRuta = (ruta) => {
+  const handleHabilitarRuta = (ruta, descripcion) => {
     setSelectedRuta(ruta);
-    setShowModalHabilitar(true);
+    setSelectedRutaDescripcion(descripcion)
+    setHabilitarModalVisible(true);
   };
 
   const handleCloseModalDeshabilitar = () => {
-    setShowModalDeshabilitar(false);
+    setDeshabilitarModalVisible(false);
     fetchRutas();
   };
 
   const handleCloseModalHabilitar = () => {
-    setShowModalHabilitar(false);
+    setHabilitarModalVisible(false);
     fetchRutas();
   };
 
@@ -249,7 +253,7 @@ const GestionOrdenMovilizacion = () => {
                   <td className="border px-4 py-2">{ruta.ruta_origen}</td>
                   <td className="border px-4 py-2">{ruta.ruta_destino}</td>
                   <td className="border px-4 py-2">
-                    {ruta.ruta_estado === '1' ? 'Disponible' : 'No Disponible'}
+                    {ruta.ruta_estado === 1 ? 'Disponible' : 'No Disponible'}
                   </td>
                   <td className="border px-4 py-2 text-sm text-gray-600 flex space-x-2">
                   <button
@@ -259,11 +263,11 @@ const GestionOrdenMovilizacion = () => {
                       >
                         <FaEdit />
                       </button>
-                    {ruta.ruta_estado === '1' ? (
+                    {ruta.ruta_estado === 1 ? (
                         <button 
                         className="p-2 bg-red-500 text-white rounded-full"
                         title="Deshabilitar"
-                        onClick={() => handleDeshabilitarRuta(ruta)}
+                        onClick={() => handleDeshabilitarRuta(ruta.id_ruta_movilizacion, ruta.ruta_descripcion)}
                         >
                           <FaBan />
                         </button>
@@ -271,7 +275,7 @@ const GestionOrdenMovilizacion = () => {
                       <button 
                       className="p-2 bg-green-500 text-white rounded-full"
                       title="Habilitar"
-                      onClick={() => handleHabilitarRuta(ruta)}
+                      onClick={() => handleHabilitarRuta(ruta.id_ruta_movilizacion, ruta.ruta_descripcion)}
                       >
                         <FaCheck />
                       </button>
@@ -284,19 +288,19 @@ const GestionOrdenMovilizacion = () => {
         )}
       </div>
 
-      {showModalDeshabilitar && (
-        <ModalDeshabilitarRuta
-          ruta={selectedRuta}
-          onClose={handleCloseModalDeshabilitar}
-        />
-      )}
+      <ModalDeshabilitarRuta
+        ruta={selectedRuta}
+        descripcion={selectedRutaDescripcion}
+        visible={deshabilitarModalVisible}
+        onClose={handleCloseModalDeshabilitar}
+      />
 
-      {showModalHabilitar && (
-        <ModalHabilitarRuta
-          ruta={selectedRuta}
-          onClose={handleCloseModalHabilitar}
-        />
-      )}
+      <ModalHabilitarRuta
+        ruta={selectedRuta}
+        descripcion={selectedRutaDescripcion}
+        visible={habilitarModalVisible}
+        onClose={handleCloseModalHabilitar}
+      />
     </div>
   );
 };

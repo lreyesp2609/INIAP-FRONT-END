@@ -112,7 +112,8 @@ const SolicitarMovilizacion = ({ onClose }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setRutas(data.rutas);
+        const rutasHabilitadas = data.rutas.filter(ruta => ruta.ruta_estado === 1);
+        setRutas(rutasHabilitadas);
       } else {
         const errorData = await response.json();
         setError(errorData.error);
@@ -298,7 +299,6 @@ const SolicitarMovilizacion = ({ onClose }) => {
       )}
     </div>
     <form id="solicitudForm" onSubmit={handleSubmit}>
-      {/* Lugar Origen - Destino */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Lugar Origen - Destino:</label>
         <select
@@ -317,7 +317,6 @@ const SolicitarMovilizacion = ({ onClose }) => {
         </select>
       </div>
 
-      {/* Fecha de Viaje */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Fecha de Viaje:</label>
         <input
