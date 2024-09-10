@@ -25,6 +25,7 @@ const ListarSolicitudesAceptadas = () => {
   const [solicitudToCancel, setSolicitudToCancel] = useState(null);
   const [motivoCancelacion, setMotivoCancelacion] = useState('');
   const [view, setView] = useState('aceptadas'); // Estado para manejar la vista actual  
+  const [includeHeaderFooter, setIncludeHeaderFooter] = useState(true); // Estado para incluir encabezado y pie de página
 
 
   const fetchSolicitudes = useCallback(async () => {
@@ -207,7 +208,7 @@ const ListarSolicitudesAceptadas = () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Token no encontrado');
 
-        const response = await fetch(`${API_URL}/Informes/generar_pdf_solicitud/${idUsuario}/${idSolicitud}/pdf/`, {
+        const response = await fetch(`${API_URL}/Informes/generar_pdf_solicitud/${idUsuario}/${idSolicitud}/pdf/?include_header_footer=${includeHeaderFooter}`, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`,
@@ -278,6 +279,16 @@ const ListarSolicitudesAceptadas = () => {
                 Crear Solicitud
               </button>
             </div>
+            <div className="flex mb-4">
+                    <label htmlFor="include-header-footer" className="mr-2 text-lg font-light">Incluir Encabezado y Pie de Página:</label>
+                    <input
+                        type="checkbox"
+                        id="include-header-footer"
+                        checked={includeHeaderFooter}
+                        onChange={() => setIncludeHeaderFooter(!includeHeaderFooter)}
+                        className="mr-2"
+                    />
+                </div>
             <div className="flex mb-4 mt-4">
               <input
                 type="text"
