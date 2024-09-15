@@ -170,7 +170,27 @@ const ListarSolicitudesCanceladas = () => {
   {!showMostrarSolicitud && !showAcceptedRequests && !showPendingRequests && (
     <>
        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-        <h1 className="text-2xl font-light">Gestión de Solicitudes</h1>
+       <h1 className="text-xl font-medium mb-2 md:mb-0">
+            Gestión de Solicitudes
+          </h1>
+        <div className="flex flex-col md:flex-row items-center md:items-center mb-2 md:mb-0">
+            <label
+              htmlFor="view-select"
+              className="text-lg font-light mb-2 md:mb-0 md:mr-2"
+            >
+              Ver:
+            </label>
+            <select
+              id="view-select"
+              value={view}
+              onChange={handleViewChange}
+              className="p-2 border border-gray-300 rounded mb-2 md:mb-0"
+            >
+              <option value="pendientes">Solicitudes Pendientes</option>
+              <option value="aceptadas">Solicitudes Aceptadas</option>
+              <option value="canceladas">Solicitudes Canceladas</option>
+            </select>
+          </div>
         <button
           className="mt-2 md:mt-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-b-4 border-blue-300 
                       hover:border-blue-700 rounded"
@@ -179,26 +199,6 @@ const ListarSolicitudesCanceladas = () => {
           Crear Solicitud
         </button>
       </div>
-
-      <div className="mb-4">
- 
-     
-          <div className="mt-8 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
-            <button
-              className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-300 rounded"
-              onClick={handleShowPendingRequests}
-            >
-              Solicitudes Pendientes
-            </button>
-            <button
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border-b-4 border-green-400 hover:border-green-900 rounded"
-              onClick={handleShowAcceptedRequests}
-            >
-              Solicitudes Aceptadas
-            </button>
-          </div>
-          
-        </div>
 
           <div className="mb-4">
           <h2 className="text-xl font-light mb-4">Solicitudes Canceladas del Usuario</h2>

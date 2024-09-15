@@ -261,6 +261,7 @@ const ListarSolicitudesPendientes = () => {
         </div>
           
           <div className="mb-4">
+          <h2 className="text-xl font-light mb-4">Solicitudes Pendientes del Usuario</h2>
             <div className="flex flex-col md:flex-row items-start md:items-center">
               <input
                 type="text"
