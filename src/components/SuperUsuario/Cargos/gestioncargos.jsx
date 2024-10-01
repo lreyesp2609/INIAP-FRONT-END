@@ -37,7 +37,7 @@ const GestionCargos = () => {
     try {
       const formData = new FormData();
       const response = await fetch(
-        `${API_URL}/Cargos/cargos/`,
+        `${API_URL}/Cargos/cargosall/`,
         {
           method: "POST",
           headers: {

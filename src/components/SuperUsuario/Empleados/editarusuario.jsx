@@ -19,7 +19,6 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     estacion: empleado.estacion ? empleado.estacion.id_estacion : "",
     fecha_ingreso: empleado.fecha_ingreso,
     direccion: empleado.direccion,
-    habilitado: empleado.habilitado || false,
     id_rol: empleado.rol ? empleado.rol.id_rol : "",
     genero: empleado.genero,
     id_unidad: empleado.id_unidad,
@@ -27,8 +26,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     id_cargo: empleado.id_cargo,
     usuario: empleado.usuario,
     distintivo: empleado.distintivo,
-    licencias: empleado.licencias ? empleado.licencias.id_tipo_licencia : "",
-    id_licencia: empleado.id_tipo_licencia,
+    licencias: empleado.licencias ? empleado.licencias.id_tipo_licencia : null,
+    id_licencia: empleado.id_tipo_licencia || null,
   });
 
   const [cargos, setCargos] = useState([]);
@@ -63,8 +62,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
             id_estacion: data.estacion ? data.estacion.id_estacion : "",
             unidad: data.unidad ? data.unidad.id_unidad : "",
             id_unidad: data.unidad ? data.unidad.id_unidad : "",
-            habilitado: data.habilitado || false,
             id_rol: data.rol ? data.rol.id_rol : "",
+            id_tipo_licencia: data.licencia ? data.licencia.id_tipo_licencia : "",
           }));
         } else {
           console.error(
@@ -160,7 +159,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
   
         if (response.ok) {
           const data = await response.json();
-          setLicencias(data.tipos_licencias); // Extrae la lista de la propiedad tipos_licencias
+          setLicencias(data.tipos_licencias);
         } else {
           console.error("Error al obtener las licencias:", response.statusText);
         }
@@ -170,9 +169,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     };
   
     fetchLicencias();
-  }, []);
+  }, [user.usuario.id_usuario]);
   
-
   useEffect(() => {
     const fetchUnidades = async () => {
       const token = localStorage.getItem("token");
@@ -195,13 +193,6 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
         if (response.ok) {
           const data = await response.json();
           setUnidades(data);
-
-          if (!data.find((u) => u.id_unidad === formData.unidad)) {
-            setFormData((prevFormData) => ({
-              ...prevFormData,
-              unidad: data.length > 0 ? data[0].id_unidad : "",
-            }));
-          }
         } else {
           console.error("Error al obtener unidades:", response.statusText);
         }
@@ -213,7 +204,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     if (formData.estacion) {
       fetchUnidades();
     }
-  }, [formData.estacion, formData.unidad]);
+  }, [formData.estacion]);
 
   useEffect(() => {
     const fetchEstaciones = async () => {
@@ -240,7 +231,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     };
 
     fetchEstaciones();
-  }, []);
+  }, [user.usuario.id_usuario]);
 
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -251,13 +242,23 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       [name]: name === "habilitado" ? newValue === true : newValue,
     }));
   
-    if (name === "id_cargo") {
-      console.log("Nuevo valor de id_cargo:", value);
-    } else if (name === "id_licencia") {
-      console.log("Nuevo valor de id_licencia:", value);
+    // Si se cambia la estación, resetea la unidad y el cargo
+    if (name === "estacion") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        unidad: "",
+        id_cargo: "",
+      }));
+    }
+    
+    // Si se cambia la unidad, resetea solo el cargo
+    if (name === "unidad") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        id_cargo: "",
+      }));
     }
   };
-  
   
   const handleSave = async () => {
     if (!formData.id_cargo) {
@@ -285,11 +286,10 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("correo_electronico", formData.correo_electronico);
       formDataForUpdate.append("id_cargo", formData.id_cargo);
       formDataForUpdate.append("fecha_ingreso", formData.fecha_ingreso);
-      formDataForUpdate.append("habilitado", formData.habilitado ? 1 : 0);
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
       formDataForUpdate.append("id_rol", formData.id_rol);
-      formDataForUpdate.append("id_licencia", formData.id_licencia); // Añadir este campo
+      formDataForUpdate.append("id_licencia", formData.id_licencia !== undefined ? formData.id_licencia : null);
   
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
@@ -333,8 +333,6 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       });
     }
   };
-  
-  
 
   return (
     <div>

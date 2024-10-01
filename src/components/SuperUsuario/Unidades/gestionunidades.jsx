@@ -39,7 +39,7 @@ const GestionUnidadesPorEstacion = () => {
 
       const formData = new FormData();
 
-      const response = await fetch(`${API_URL}/Unidades/unidades/`, {
+      const response = await fetch(`${API_URL}/Unidades/unidadesall/`, {
         method: "POST",
         headers: {
           Authorization: `${token}`,

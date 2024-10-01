@@ -202,20 +202,6 @@ const FormularioEditarEmpleado = ({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Habilitado
-            </label>
-            <select
-              name="habilitado"
-              value={formData.habilitado}
-              onChange={handleInputChange}
-              className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
-            >
-              <option value={true}>Habilitado</option>
-              <option value={false}>No Habilitado</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
               Usuario
             </label>
             <input
@@ -232,7 +218,7 @@ const FormularioEditarEmpleado = ({
             </label>
             <select
               name="id_licencia"
-              value={formData.id_licencia || ""}
+              value={formData.id_licencia}
               onChange={handleInputChange}
               className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
             >
