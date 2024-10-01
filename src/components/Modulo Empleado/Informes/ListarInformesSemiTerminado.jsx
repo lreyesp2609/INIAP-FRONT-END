@@ -216,7 +216,6 @@ const InformesSemiTerminados = () => {
         <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
           <th className="py-3 px-6 text-left">Código de Solicitud</th>
           <th className="py-3 px-6 text-left">Fecha Informe</th>
-          <th className="py-3 px-6 text-left">Estado Informe</th>
           <th className="py-3 px-6 text-left">Acciones</th>
         </tr>
       </thead>
@@ -225,23 +224,22 @@ const InformesSemiTerminados = () => {
           <tr key={informe.id_informes} className="border-b border-gray-300 hover:bg-gray-100">
             <td className="py-3 px-6 text-left whitespace-nowrap">{informe.codigo_solicitud}</td>
             <td className="py-3 px-6 text-left whitespace-nowrap">{informe.fecha_informe}</td>
-            <td className="py-3 px-6 text-left whitespace-nowrap">{informe.estado}</td>
             <td className="py-3 px-6 text-left whitespace-nowrap">
               <button
                 onClick={() => handleEditClick(informe.id_informes)}
-                className="text-blue-500 hover:text-blue-700"
+                className="p-2 bg-yellow-500 text-white rounded-full mr-2"
               >
                 <FontAwesomeIcon icon={faFileEdit} />
               </button>
               <button
                 onClick={() => handlePDFClick(informe.id_informes)}
-                className="text-green-500 hover:text-green-700 ml-4"
+                className="p-2 bg-gray-500 text-white rounded-full mr-2"
               >
                 <FontAwesomeIcon icon={faFilePdf} />
               </button>
               <button
                 onClick={() => handleDetallePDFClick(informe.id_informes)}
-                className="text-purple-500 hover:text-purple-700 ml-4"
+                className="p-2 bg-blue-500 text-white rounded-full mr-2"
               >
                 <FontAwesomeIcon icon={faEye} />
               </button>
