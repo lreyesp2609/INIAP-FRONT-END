@@ -190,7 +190,7 @@ const ListarFacturasInformes = () => {
                   {informe.estado_factura === 0 ? 'Pendiente' : 'Completada'}
                 </td>
                 <td className="py-3 px-6 text-left">
-                  {informe.estado_factura === 0 ? (
+                  
                     <button
                       onClick={() => handleEditClick(informe.id_informe)}
                       className="p-2 bg-yellow-500 text-white rounded-full mr-2"
@@ -198,7 +198,6 @@ const ListarFacturasInformes = () => {
                     >
                       <FontAwesomeIcon icon={faFileEdit} />
                     </button>
-                  ) : (
                     <button
                       onClick={() => handlePDFClick(informe.id_informe)}
                       className="p-2 bg-gray-500 text-white rounded-full mr-2"
@@ -206,7 +205,6 @@ const ListarFacturasInformes = () => {
                     >
                       <FontAwesomeIcon icon={faFilePdf} />
                     </button>
-                  )}
                 </td>
               </tr>
             ))}

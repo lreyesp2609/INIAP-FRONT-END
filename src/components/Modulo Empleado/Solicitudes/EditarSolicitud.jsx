@@ -18,6 +18,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
   const [vehiculos, setVehiculos] = useState([]);
   const [bancos, setBancos] = useState([]);
 
+
   useEffect(() => {
     const fetchSolicitud = async () => {
       try {
@@ -43,10 +44,14 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
         if (response.ok) {
           const data = await response.json();
           console.log('Datos de la solicitud:', data);
-          setSolicitud(data.solicitud);
+          setSolicitud({
+            ...data.solicitud,
+            id_banco: data.cuenta_bancaria?.id_banco || '',
+            tipo_cuenta: data.cuenta_bancaria?.['Tipo de Cuenta'] || '',
+            numero_cuenta: data.cuenta_bancaria?.['Número de Cuenta'] || ''
+          });
           setDatosPersonales(data.datos_personales);
           setRutas(data.rutas);
-          setCuentaBancaria(data.cuenta_bancaria);
           setEmpleadosSeleccionados(data.solicitud['Listado de Empleados'].split(', '));
           setEmpleadoSesion({
             distintivo: data.datos_personales.Distintivo,
@@ -150,9 +155,6 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
     };
 
 
-
-
-
     const fetchBancos = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -169,7 +171,14 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
 
         if (response.ok) {
           const data = await response.json();
-          setBancos(data.bancos);
+          console.log('Respuesta completa de bancos:', data);
+          if (Array.isArray(data.bancos)) {
+            console.log('Bancos obtenidos:', data.bancos);
+            setBancos(data.bancos);
+          } else {
+            console.error('El formato de los bancos no es el esperado:', data);
+            setError('El formato de los datos de bancos no es válido');
+          }
         } else {
           const errorData = await response.json();
           console.log('Error al obtener los bancos:', errorData);
@@ -199,7 +208,10 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
   };
 
   const handleCuentaBancariaChange = (field, value) => {
-    setCuentaBancaria({ ...cuentaBancaria, [field]: value });
+    setSolicitud(prevSolicitud => ({
+      ...prevSolicitud,
+      [field]: value
+    }));
   };
 
   const handleAddEmpleado = () => {
@@ -282,9 +294,9 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
             fecha_llegada_soli: ruta['Fecha de Llegada'],
             hora_llegada_soli: ruta['Hora de Llegada']
           })),
-          id_banco: cuentaBancaria.id_banco,
-          tipo_cuenta: cuentaBancaria['Tipo de Cuenta'],
-          numero_cuenta: cuentaBancaria['Número de Cuenta']
+          id_banco: solicitud.id_banco,
+          tipo_cuenta: solicitud.tipo_cuenta,
+          numero_cuenta: solicitud.numero_cuenta
         }),
       });
 
@@ -626,7 +638,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
             <div className="w-full md:w-1/3 px-2 mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">NOMBRE DEL BANCO:</label>
               <select
-                value={cuentaBancaria?.id_banco || ''}
+                value={solicitud.id_banco}
                 onChange={(e) => handleCuentaBancariaChange('id_banco', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -641,8 +653,8 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
             <div className="w-full md:w-1/3 px-2 mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">TIPO DE CUENTA:</label>
               <select
-                value={cuentaBancaria?.['Tipo de Cuenta'] || ''}
-                onChange={(e) => handleCuentaBancariaChange('Tipo de Cuenta', e.target.value)}
+                value={solicitud.tipo_cuenta}
+                onChange={(e) => handleCuentaBancariaChange('tipo_cuenta', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Seleccione el tipo de cuenta</option>
@@ -654,8 +666,8 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2">No. DE CUENTA:</label>
               <input
                 type="text"
-                value={cuentaBancaria?.['Número de Cuenta']}
-                onChange={(e) => handleCuentaBancariaChange('Número de Cuenta', e.target.value)}
+                value={solicitud.numero_cuenta}
+                onChange={(e) => handleCuentaBancariaChange('numero_cuenta', e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
