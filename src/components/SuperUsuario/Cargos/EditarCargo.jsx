@@ -23,7 +23,6 @@ const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
 
     const urlEncodedData = new URLSearchParams();
     urlEncodedData.append("cargo", formData.cargo);
-;
 
     try {
       const response = await fetch(
@@ -44,7 +43,7 @@ const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
           message: 'Éxito',
           description: data.mensaje || 'Cargo editado correctamente'
         });
-        onActualizacion();
+        onActualizacion();  // Esto debe llamar a fetchCargos y cerrar el formulario de edición
         onCancel();
       } else {
         const errorData = await response.json();
@@ -59,7 +58,6 @@ const EditarCargo = ({ cargo, onCancel, onActualizacion }) => {
     }
   };
 
-  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Editar Estación</h2>
