@@ -23,7 +23,7 @@ const GestionEmpleadosJefes = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/Empleados/lista-empleados/${id_usuario}/`,
+        `${API_URL}/Empleados/lista-empleados-administrador/${id_usuario}/`,
         {
           headers: {
             Authorization: `${token}`,

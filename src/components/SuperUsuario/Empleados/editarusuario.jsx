@@ -20,7 +20,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     fecha_ingreso: empleado.fecha_ingreso,
     direccion: empleado.direccion,
     id_rol: empleado.rol ? empleado.rol.id_rol : "",
-    genero: empleado.genero,
+    genero: empleado.genero || "", // Asegura que si no hay género, sea una cadena vacía
     id_unidad: empleado.id_unidad,
     id_estacion: empleado.id_estacion,
     id_cargo: empleado.id_cargo,
@@ -265,6 +265,14 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       notification.error({
         message: "Error al actualizar",
         description: "Se necesita un cargo para actualizar.",
+      });
+      return;
+    }
+
+    if (!["Masculino", "Femenino"].includes(formData.genero)) {
+      notification.error({
+        message: "Error de validación",
+        description: "El género debe ser Masculino o Femenino"
       });
       return;
     }

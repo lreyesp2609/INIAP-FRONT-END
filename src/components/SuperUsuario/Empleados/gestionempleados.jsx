@@ -67,6 +67,12 @@ const GestionEmpleados = () => {
     }
   };
 
+  const refreshEmpleados = () => {
+    if (user) {
+      fetchEmpleados(user.usuario.id_usuario);
+    }
+  };
+
   const fetchCargos = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -176,7 +182,7 @@ const GestionEmpleados = () => {
     setCurrentPage(pageNumber);
   };
 
-  return ( 
+  return (
     <div className="p-4 mt-16">
       {selectedEmpleado ? (
         <EditarUsuario
@@ -191,6 +197,7 @@ const GestionEmpleados = () => {
           cargos={cargos}
           user={user}
           fetchEmpleados={fetchEmpleados}
+          refreshEmpleados={refreshEmpleados}
         />
       ) : isHabilitarEmpleadoVisible && user ? (
         <HabilitarEmpleado
