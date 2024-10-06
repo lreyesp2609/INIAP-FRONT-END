@@ -194,7 +194,7 @@ const TablaEmpleadosJefes = ({ empleados, asignarJefe, asignarDirector }) => {
           <p>
             ¿Estás seguro de que quieres asignar a {selectedEmpleado.nombres}{" "}
             {selectedEmpleado.apellidos} (Cédula: {selectedEmpleado.cedula}) como director
-            de la estación {selectedEmpleado.nombre_unidad}?
+            de la estación {selectedEmpleado.nombre_estacion}?
           </p>
         )}
       </Modal>
