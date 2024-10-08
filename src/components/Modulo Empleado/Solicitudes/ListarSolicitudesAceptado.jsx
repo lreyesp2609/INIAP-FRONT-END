@@ -286,7 +286,16 @@ const ListarSolicitudesAceptadas = () => {
           Crear Solicitud
         </button>
       </div>
-
+      <div className="flex mb-4">
+                    <label htmlFor="include-header-footer" className="mr-2 text-lg font-light">Incluir Encabezado y Pie de Página:</label>
+                    <input
+                        type="checkbox"
+                        id="include-header-footer"
+                        checked={includeHeaderFooter}
+                        onChange={() => setIncludeHeaderFooter(!includeHeaderFooter)}
+                        className="mr-2"
+                    />
+                </div>
       
 
       
