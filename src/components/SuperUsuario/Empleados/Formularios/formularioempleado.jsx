@@ -17,6 +17,13 @@ const FormularioEmpleado = ({
     setEsCedulaExtranjera(e.target.checked); // Actualiza el estado correcto
     setCedulaExtranjera(e.target.checked); // Mantén esta llamada si es necesario en otro lugar
   };
+  // Función para manejar el cambio en el campo de tipo de licencia
+  const handleLicenciaChange = (event) => {
+    const { value } = event.target;
+    // Si decides validar de todos modos, puedes hacer esto, pero como no es obligatorio, lo dejaremos vacío.
+    handleInputChange(event); // Llamar a la función general que maneja el cambio de los datos del formulario.
+    // No es necesario agregar un error para este campo.
+  };
 
   // Función para manejar el cambio en el campo de número de cédula
   const handleCedulaChange = (event) => {
@@ -370,7 +377,7 @@ const FormularioEmpleado = ({
           <select
             name="id_tipo_licencia"
             value={formData.id_tipo_licencia}
-            onChange={handleInputChange}
+            onChange={handleLicenciaChange}
             className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
           >
             <option value="">Seleccione licencia</option>

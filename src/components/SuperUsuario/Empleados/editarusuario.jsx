@@ -26,8 +26,7 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     id_cargo: empleado.id_cargo,
     usuario: empleado.usuario,
     distintivo: empleado.distintivo,
-    licencias: empleado.licencias ? empleado.licencias.id_tipo_licencia : null,
-    id_licencia: empleado.id_tipo_licencia || null,
+
   });
 
   const [cargos, setCargos] = useState([]);
@@ -297,7 +296,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
       formDataForUpdate.append("id_rol", formData.id_rol);
-      formDataForUpdate.append("id_licencia", formData.id_licencia !== undefined ? formData.id_licencia : null);
+      formDataForUpdate.append("id_licencia", formData.id_tipo_licencia !== undefined ? formData.id_tipo_licencia : null);
+
   
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,
