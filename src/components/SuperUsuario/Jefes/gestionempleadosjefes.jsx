@@ -152,7 +152,7 @@ const GestionEmpleadosJefes = () => {
 
   return (
     <div className="p-4 mt-16">
-      <h1 className="text-2xl font-light">Gestión de Empleados</h1>
+      <h1 className="text-2xl font-light">Gestión de Jefes</h1>
 
       <div className="mb-4">
         <div className="flex flex-col md:flex-row">
