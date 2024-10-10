@@ -281,7 +281,7 @@ const ListarEditarDetalleFacturas = ({ idInforme, onClose, onUpdate }) => {
             type="submit"
             className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Terminar Justificación de Gastos
+            Actualizar Justificación de Gastos
           </button>
           <button
             type="button"
