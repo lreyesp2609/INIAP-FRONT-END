@@ -6,7 +6,7 @@ import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import FormularioEmpleado from "./Formularios/formularioempleado";
 
 const AgregarEmpleados = (props) => {
-  const { onClose, user } = props;
+  const { onClose, user, refreshEmpleados } = props;
   const [roles, setRoles] = useState([]);
   const [estaciones, setEstaciones] = useState([]);
   const [unidades, setUnidades] = useState([]);
@@ -281,7 +281,7 @@ const AgregarEmpleados = (props) => {
         console.error("Token not found");
         return;
       }
-  
+
       const response = await fetch(`${API_URL}/Licencias/listar-tipos/${user.usuario.id_usuario}/`, {
         method: "GET",
         headers: {
@@ -299,14 +299,14 @@ const AgregarEmpleados = (props) => {
       console.error("Error al obtener licencias:", error);
     }
   };
-  
+
   useEffect(() => {
     const fetchLicencias = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
         return;
       }
-  
+
       try {
         const response = await fetch(`${API_URL}/Licencias/listar-tipos/${user.usuario.id_usuario}/`, {
           method: "GET",
@@ -314,7 +314,7 @@ const AgregarEmpleados = (props) => {
             Authorization: token,
           },
         });
-  
+
         if (response.ok) {
           const data = await response.json();
           setLicencias(data.tipos_licencias); // Extrae la lista de la propiedad tipos_licencias
@@ -325,7 +325,7 @@ const AgregarEmpleados = (props) => {
         console.error("Error al obtener licencias:", error);
       }
     };
-  
+
     fetchLicencias();
   }, []);
 
@@ -362,6 +362,7 @@ const AgregarEmpleados = (props) => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
+        refreshEmpleados(); // Llama a la función para refrescar la lista
         onClose();
         notification.success({
           message: "Éxito",
@@ -394,7 +395,7 @@ const AgregarEmpleados = (props) => {
   };
 
 
-  
+
   return (
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">
@@ -406,7 +407,7 @@ const AgregarEmpleados = (props) => {
           roles={roles}
           estaciones={estaciones}
           unidades={unidades}
-          licencias={licencias} 
+          licencias={licencias}
           setCedulaExtranjera={setCedulaExtranjera}
         />
         <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
@@ -417,7 +418,7 @@ const AgregarEmpleados = (props) => {
             w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-900 rounded
             "
           >
-           <FontAwesomeIcon icon={faTimes} /> Cancelar
+            <FontAwesomeIcon icon={faTimes} /> Cancelar
           </button>
           <button
             type="button"

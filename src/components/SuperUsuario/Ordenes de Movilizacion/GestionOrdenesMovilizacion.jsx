@@ -130,9 +130,11 @@ const GestionOrdenMovilizacion = () => {
     return <CrearRutaMovilizacion onClose={handleCloseCrearRuta} Userid={idUsuario} />;
   }
 
-  const handleClickEditarRuta = () => {
+  const handleClickEditarRuta = (idRuta) => {
+    setSelectedRuta(idRuta);
     setShowEditarRuta(true);
   };
+  
 
   const handleCloseEditarRuta = () => {
     setShowEditarRuta(false);
@@ -140,9 +142,9 @@ const GestionOrdenMovilizacion = () => {
   };
 
   if (showEditarRuta) {
-    return <EditarRutaMovilizacion onClose={handleCloseEditarRuta} />;
+    return <EditarRutaMovilizacion onClose={handleCloseEditarRuta} Userid={idUsuario} idRuta={selectedRuta} />;
   }
-
+  
   const handleClickEditarHorario = () => {
     setShowEditarHorario(true);
   };
@@ -259,7 +261,7 @@ const GestionOrdenMovilizacion = () => {
                   <button
                       className="p-2 bg-blue-500 text-white rounded-full"
                       title="Editar Ruta"
-                      onClick={() => handleClickEditarRuta(ruta)}
+                      onClick={() => handleClickEditarRuta(ruta.id_ruta_movilizacion)}
                       >
                         <FaEdit />
                       </button>

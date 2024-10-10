@@ -2,18 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { notification } from 'antd';
 import API_URL from '../../../Config';
 
-const EditarRutaMovilizacion = ({ onClose, Userid }) => {
+const CrearRutaMovilizacion = ({ onClose, Userid, idRuta }) => {
   const [provincias, setProvincias] = useState([]);
   const [ciudadesOrigen, setCiudadesOrigen] = useState([]);
   const [ciudadesDestino, setCiudadesDestino] = useState([]);
+  const [rutaData, setRutaData] = useState(null);
 
-  const [selectedProvinciaOrigen, setSelectedProvinciaOrigen] = useState('Los Ríos');
-  const [selectedCiudadOrigen, setSelectedCiudadOrigen] = useState('Mocache');
+  const [selectedProvinciaOrigen, setSelectedProvinciaOrigen] = useState('');
+  const [selectedCiudadOrigen, setSelectedCiudadOrigen] = useState('');
   const [selectedProvinciaDestino, setSelectedProvinciaDestino] = useState('');
   const [selectedCiudadDestino, setSelectedCiudadDestino] = useState('');
 
   const [rutaDescripcion, setRutaDescripcion] = useState('');
   const [rutaEstado, setRutaEstado] = useState('');
+
+  const obtenerProvinciaPorCiudad = (ciudad) => {
+    for (const provincia of provincias) {
+      if (provincia.Ciudades.includes(ciudad)) {
+        return provincia.Provincia;
+      }
+    }
+    return '';
+  };
 
   const fetchProvinciasYCiudades = async () => {
     try {
@@ -42,15 +52,51 @@ const EditarRutaMovilizacion = ({ onClose, Userid }) => {
   };
 
   useEffect(() => {
-    fetchProvinciasYCiudades();
-  }, []);
+    if (provincias.length > 0 && rutaData) {
+      const provinciaOrigen = obtenerProvinciaPorCiudad(rutaData.ruta_origen);
+      const provinciaDestino = obtenerProvinciaPorCiudad(rutaData.ruta_destino);
+  
+      setSelectedProvinciaOrigen(provinciaOrigen);
+      setSelectedCiudadOrigen(rutaData.ruta_origen);
+  
+      setSelectedProvinciaDestino(provinciaDestino);
+      setSelectedCiudadDestino(rutaData.ruta_destino);
+  
+      setRutaDescripcion(rutaData.ruta_descripcion);
+      setRutaEstado(rutaData.ruta_estado.toString());
+    }
+  }, [provincias, rutaData]);
+  
+  useEffect(() => {
+    if (selectedProvinciaOrigen) {
+      const provinciaOrigen = provincias.find((p) => p.Provincia === selectedProvinciaOrigen);
+      if (provinciaOrigen) {
+        setCiudadesOrigen(provinciaOrigen.Ciudades);
+      }
+    }
+  }, [selectedProvinciaOrigen, provincias]);
 
   useEffect(() => {
-    const provinciaOrigen = provincias.find((p) => p.Provincia === 'Los Ríos');
-    if (provinciaOrigen) {
-      setCiudadesOrigen(provinciaOrigen.Ciudades);
+    if (selectedProvinciaDestino) {
+      const provinciaDestino = provincias.find((p) => p.Provincia === selectedProvinciaDestino);
+      if (provinciaDestino) {
+        setCiudadesDestino(provinciaDestino.Ciudades);
+      }
     }
-  }, [provincias]);
+  }, [selectedProvinciaDestino, provincias]);
+
+  useEffect(() => {
+    setRutaDescripcion(`${selectedCiudadOrigen} - ${selectedCiudadDestino}`);
+  }, [selectedCiudadOrigen, selectedCiudadDestino]);
+
+  useEffect(() => {
+    if (selectedProvinciaDestino) {
+      const provinciaDestino = provincias.find((p) => p.Provincia === selectedProvinciaDestino);
+      if (provinciaDestino) {
+        setCiudadesDestino(provinciaDestino.Ciudades);
+      }
+    }
+  }, [selectedProvinciaDestino, provincias]);
 
   useEffect(() => {
     setRutaDescripcion(`${selectedCiudadOrigen} - ${selectedCiudadDestino}`);
@@ -72,6 +118,38 @@ const EditarRutaMovilizacion = ({ onClose, Userid }) => {
     setSelectedCiudadDestino('');
   };
 
+
+  // Función para obtener los datos de la ruta actual
+  const fetchRutaActual = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        notification.error({ message: 'Token no encontrado' });
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/detalle-ruta/${Userid}/${idRuta}/`, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRutaData(data);
+      } else {
+        notification.error({ message: 'Error al obtener los datos de la ruta' });
+      }
+    } catch (error) {
+      notification.error({ message: 'Error al obtener los datos de la ruta: ' + error.message });
+    }
+  };
+
+  useEffect(() => {
+    fetchProvinciasYCiudades();
+    fetchRutaActual();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -87,7 +165,7 @@ const EditarRutaMovilizacion = ({ onClose, Userid }) => {
       formData.append('ruta_descripcion', rutaDescripcion);
       formData.append('ruta_estado', rutaEstado);
 
-      const response = await fetch(`${API_URL}/OrdenesMovilizacion/crear-ruta/${Userid}/`, {
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/editar-ruta/${Userid}/${idRuta}/`, {
         method: 'POST',
         headers: {
           Authorization: `${token}`,
@@ -96,20 +174,20 @@ const EditarRutaMovilizacion = ({ onClose, Userid }) => {
       });
 
       if (response.ok) {
-        notification.success({ message: 'Ruta creada exitosamente' });
+        notification.success({ message: 'Ruta actualizada exitosamente' });
         onClose();
       } else {
         const errorData = await response.json();
-        notification.error({ message: errorData.error || 'Error al crear la ruta' });
+        notification.error({ message: errorData.error || 'Error al actualizar la ruta' });
       }
     } catch (error) {
-      notification.error({ message: 'Error al crear la ruta: ' + error.message });
+      notification.error({ message: 'Error al actualizar la ruta: ' + error.message });
     }
   };
 
   return (
     <div className="p-4 sm:p-6">
-      <h2 className="text-2xl font-bold mb-4">Crear Ruta</h2>
+      <h2 className="text-2xl font-bold mb-4">Editar Ruta</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Seleccionar Origen</h3>
@@ -228,4 +306,4 @@ const EditarRutaMovilizacion = ({ onClose, Userid }) => {
   );
 };
 
-export default EditarRutaMovilizacion;
+export default CrearRutaMovilizacion;

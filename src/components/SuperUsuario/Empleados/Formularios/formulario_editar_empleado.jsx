@@ -80,7 +80,7 @@ const FormularioEditarEmpleado = ({
             </label>
             <select
               name="genero"
-              value={formData.genero}
+              value={formData.genero || ""}
               onChange={handleInputChange}
               className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
             >
@@ -217,8 +217,8 @@ const FormularioEditarEmpleado = ({
               Tipo de Licencia
             </label>
             <select
-              name="id_licencia"
-              value={formData.id_licencia}
+              name="id_tipo_licencia"
+              value={formData.id_tipo_licencia}
               onChange={handleInputChange}
               className="w-full bg-blue-100 text-black border border-blue-100 rounded py-2 px-4"
             >

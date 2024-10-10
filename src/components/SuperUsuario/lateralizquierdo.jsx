@@ -45,6 +45,16 @@ const LeftMenu = ({ user, onNavigate }) => {
               </button>
               <button
                 onClick={() => {
+                  onNavigate("gestion-jefes");
+                  setIsOpen(false);
+                }}
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FiUsers className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Gestión de Jefes</span>
+              </button>
+              <button
+                onClick={() => {
                   onNavigate("gestion-vehiculos");
                   setIsOpen(false);
                 }}
@@ -184,6 +194,15 @@ const LeftMenu = ({ user, onNavigate }) => {
             <FiUsers className="w-6 h-6 text-white mx-3" />
             <span className="text-white text-xs hidden md:inline">
               Gestión de Empleados
+            </span>
+          </button>
+          <button
+            onClick={() => onNavigate("gestion-jefes")}
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FiUsers className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs hidden md:inline">
+              Gestión de Jefes
             </span>
           </button>
           <button

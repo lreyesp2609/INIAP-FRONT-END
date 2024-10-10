@@ -10,6 +10,10 @@ import Reportes from "./Reportes/Inicio"
 import API_URL from "../../Config";
 import { notification } from "antd";
 import ListarSolicitudesPendientesAdmin from "./Solicitudes/ListarSolicitudesAdmin";
+import ListarMovilizacion from "../Modulo Empleado/Ordenes de Movilizacion/ListarMovilizacion";
+import ListarSolicitudes from "../Modulo Empleado/Solicitudes/ListaSolicitude";
+import InformesPendientes from "../Modulo Empleado/Informes/ListarInformesPendientes";
+import ListarJustificacione from "../Modulo Empleado/Jutificacion de Gastos/ListarJustificaciones";
 
 const MenuAdministrador = () => {
   const [user, setUser] = useState({});
@@ -104,8 +108,12 @@ const MenuAdministrador = () => {
           </div>
         )}
         {view === "gestion-empleados" && <GestionEmpleados />}
+        {view === 'gestion-ordenes-solicitud' && <ListarMovilizacion />}
         {view === 'gestion-movilizaciones' && <ListarMovilizaciones />}
         {view === 'gestion-solicitud' && <ListarSolicitudesPendientesAdmin/>}
+        {view === 'gestion-solicitud-crear' && <ListarSolicitudes />}
+        {view === 'gestion-informe-crear' && <InformesPendientes/>}
+        {view === 'gestion-gastos' && <ListarJustificacione/>}
         {view === 'reportes' && <Reportes />}
         {view === 'calendario-ordenes-aprobadas' && <Calendario />}
       </div>

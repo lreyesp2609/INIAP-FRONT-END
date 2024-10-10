@@ -20,14 +20,13 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
     fecha_ingreso: empleado.fecha_ingreso,
     direccion: empleado.direccion,
     id_rol: empleado.rol ? empleado.rol.id_rol : "",
-    genero: empleado.genero,
+    genero: empleado.genero || "", // Asegura que si no hay género, sea una cadena vacía
     id_unidad: empleado.id_unidad,
     id_estacion: empleado.id_estacion,
     id_cargo: empleado.id_cargo,
     usuario: empleado.usuario,
     distintivo: empleado.distintivo,
-    licencias: empleado.licencias ? empleado.licencias.id_tipo_licencia : null,
-    id_licencia: empleado.id_tipo_licencia || null,
+
   });
 
   const [cargos, setCargos] = useState([]);
@@ -268,6 +267,14 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       });
       return;
     }
+
+    if (!["Masculino", "Femenino"].includes(formData.genero)) {
+      notification.error({
+        message: "Error de validación",
+        description: "El género debe ser Masculino o Femenino"
+      });
+      return;
+    }
   
     const token = localStorage.getItem("token");
     if (!token) {
@@ -289,7 +296,8 @@ const EditarUsuario = ({ empleado, onClose, user, fetchEmpleados }) => {
       formDataForUpdate.append("usuario", formData.usuario);
       formDataForUpdate.append("distintivo", formData.distintivo);
       formDataForUpdate.append("id_rol", formData.id_rol);
-      formDataForUpdate.append("id_licencia", formData.id_licencia !== undefined ? formData.id_licencia : null);
+      formDataForUpdate.append("id_licencia", formData.id_tipo_licencia !== undefined ? formData.id_tipo_licencia : null);
+
   
       const response = await fetch(
         `${API_URL}/Empleados/editar-empleado/${user.usuario.id_usuario}/${empleado.id_empleado}/`,

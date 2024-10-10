@@ -82,7 +82,7 @@ const GestionCargos = () => {
 
   const handleCloseAddForm = () => {
     setIsAdding(false);
-    fetchCargos(user.usuario.id_usuario, id_unidad);
+    fetchCargos();
   };
 
   const handleEditCargos = (cargo) => {
@@ -94,9 +94,10 @@ const GestionCargos = () => {
     setCargoToEdit(null);
   };
   const handleActualizacion = () => {
-    fetchCargos(userId);
-    setIsEditing(false);
+    fetchCargos(user.usuario.id_usuario);
+    setIsEditing(false);  // Volver al listado de cargos
   };
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredCargos.slice(indexOfFirstItem, indexOfLastItem);

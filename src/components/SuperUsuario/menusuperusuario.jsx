@@ -15,6 +15,7 @@ import GestionEncabezados from "./Encabezados/gestionencabezados";
 import GestionUnidadesPorEstacion from "./Unidades/gestionunidades";
 import GestionCargos from "./Cargos/gestioncargos";
 import GestionBancos from "./Bancos/gestionbancos";
+import GestionEmpleadosJefes from "./Jefes/gestionempleadosjefes";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -122,6 +123,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-unidades" && <GestionUnidadesPorEstacion />}
         {view === "gestion-cargos" && <GestionCargos />}
         {view === "gestion-bancos" && <GestionBancos/>}
+        {view === "gestion-jefes" && <GestionEmpleadosJefes />}
 
       </div>
       <ChangePasswordModal

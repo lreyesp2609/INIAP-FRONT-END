@@ -22,6 +22,7 @@ import GestionCargos from "./components/SuperUsuario/Cargos/gestioncargos";
 import GestionUnidadesPorEstacion from "./components/SuperUsuario/Unidades/gestionunidades";
 import GestionBancos from "./components/SuperUsuario/Bancos/gestionbancos";
 import ListarJustificacione from "./components/Modulo Empleado/Jutificacion de Gastos/ListarJustificaciones";
+import GestionEmpleadosJefes from "./components/SuperUsuario/Jefes/gestionempleadosjefes";
 const AppContent = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const AppContent = () => {
         <Route path="/listar-movilizacion" element={<ListarMovilizacion />} />
         <Route path="/gestion-provincias" element={<GestionProvincias />} />
         <Route path="/gestion-bancos" element={<GestionBancos />} />
+        <Route path="/gestion-jefes" element={<GestionEmpleadosJefes />} />
       </Routes>
     </div>
   );

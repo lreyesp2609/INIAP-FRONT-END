@@ -3,7 +3,7 @@ import { notification } from "antd";
 import API_URL from "../../../Config";
 import FormularioUnidad from "./Formulario/formulariounidad";
 
-const AgregarUnidad = ({ onClose, onUnidadAdded }) => {
+const AgregarUnidad = ({ onCancel, onUnidadAdded }) => {
   const [nombre_unidad, setNombreUnidad] = useState("");
   const [Estaciones, setEstaciones] = useState([]);
   const [formData, setFormData] = useState({
@@ -103,7 +103,7 @@ const AgregarUnidad = ({ onClose, onUnidadAdded }) => {
           description: "Unidad agregada correctamente",
         });
         onUnidadAdded();
-        onClose();
+        onCancel();
       } else {
         const errorText = await response.text();
         try {
@@ -134,7 +134,7 @@ const AgregarUnidad = ({ onClose, onUnidadAdded }) => {
     <div className="w-full flex justify-center">
       <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
         <button
-          onClick={onClose}
+          onClick={onCancel}
           className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 
           px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
         >
@@ -152,7 +152,7 @@ const AgregarUnidad = ({ onClose, onUnidadAdded }) => {
         <div className="mt-8 flex flex-col md:flex-row justify-end md:space-x-4 space-y-4 md:space-y-0">
           <button
             type="button"
-            onClick={() => onClose()} // Cierra el formulario sin hacer cambios
+            onClick={onCancel} // Cambiar onClose por onCancel aquí
             className="
             w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 
             px-4 border-b-4 border-red-400 hover:border-red-900 rounded
