@@ -221,17 +221,17 @@ const SolicitarMovilizacion = ({ onClose }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const token = localStorage.getItem('token');
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const idEmpleado = storedUser?.usuario?.id_empleado;
     const idUsuario = storedUser?.usuario?.id_usuario;
-
+  
     if (!token) {
-        setError('Token no encontrado');
-        return;
+      setError('Token no encontrado');
+      return;
     }
-
+  
     const formDataObj = new FormData();
     formDataObj.append('secuencial_orden_movilizacion', formData.secuencial_orden_movilizacion);
     formDataObj.append('motivo_movilizacion', formData.motivo_movilizacion);
@@ -244,40 +244,53 @@ const SolicitarMovilizacion = ({ onClose }) => {
     formDataObj.append('hora_regreso', formData.hora_regreso);
     formDataObj.append('estado_movilizacion', formData.estado_movilizacion);
     formDataObj.append('id_empleado', idEmpleado);  
-
+  
     try {
-        const response = await fetch(`${API_URL}/OrdenesMovilizacion/crear-orden/${idUsuario}/`, {
-            method: 'POST',
-            headers: {
-                Authorization: `${token}`,
-            },
-            body: formDataObj,
+      const response = await fetch(`${API_URL}/OrdenesMovilizacion/crear-orden/${idUsuario}/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `${token}`,
+        },
+        body: formDataObj,
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        notification.success({
+          message: 'Éxito',
+          description: data.message || 'Solicitud creada exitosamente.',
+          placement: 'topRight',
         });
-
-        if (response.ok) {
-            const data = await response.json();
-            notification.success({
-                message: 'Éxito',
-                description: data.message || 'Solicitud creada exitosamente.',
-                placement: 'topRight',
-            });
-            onClose();
+        onClose();
+      } else {
+        const errorData = await response.json();
+        // Manejar el error de conflicto de horario específicamente
+        if (errorData.detalles && errorData.detalles.length > 0) {
+          const errorMessage = errorData.detalles.join(', '); // Combina los mensajes de conflicto
+          setError(errorMessage);
+          notification.error({
+            message: 'Conflicto de horario',
+            description: errorMessage,
+            placement: 'topRight',
+          });
         } else {
-          const errorData = await response.json();
           setError(errorData.error);
           notification.error({
             message: 'Error',
             description: errorData.error,
-          }) }
-        } catch (error) {
-            notification.error({
-                message: 'Error',
-                description: error.message || 'Ha ocurrido un error al crear la solicitud.',
-                placement: 'topRight',
-            });
+            placement: 'topRight',
+          });
         }
-      };
-
+      }
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message || 'Ha ocurrido un error al crear la solicitud.',
+        placement: 'topRight',
+      });
+    }
+  };
+  
   return (
     <div className="w-full flex justify-center mt-16">
   <div className="bg-white p-8 rounded shadow-lg w-full max-w-5xl">

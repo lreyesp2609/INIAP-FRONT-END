@@ -296,11 +296,24 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
         onClose();
       } else {
         const errorData = await response.json();
-        setError(errorData.error);
-        notification.error({
-          message: 'Error',
-          description: errorData.error,
-        }) }
+        // Manejar el error de conflicto de manera específica
+        if (errorData.detalles && errorData.detalles.length > 0) {
+          const errorMessage = errorData.detalles.join(', '); // Combina los mensajes de conflicto
+          setError(errorMessage);
+          notification.error({
+            message: 'Conflicto de horario',
+            description: errorMessage,
+            placement: 'topRight',
+          });
+        } else {
+          setError(errorData.error);
+          notification.error({
+            message: 'Error',
+            description: errorData.error,
+            placement: 'topRight',
+          });
+        }
+      }
     } catch (error) {
       notification.error({
         message: 'Error',
@@ -309,6 +322,7 @@ const EditarSolicitudMovilizacion = ({ orderId, onClose }) => {
       });
     }
   };
+  
 
   
   return (
