@@ -12,6 +12,7 @@ const AgendaView = ({
   const [mostrarLista, setMostrarLista] = useState(true);
   const [idUsuario, setIdUsuario] = useState(null);
   const [token, setToken] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // Guardar el mes actual
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -40,22 +41,24 @@ const AgendaView = ({
     };
     return new Date(date).toLocaleDateString("es-ES", options);
   };
-  
+
   const groupItemsByDate = (items, dateField) => {
     return items.reduce((acc, item) => {
       const fecha = item[dateField];
       if (!fecha) return acc;
   
-      // Si el campo de fecha incluye hora, usa solo la parte de la fecha
       const date = new Date(fecha.split("T")[0]); 
       if (isNaN(date.getTime())) return acc;
-      const formattedDate = date.toISOString().split("T")[0];
-      if (!acc[formattedDate]) acc[formattedDate] = [];
-      acc[formattedDate].push(item);
+
+      // Solo agregar elementos del mes actual
+      if (date.getMonth() === currentMonth) {
+        const formattedDate = date.toISOString().split("T")[0];
+        if (!acc[formattedDate]) acc[formattedDate] = [];
+        acc[formattedDate].push(item);
+      }
       return acc;
     }, {});
   };
-  
 
   const formatTime = (time) => {
     return new Date(`1970-01-01T${time}Z`).toLocaleTimeString("es-ES", {
@@ -84,13 +87,13 @@ const AgendaView = ({
   };
 
   const handleSolicitudClick = (id) => {
-    setSolicitudSeleccionada(id); // Establecer solicitud seleccionada
+    setSolicitudSeleccionada(id); 
     setMostrarLista(false);
   };
 
   const handleCloseDetail = () => {
     setOrdenSeleccionada(null);
-    setSolicitudSeleccionada(null); // Limpiar solicitud seleccionada
+    setSolicitudSeleccionada(null);
     setMostrarLista(true);
   };
 
@@ -113,7 +116,7 @@ const AgendaView = ({
       {mostrarLista && (
         <>
           {allDates.length === 0 ? (
-            <p>No hay órdenes ni solicitudes para mostrar.</p>
+            <p>No hay órdenes ni solicitudes para mostrar este mes.</p>
           ) : (
             allDates.map((date) => (
               <div key={date} className="mb-4">
@@ -143,7 +146,7 @@ const AgendaView = ({
                     key={viaje["Codigo de Solicitud"]}
                     className="p-2 border border-gray-300 rounded mt-2 hover:bg-gray-100"
                     onClick={() => {
-                      handleShowSolicitud(viaje.id); // Asegúrate de que aquí coincida con el nombre esperado en MostrarSolicitudAdministrador
+                      handleShowSolicitud(viaje.id);
                     }}
                     title={viaje["Codigo de Solicitud"]}
                   >

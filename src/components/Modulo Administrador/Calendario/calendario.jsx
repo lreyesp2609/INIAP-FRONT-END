@@ -70,7 +70,7 @@ const Calendario = () => {
 
       try {
         const response = await fetch(
-          `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/`
+          `${API_URL}/Informes/listar-solicitudes-aceptadas-admin/${id_usuario}/`
         );
         const data = await response.json();
         const filteredSolicitudes = data.solicitudes.filter((solicitud) => {
