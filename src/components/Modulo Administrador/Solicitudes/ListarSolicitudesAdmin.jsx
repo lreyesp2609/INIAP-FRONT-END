@@ -31,11 +31,11 @@ const ListarSolicitudesPendientesAdmin = () => {
   const fetchSolicitudes = async () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
-      const idUsuario = storedUser.usuario.id_usuario;
+      const id_usuario = storedUser.usuario.id_usuario;
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token no encontrado');
 
-      const url = `${API_URL}/Informes/listar-solicitudes-pedientes-admin/`;
+      const url = `${API_URL}/Informes/listar-solicitudes-pendientes-admin/${id_usuario}/`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
