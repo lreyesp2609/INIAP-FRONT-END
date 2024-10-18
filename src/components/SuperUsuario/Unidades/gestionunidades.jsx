@@ -65,14 +65,15 @@ const GestionUnidadesPorEstacion = () => {
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
-
+  
     const filtered = unidades.filter((unidad) =>
-      unidad.nombre.toLowerCase().includes(searchValue)
+      unidad.nombre_unidad && unidad.nombre_unidad.toLowerCase().includes(searchValue)
     );
-
+    
     setFilteredUnidades(filtered);
     setCurrentPage(1);
   };
+  
 
   const handleClear = () => {
     setSearchTerm("");
