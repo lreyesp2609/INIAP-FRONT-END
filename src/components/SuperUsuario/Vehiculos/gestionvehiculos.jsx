@@ -7,6 +7,7 @@ import EditarVehiculo from "./editarvehiculo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 import FormularioRegistrarKilometraje from "../Mantenimiento/Formularios/formulariomantenimiento";
+import ListarKilometrajes from "../Mantenimiento/Tablas/ListarKilometrajes";
 
 const GestionVehiculos = () => {
   const [vehiculos, setVehiculos] = useState([]);
@@ -21,6 +22,7 @@ const GestionVehiculos = () => {
   const [isHabilitarVehiculoVisible, setIsHabilitarVehiculoVisible] = useState(false);
   const [isKilometrajeFormVisible, setIsKilometrajeFormVisible] = useState(false); // Estado para mostrar el formulario
   const [selectedVehiculoForKilometraje, setSelectedVehiculoForKilometraje] = useState(null); // Vehículo seleccionado para el formulario
+  const [isListarKilometrajesVisible, setIsListarKilometrajesVisible] = useState(false); // Nuevo estado
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -108,6 +110,19 @@ const GestionVehiculos = () => {
     setSelectedVehiculoForKilometraje(null);
   };
 
+  const handleHistorialMantenimiento = (vehiculo) => {
+    setSelectedVehiculoForKilometraje(vehiculo); // Establecer el vehículo seleccionado
+    setIsListarKilometrajesVisible(true); // Mostrar el componente ListarKilometrajes
+    setIsKilometrajeFormVisible(false); // Asegurarse de que el formulario no se muestre
+  };
+
+
+  const handleVolverHistorial = () => {
+    setIsListarKilometrajesVisible(false);  // Cerrar el listado de kilometrajes
+    setIsKilometrajeFormVisible(false);  // Asegurarse de que el formulario también esté cerrado
+  };
+  
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredVehiculos.slice(
@@ -151,6 +166,13 @@ const GestionVehiculos = () => {
             handleCancel={handleCloseKilometrajeForm}  // Esta es la misma función que se pasa como handleCancel
           />
         </div>
+      ) : isListarKilometrajesVisible ? (
+        <div className="bg-white p-4 border rounded shadow-lg">
+          <ListarKilometrajes
+            vehiculo={selectedVehiculoForKilometraje}
+            handleCancel={handleVolverHistorial}
+          />
+        </div>
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
@@ -190,6 +212,7 @@ const GestionVehiculos = () => {
             userId={userId}
             fetchVehiculos={fetchVehiculos}
             onKilometraje={handleKilometraje} // Pasar la función de manejar el clic
+            onHistorialMantenimiento={handleHistorialMantenimiento}
 
           />
           <div className="flex justify-center mt-4">
@@ -198,8 +221,8 @@ const GestionVehiculos = () => {
                 key={index}
                 onClick={() => setCurrentPage(index + 1)}
                 className={`mx-1 px-3 py-1 border rounded ${currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-black"
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-black"
                   }`}
               >
                 {index + 1}
