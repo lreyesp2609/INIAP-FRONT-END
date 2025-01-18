@@ -25,14 +25,14 @@ const Reportes = () => {
   const [estadoOrden, setEstadoOrden] = useState(0);
 
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1; 
-  const currentDay = new Date().getDate(); 
+  const currentMonth = new Date().getMonth() + 1;
+  const currentDay = new Date().getDate();
 
   const years = Array.from(new Array(currentYear - 2021), (val, index) => 2022 + index);
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ]; 
+  ];
 
   const getDaysInMonth = (month, year) => {
     return new Date(year, month, 0).getDate();
@@ -55,7 +55,7 @@ const Reportes = () => {
   useEffect(() => {
     updateDays(setDaysFin, selectedYearFin, selectedMonthFin);
   }, [selectedYearFin, selectedMonthFin]);
-  
+
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const idUsuario = storedUser?.usuario?.id_usuario;
 
@@ -104,7 +104,7 @@ const Reportes = () => {
 
   const fetchVehiculos = async () => {
     try {
-      const token = localStorage.getItem('token');  
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/Vehiculos/vehiculos/${idUsuario}/`, {
         headers: {
           Authorization: `${token}`,
@@ -152,71 +152,71 @@ const Reportes = () => {
 
   const handleGenerarReporte = async () => {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Token no encontrado');
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
 
-        let fechaInicioFormatted = null;
-        let fechaFinFormatted = null;
+      let fechaInicioFormatted = null;
+      let fechaFinFormatted = null;
 
-        if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
-            // Si se selecciona la fecha completa para inicio y fin.
-            fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
-            fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
-        } else if (selectedYearInicio && selectedYearFin) {
-            // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
-            fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-            fechaFinFormatted = `${selectedYearFin}-12-31`;
-        } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
-            // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
-            fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
-            fechaFinFormatted = new Date().toISOString().split('T')[0];
-        } else if (selectedYearInicio) {
-            // Si solo se selecciona el año inicio, usar todo ese año.
-            fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-            fechaFinFormatted = `${selectedYearInicio}-12-31`;
-        }
+      if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
+        // Si se selecciona la fecha completa para inicio y fin.
+        fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
+        fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
+      } else if (selectedYearInicio && selectedYearFin) {
+        // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
+        fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+        fechaFinFormatted = `${selectedYearFin}-12-31`;
+      } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
+        // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
+        fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
+        fechaFinFormatted = new Date().toISOString().split('T')[0];
+      } else if (selectedYearInicio) {
+        // Si solo se selecciona el año inicio, usar todo ese año.
+        fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+        fechaFinFormatted = `${selectedYearInicio}-12-31`;
+      }
 
-        const formData = new FormData();
-        formData.append('fecha_inicio', fechaInicioFormatted || '');
-        formData.append('fecha_fin', fechaFinFormatted || '');
-        formData.append('empleado', empleadoSeleccionado);
-        formData.append('conductor', conductorSeleccionado);
-        formData.append('vehiculo', vehiculoSeleccionado);
-        formData.append('ruta', selectedRuta);
-        formData.append('estado', estadoOrden);
+      const formData = new FormData();
+      formData.append('fecha_inicio', fechaInicioFormatted || '');
+      formData.append('fecha_fin', fechaFinFormatted || '');
+      formData.append('empleado', empleadoSeleccionado);
+      formData.append('conductor', conductorSeleccionado);
+      formData.append('vehiculo', vehiculoSeleccionado);
+      formData.append('ruta', selectedRuta);
+      formData.append('estado', estadoOrden);
 
-        const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
-            method: 'POST',
-            headers: {
-                'Authorization': token,
-            },
-            body: formData,
+      const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Error en la respuesta del servidor');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const popup = window.open('', '_blank');
+      if (popup) {
+        popup.location.href = url;
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error);
+        notification.error({
+          message: 'Error',
+          description: errorData.error,
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || 'Error en la respuesta del servidor');
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const popup = window.open('', '_blank');
-        if (popup) {
-            popup.location.href = url;
-        } else {
-            const errorData = await response.json();
-            setError(errorData.error);
-            notification.error({
-              message: 'Error',
-              description: errorData.error,
-            });
-        }
-        window.URL.revokeObjectURL(url);
+      }
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       notification.error({
-          message: 'Error',
-          description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
-          placement: 'topRight',
+        message: 'Error',
+        description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
+        placement: 'topRight',
       });
     }
   };
@@ -261,44 +261,48 @@ const Reportes = () => {
   return (
     <div className="p-4 mt-16">
       <h2 className="text-xl sm:text-2xl font-bold mb-4">Generar Reportes</h2>
-      <FormularioReporteOrdenes
-        rutas={rutas}
-        vehiculos={vehiculos}
-        conductores={conductores}
-        selectedRuta={selectedRuta}
-        setSelectedRuta={setSelectedRuta}
-        vehiculoSeleccionado={vehiculoSeleccionado}
-        setVehiculoSeleccionado={setVehiculoSeleccionado}
-        empleadoSeleccionado={empleadoSeleccionado}
-        setEmpleadoSeleccionado={setEmpleadoSeleccionado}
-        conductorSeleccionado={conductorSeleccionado}
-        setConductorSeleccionado={setConductorSeleccionado}
-        estadoOrden={estadoOrden}
-        setEstadoOrden={setEstadoOrden}
-        selectedYearInicio={selectedYearInicio}
-        setSelectedYearInicio={setSelectedYearInicio}
-        selectedMonthInicio={selectedMonthInicio}
-        setSelectedMonthInicio={setSelectedMonthInicio}
-        selectedDayInicio={selectedDayInicio}
-        setSelectedDayInicio={setSelectedDayInicio}
-        selectedYearFin={selectedYearFin}
-        setSelectedYearFin={setSelectedYearFin}
-        selectedMonthFin={selectedMonthFin}
-        setSelectedMonthFin={setSelectedMonthFin}
-        selectedDayFin={selectedDayFin}
-        setSelectedDayFin={setSelectedDayFin}
-        handleYearChangeInicio={(e) => setSelectedYearInicio(e.target.value)}
-        handleMonthChangeInicio={(e) => setSelectedMonthInicio(e.target.value)}
-        handleDayChangeInicio={(e) => setSelectedDayInicio(e.target.value)}
-        handleYearChangeFin={(e) => setSelectedYearFin(e.target.value)}
-        handleMonthChangeFin={(e) => setSelectedMonthFin(e.target.value)}
-        handleDayChangeFin={(e) => setSelectedDayFin(e.target.value)}
-        filterYears={filterYears}
-        filterMonths={filterMonths}
-        daysInicio={daysInicio}
-        daysFin={daysFin}
-        handleGenerarReporte={handleGenerarReporte}
-      />
+      <div className="mb-6 border-2 border-gray-600 rounded-lg p-4">
+        <FormularioReporteOrdenes
+          rutas={rutas}
+          vehiculos={vehiculos}
+          conductores={conductores}
+          selectedRuta={selectedRuta}
+          setSelectedRuta={setSelectedRuta}
+          vehiculoSeleccionado={vehiculoSeleccionado}
+          setVehiculoSeleccionado={setVehiculoSeleccionado}
+          empleadoSeleccionado={empleadoSeleccionado}
+          setEmpleadoSeleccionado={setEmpleadoSeleccionado}
+          conductorSeleccionado={conductorSeleccionado}
+          setConductorSeleccionado={setConductorSeleccionado}
+          estadoOrden={estadoOrden}
+          setEstadoOrden={setEstadoOrden}
+          selectedYearInicio={selectedYearInicio}
+          setSelectedYearInicio={setSelectedYearInicio}
+          selectedMonthInicio={selectedMonthInicio}
+          setSelectedMonthInicio={setSelectedMonthInicio}
+          selectedDayInicio={selectedDayInicio}
+          setSelectedDayInicio={setSelectedDayInicio}
+          selectedYearFin={selectedYearFin}
+          setSelectedYearFin={setSelectedYearFin}
+          selectedMonthFin={selectedMonthFin}
+          setSelectedMonthFin={setSelectedMonthFin}
+          selectedDayFin={selectedDayFin}
+          setSelectedDayFin={setSelectedDayFin}
+          handleYearChangeInicio={(e) => setSelectedYearInicio(e.target.value)}
+          handleMonthChangeInicio={(e) => setSelectedMonthInicio(e.target.value)}
+          handleDayChangeInicio={(e) => setSelectedDayInicio(e.target.value)}
+          handleYearChangeFin={(e) => setSelectedYearFin(e.target.value)}
+          handleMonthChangeFin={(e) => setSelectedMonthFin(e.target.value)}
+          handleDayChangeFin={(e) => setSelectedDayFin(e.target.value)}
+          filterYears={filterYears}
+          filterMonths={filterMonths}
+          daysInicio={daysInicio}
+          daysFin={daysFin}
+          handleGenerarReporte={handleGenerarReporte}
+        />
+      </div>
+
+
     </div>
 
   );
