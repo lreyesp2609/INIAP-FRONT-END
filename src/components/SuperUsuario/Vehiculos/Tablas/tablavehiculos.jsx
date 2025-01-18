@@ -1,14 +1,23 @@
 import React from "react";
 import { FaEdit } from "react-icons/fa";
+import { FaWrench, FaHistory } from "react-icons/fa"; // Icono para historial de mantenimiento
 import DeshabilitarVehiculo from "../deshabilitarvehiculo";
 
-const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) => {
+const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo, onKilometraje, onHistorialMantenimiento }) => {
   const handleDeshabilitar = async () => {
     await fetchVehiculos(userId);
   };
 
   const handleEditClick = (vehiculo, userId) => {
     onEditVehiculo(vehiculo, userId);
+  };
+
+  const handleKilometraje = (vehiculo) => {
+    onKilometraje(vehiculo); // Lógica para gestionar el kilometraje o mantenimiento
+  };
+
+  const handleHistorialMantenimiento = (vehiculo) => {
+    onHistorialMantenimiento(vehiculo); // Lógica para gestionar el historial de mantenimiento
   };
 
   return (
@@ -43,6 +52,20 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) =
                   >
                     <FaEdit />
                   </button>
+                  <button
+                    className="p-2 bg-green-500 text-white rounded-full"
+                    title="Kilometraje o mantenimiento"
+                    onClick={() => handleKilometraje(vehiculo)}
+                  >
+                    <FaWrench />
+                  </button>
+                  <button
+                    className="p-2 bg-yellow-500 text-white rounded-full"
+                    title="Historial de mantenimiento"
+                    onClick={() => handleHistorialMantenimiento(vehiculo)}
+                  >
+                    <FaHistory />
+                  </button>
                   <DeshabilitarVehiculo
                     vehiculoId={vehiculo.id_vehiculo}
                     userId={userId}
@@ -71,6 +94,20 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo }) =
                 onClick={() => handleEditClick(vehiculo, userId)}
               >
                 <FaEdit />
+              </button>
+              <button
+                className="p-2 bg-green-500 text-white rounded-full"
+                title="Kilometraje o mantenimiento"
+                onClick={() => handleKilometraje(vehiculo)}
+              >
+                <FaWrench />
+              </button>
+              <button
+                className="p-2 bg-yellow-500 text-white rounded-full"
+                title="Historial de mantenimiento"
+                onClick={() => handleHistorialMantenimiento(vehiculo)}
+              >
+                <FaHistory />
               </button>
               <DeshabilitarVehiculo
                 vehiculoId={vehiculo.id_vehiculo}
