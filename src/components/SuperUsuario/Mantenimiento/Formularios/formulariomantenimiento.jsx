@@ -25,10 +25,11 @@ const FormularioRegistrarKilometraje = ({ vehiculo, handleSubmit, handleCancel }
             Authorization: `${token}`,
           },
         });
-
+  
         const result = await response.json();
         if (response.ok) {
           setData({
+            id_vehiculo: formData.id_vehiculo,  // Asegúrate de establecer id_vehiculo
             placa: result.placa,
             marca: result.marca,
             fecha_registro: result.fecha_registro || '',
@@ -36,15 +37,26 @@ const FormularioRegistrarKilometraje = ({ vehiculo, handleSubmit, handleCancel }
             evento: result.evento || ''
           });
         } else {
-          console.error('Error al obtener los datos del vehículo:', result.mensaje);
+          // Mostrar una notificación si no hay datos de kilometraje
+          message.warning('No se ha registrado kilometraje para este vehículo');
+          setData({
+            id_vehiculo: formData.id_vehiculo,  // Asegúrate de establecer id_vehiculo
+            placa: result.placa,
+            marca: result.marca,
+            fecha_registro: '',
+            kilometraje: '',
+            evento: ''
+          });
         }
       } catch (error) {
         console.error('Error al obtener los datos del vehículo:', error);
+        message.error('Error al obtener los datos del vehículo');
       }
     };
-
+  
     obtenerVehiculo();
   }, [formData.id_vehiculo, userId, token]);
+  
 
   // Función para manejar los cambios de los inputs
   const handleChange = (event) => {
@@ -61,34 +73,43 @@ const FormularioRegistrarKilometraje = ({ vehiculo, handleSubmit, handleCancel }
     formData.append('fecha_registro', data.fecha_registro);
     formData.append('kilometraje', data.kilometraje);
     formData.append('evento', data.evento);
-
+  
+    // Mostrar los datos en la consola antes de enviarlos
+    console.log('Datos a enviar:', {
+      fecha_registro: data.fecha_registro,
+      kilometraje: data.kilometraje,
+      evento: data.evento,
+    });
+  
     try {
-      const response = await fetch(`${API_URL}/Mantenimientos/registrarkilometraje/${userId}/${formData.id_vehiculo}/`, {
+      const response = await fetch(`${API_URL}/Mantenimientos/registrarkilometraje/${userId}/${data.id_vehiculo}/`, {
         method: 'POST',
         headers: {
           'Authorization': `${token}`,
         },
         body: formData, // Enviar como FormData
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         // Mostrar la notificación de éxito
         message.success(result.mensaje);
-
+  
         // Cerrar el formulario después de un registro exitoso
         handleCancel();
       } else {
+        // Mostrar el mensaje de error del servidor
         console.error('Error al registrar el kilometraje:', result.mensaje);
-        message.error('Hubo un error al registrar el kilometraje');
+        message.error(`Error al registrar el kilometraje: ${result.mensaje}`);
       }
     } catch (error) {
       console.error('Error al hacer la solicitud:', error);
       message.error('Hubo un error al realizar la solicitud');
     }
   };
-
+  
+  
   return (
     <form onSubmit={(e) => { e.preventDefault(); registrarKilometraje(); }} className="space-y-8">
       <div>
