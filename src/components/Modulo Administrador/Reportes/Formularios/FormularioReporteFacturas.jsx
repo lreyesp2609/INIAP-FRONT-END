@@ -81,81 +81,81 @@ const FormularioReporteFacturas = ({ empleados, idUsuario }) => {
         setEmpleadosSeleccionados(nuevosEmpleados);
     };
 
-    
-  const handleGenerarReporteFacturas = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Token no encontrado');
 
-      let fechaInicioFormatted = null;
-      let fechaFinFormatted = null;
+    const handleGenerarReporteFacturas = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado');
 
-      if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
-        // Si se selecciona la fecha completa para inicio y fin.
-        fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
-        fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
-      } else if (selectedYearInicio && selectedYearFin) {
-        // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
-        fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-        fechaFinFormatted = `${selectedYearFin}-12-31`;
-      } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
-        // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
-        fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
-        fechaFinFormatted = new Date().toISOString().split('T')[0];
-      } else if (selectedYearInicio) {
-        // Si solo se selecciona el año inicio, usar todo ese año.
-        fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-        fechaFinFormatted = `${selectedYearInicio}-12-31`;
-      }
+            let fechaInicioFormatted = null;
+            let fechaFinFormatted = null;
 
-      const formData = new FormData();
-      formData.append('fecha_inicio', fechaInicioFormatted || '');
-      formData.append('fecha_fin', fechaFinFormatted || '');
-      formData.append('empleado', empleadoSeleccionado);
-      formData.append('conductor', conductorSeleccionado);
-      formData.append('vehiculo', vehiculoSeleccionado);
-      formData.append('ruta', selectedRuta);
-      formData.append('estado', estadoOrden);
+            if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
+                // Si se selecciona la fecha completa para inicio y fin.
+                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
+                fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
+            } else if (selectedYearInicio && selectedYearFin) {
+                // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
+                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+                fechaFinFormatted = `${selectedYearFin}-12-31`;
+            } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
+                // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
+                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
+                fechaFinFormatted = new Date().toISOString().split('T')[0];
+            } else if (selectedYearInicio) {
+                // Si solo se selecciona el año inicio, usar todo ese año.
+                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+                fechaFinFormatted = `${selectedYearInicio}-12-31`;
+            }
 
-      const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': token,
-        },
-        body: formData,
-      });
+            const formData = new FormData();
+            formData.append('fecha_inicio', fechaInicioFormatted || '');
+            formData.append('fecha_fin', fechaFinFormatted || '');
+            formData.append('empleado', empleadoSeleccionado);
+            formData.append('conductor', conductorSeleccionado);
+            formData.append('vehiculo', vehiculoSeleccionado);
+            formData.append('ruta', selectedRuta);
+            formData.append('estado', estadoOrden);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Error en la respuesta del servidor');
-      }
+            const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token,
+                },
+                body: formData,
+            });
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const popup = window.open('', '_blank');
-      if (popup) {
-        popup.location.href = url;
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error);
-        notification.error({
-          message: 'Error',
-          description: errorData.error,
-        });
-      }
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
-        placement: 'topRight',
-      });
-    }
-  };
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error en la respuesta del servidor');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.location.href = url;
+            } else {
+                const errorData = await response.json();
+                setError(errorData.error);
+                notification.error({
+                    message: 'Error',
+                    description: errorData.error,
+                });
+            }
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            notification.error({
+                message: 'Error',
+                description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
+                placement: 'topRight',
+            });
+        }
+    };
 
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Reporte de Facturas</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Justificación de Gastos</h2>
 
             {/* Listado de empleados */}
             <div className="mb-6">

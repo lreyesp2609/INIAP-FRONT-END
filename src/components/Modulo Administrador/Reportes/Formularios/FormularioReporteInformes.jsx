@@ -177,7 +177,7 @@ const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
 
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Reporte de Informes de Viaje</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Informes de Viaje</h2>
 
             {/* Listado de empleados */}
             <div className="mb-6">

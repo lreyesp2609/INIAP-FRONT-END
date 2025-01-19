@@ -8,10 +8,12 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const [empleadoInput, setEmpleadoInput] = useState("");
     const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
     const [conductorInput, setConductorInput] = useState("");
-    const [conductoresSeleccionados, setConductorsSeleccionados] = useState([]);
-    const [selectedRuta, setSelectedRuta] = useState('');
+    const [conductoresSeleccionados, setConductoresSeleccionados] = useState([]);
+    const [rutaInput, setrutaInput] = useState("");
+    const [rutasSeleccionadas, setRutasSeleccionadas] = useState([]);
+    const [vehiculoInput, setVehiculoInput] = useState("");
+    const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
     const [estadoOrden, setEstadoOrden] = useState(0);
-    const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState('');
     const [selectedYearInicio, setSelectedYearInicio] = useState('');
     const [selectedMonthInicio, setSelectedMonthInicio] = useState('');
     const [selectedDayInicio, setSelectedDayInicio] = useState('');
@@ -79,227 +81,297 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
 
     const handleAddConductor = () => {
         if (conductorInput && !conductoresSeleccionados.includes(conductorInput)) {
-            setConductorsSeleccionados([...conductoresSeleccionados, conductorInput]);
+            setConductoresSeleccionados([...conductoresSeleccionados, conductorInput]);
             setConductorInput("");
         }
     };
 
     const handleRemoveConductor = (index) => {
         const nuevosConductores = conductoresSeleccionados.filter((_, i) => i !== index);
-        setConductorsSeleccionados(nuevosConductores);
+        setConductoresSeleccionados(nuevosConductores);
+    };
+
+    const handleAddRuta = () => {
+        if (rutaInput && !rutasSeleccionadas.includes(rutaInput)) {
+            setRutasSeleccionadas([...rutasSeleccionadas, rutaInput]);
+            setrutaInput("");
+        }
+    };
+
+    const handleRemoveRuta = (index) => {
+        const nuevasRutas = rutasSeleccionadas.filter((_, i) => i !== index);
+        setRutasSeleccionadas(nuevasRutas);
+    };
+
+    const handleAddVehiculo = () => {
+        if (vehiculoInput && !vehiculosSeleccionados.includes(vehiculoInput)) {
+            setVehiculosSeleccionados([...vehiculosSeleccionados, vehiculoInput]);
+            setVehiculoInput("");
+        }
+    };
+
+    const handleRemoveVehiculo = (index) => {
+        const nuevosVehiculos = vehiculosSeleccionados.filter((_, i) => i !== index);
+        setVehiculosSeleccionados(nuevosVehiculos);
     };
 
     const handleGenerarReporteOrdenes = async () => {
         try {
-          const token = localStorage.getItem('token');
-          if (!token) throw new Error('Token no encontrado');
-    
-          let fechaInicioFormatted = null;
-          let fechaFinFormatted = null;
-    
-          if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
-            // Si se selecciona la fecha completa para inicio y fin.
-            fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
-            fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
-          } else if (selectedYearInicio && selectedYearFin) {
-            // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
-            fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-            fechaFinFormatted = `${selectedYearFin}-12-31`;
-          } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
-            // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
-            fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
-            fechaFinFormatted = new Date().toISOString().split('T')[0];
-          } else if (selectedYearInicio) {
-            // Si solo se selecciona el año inicio, usar todo ese año.
-            fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-            fechaFinFormatted = `${selectedYearInicio}-12-31`;
-          }
-    
-          const formData = new FormData();
-          formData.append('fecha_inicio', fechaInicioFormatted || '');
-          formData.append('fecha_fin', fechaFinFormatted || '');
-          formData.append('empleado', empleadosSeleccionados);
-          formData.append('conductor', conductoresSeleccionados);
-          formData.append('vehiculo', vehiculoSeleccionado);
-          formData.append('ruta', selectedRuta);
-          formData.append('estado', estadoOrden);
-    
-          const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
-            method: 'POST',
-            headers: {
-              'Authorization': token,
-            },
-            body: formData,
-          });
-    
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || 'Error en la respuesta del servidor');
-          }
-    
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const popup = window.open('', '_blank');
-          if (popup) {
-            popup.location.href = url;
-          } else {
-            const errorData = await response.json();
-            setError(errorData.error);
-            notification.error({
-              message: 'Error',
-              description: errorData.error,
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado');
+
+            let fechaInicioFormatted = null;
+            let fechaFinFormatted = null;
+
+            if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
+                // Si se selecciona la fecha completa para inicio y fin.
+                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
+                fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
+            } else if (selectedYearInicio && selectedYearFin) {
+                // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
+                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+                fechaFinFormatted = `${selectedYearFin}-12-31`;
+            } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
+                // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
+                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
+                fechaFinFormatted = new Date().toISOString().split('T')[0];
+            } else if (selectedYearInicio) {
+                // Si solo se selecciona el año inicio, usar todo ese año.
+                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+                fechaFinFormatted = `${selectedYearInicio}-12-31`;
+            }
+
+            const formData = new FormData();
+            formData.append('fecha_inicio', fechaInicioFormatted || '');
+            formData.append('fecha_fin', fechaFinFormatted || '');
+            formData.append('empleado', empleadosSeleccionados);
+            formData.append('conductor', conductoresSeleccionados);
+            formData.append('vehiculo', vehiculoSeleccionado);
+            formData.append('ruta', selectedRuta);
+            formData.append('estado', estadoOrden);
+
+            const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token,
+                },
+                body: formData,
             });
-          }
-          window.URL.revokeObjectURL(url);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error en la respuesta del servidor');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const popup = window.open('', '_blank');
+            if (popup) {
+                popup.location.href = url;
+            } else {
+                const errorData = await response.json();
+                setError(errorData.error);
+                notification.error({
+                    message: 'Error',
+                    description: errorData.error,
+                });
+            }
+            window.URL.revokeObjectURL(url);
         } catch (error) {
-          notification.error({
-            message: 'Error',
-            description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
-            placement: 'topRight',
-          });
+            notification.error({
+                message: 'Error',
+                description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
+                placement: 'topRight',
+            });
         }
-      };
-    
+    };
 
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Órdenes de Movilización</h2>
 
-            <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
-                {/* Ruta */}
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Ruta</label>
+            {/* Ruta */}
+            <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Rutas
+                </label>
+                <div className="flex mb-2 items-center">
                     <select
-                        name="lugar_origen_destino_movilizacion"
-                        value={selectedRuta}
-                        onChange={(e) => setSelectedRuta(e.target.value)}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={rutaInput}
+                        onChange={(e) => setrutaInput(e.target.value)}
+                        className="w-full p-2 border rounded"
                     >
-                        <option value="">Selecciona una ruta</option>
-                        {rutas.map((ruta) => (
-                            <option key={ruta.id} value={ruta.ruta_descripcion}>
-                                {ruta.ruta_descripcion}
+                        <option value="">Seleccione una Ruta</option>
+                        {rutas.map((r) => (
+                            <option
+                                key={r.id}
+                                value={r.ruta_descripcion}
+                            >
+                                {r.ruta_descripcion}
                             </option>
                         ))}
                     </select>
-                </div>
-
-                {/* Vehículo */}
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Vehículo</label>
-                    <select
-                        value={vehiculoSeleccionado}
-                        onChange={(e) => setVehiculoSeleccionado(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button
+                        type="button"
+                        onClick={handleAddRuta}
+                        className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                     >
-                        <option value="">Seleccione un vehículo</option>
-                        {vehiculos.map((vehiculo) => (
-                            <option key={`vehiculo-${vehiculo.id_vehiculo}`} value={vehiculo.id_vehiculo}>
-                                {vehiculo.placa}
+                        +
+                    </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {rutasSeleccionadas.map((ruta, index) => (
+                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                            {ruta}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveRuta(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                                &times;
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            {/* Vehículo */}
+            <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                Vehículos
+                </label>
+                <div className="flex mb-2 items-center">
+                    <select
+                        value={vehiculoInput}
+                        onChange={(e) => setVehiculoInput(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    >
+                        <option value="">Seleccione un Vehículo</option>
+                        {vehiculos.map((v) => (
+                            <option
+                                key={v.id_vehiculo}
+                                value={v.placa}
+                            >
+                                {v.placa}
                             </option>
                         ))}
                     </select>
+                    <button
+                        type="button"
+                        onClick={handleAddVehiculo}
+                        className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        +
+                    </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {vehiculosSeleccionados.map((vehiculo, index) => (
+                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                            {vehiculo}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveVehiculo(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                                &times;
+                            </button>
+                        </span>
+                    ))}
                 </div>
             </div>
 
-            <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                <div>
-                    {/* Listado de empleados */}
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Servidores
-                        </label>
-                        <div className="flex mb-2 items-center">
-                            <select
-                                value={empleadoInput}
-                                onChange={(e) => setEmpleadoInput(e.target.value)}
-                                className="w-full p-2 border rounded"
+            {/* Listado de empleados */}
+            <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Servidores
+                </label>
+                <div className="flex mb-2 items-center">
+                    <select
+                        value={empleadoInput}
+                        onChange={(e) => setEmpleadoInput(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    >
+                        <option value="">Seleccione un empleado</option>
+                        {empleados.map((emp) => (
+                            <option
+                                key={emp.id}
+                                value={`${emp.nombres} ${emp.apellidos}`}
                             >
-                                <option value="">Seleccione un empleado</option>
-                                {empleados.map((emp) => (
-                                    <option
-                                        key={emp.id}
-                                        value={`${emp.nombres} ${emp.apellidos}`}
-                                    >
-                                        {emp.nombres} {emp.apellidos}
-                                    </option>
-                                ))}
-                            </select>
+                                {emp.nombres} {emp.apellidos}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        type="button"
+                        onClick={handleAddEmpleado}
+                        className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        +
+                    </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {empleadosSeleccionados.map((empleado, index) => (
+                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                            {empleado}
                             <button
                                 type="button"
-                                onClick={handleAddEmpleado}
-                                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                onClick={() => handleRemoveEmpleado(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
                             >
-                                +
+                                &times;
                             </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {empleadosSeleccionados.map((empleado, index) => (
-                                <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                                    {empleado}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveEmpleado(index)}
-                                        className="ml-2 text-red-500 hover:text-red-700"
-                                    >
-                                        &times;
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                        </span>
+                    ))}
                 </div>
-                <div>
-                    {/* Listado de conductores */}
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Conductores
-                        </label>
-                        <div className="flex mb-2 items-center">
-                            <select
-                                value={conductorInput}
-                                onChange={(e) => setConductorInput(e.target.value)}
-                                className="w-full p-2 border rounded"
-                            >
-                                <option value="">Seleccione un conductor</option>
-                                {conductores.map((c) => (
-                                    <option
-                                        key={c.id}
-                                        value={`${c.nombres} ${c.apellidos}`}
-                                    >
-                                        {c.nombres} {c.apellidos}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                type="button"
-                                onClick={handleAddConductor}
-                                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                            >
-                                +
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {conductoresSeleccionados.map((conductores, index) => (
-                                <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                                    {conductores}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveConductor(index)}
-                                        className="ml-2 text-red-500 hover:text-red-700"
-                                    >
-                                        &times;
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-
-
             </div>
+            
+            {/* Listado de conductores */}
+            <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Conductores
+                </label>
+                <div className="flex mb-2 items-center">
+                    <select
+                        value={conductorInput}
+                        onChange={(e) => setConductorInput(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    >
+                        <option value="">Seleccione un conductor</option>
+                        {conductores.map((c) => (
+                            <option
+                                key={c.id}
+                                value={`${c.nombres} ${c.apellidos}`}
+                            >
+                                {c.nombres} {c.apellidos}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        type="button"
+                        onClick={handleAddConductor}
+                        className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        +
+                    </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {conductoresSeleccionados.map((conductores, index) => (
+                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                            {conductores}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveConductor(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                            >
+                                &times;
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+
+
 
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
                 {/* Estado de la Orden */}

@@ -134,8 +134,6 @@ const Reportes = () => {
     }
   };
 
-
-
   return (
     <div className="p-4 mt-16">
       <h2 className="text-xl sm:text-2xl font-bold mb-4">Generar Reportes</h2>
