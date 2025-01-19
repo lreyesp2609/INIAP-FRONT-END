@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FiUsers, FiMenu, FiTruck, FiList } from 'react-icons/fi';
-import { FaBuilding, FaClipboardList,FaUserTie, FaWarehouse  } from 'react-icons/fa';
+import { FaBell, FaBuilding, FaClipboardList, FaUserTie, FaWarehouse } from 'react-icons/fa';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
 
 const LeftMenu = ({ user, onNavigate }) => {
@@ -23,9 +23,8 @@ const LeftMenu = ({ user, onNavigate }) => {
           </button>
         </div>
         <div
-          className={`transform ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          } transition-transform duration-300 ease-in-out fixed top-0 
+          className={`transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+            } transition-transform duration-300 ease-in-out fixed top-0 
           left-0 w-3/4 h-full bg-[#169658] z-40 pt-16`}
         >
           <div className="relative h-full flex flex-col">
@@ -104,7 +103,7 @@ const LeftMenu = ({ user, onNavigate }) => {
                 }}
                 className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
               >
-                <FaUserTie  className="w-6 h-6 text-white mx-3" />
+                <FaUserTie className="w-6 h-6 text-white mx-3" />
                 <span className="text-white text-xs">Gestión de Cargos</span>
               </button>
               <button
@@ -164,6 +163,16 @@ const LeftMenu = ({ user, onNavigate }) => {
                 <span className="text-white text-xs">
                   Gestión de Movilizaciones
                 </span>
+              </button>
+              <button
+                onClick={() => {
+                  onNavigate("gestion-alertas");
+                  setIsOpen(false);
+                }}
+                className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+              >
+                <FaBell className="w-6 h-6 text-white mx-3" />
+                <span className="text-white text-xs">Alertas Activas</span>
               </button>
             </div>
           </div>
@@ -300,6 +309,16 @@ const LeftMenu = ({ user, onNavigate }) => {
           >
             <FaBuilding className="w-6 h-6 text-white mx-3" />
             <span className="text-white text-xs">Gestión de Bancos</span>
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("gestion-alertas");
+              setIsOpen(false);
+            }}
+            className="flex items-center w-full focus:outline-none hover:bg-[#0d4b34] p-2 rounded transition duration-200 ease-in-out text-xs"
+          >
+            <FaBell className="w-6 h-6 text-white mx-3" />
+            <span className="text-white text-xs">Alertas Activas</span>
           </button>
         </div>
       </div>

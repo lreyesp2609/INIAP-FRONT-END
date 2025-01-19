@@ -1,9 +1,12 @@
-import React from "react";
-import { FaEdit } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaBell, FaEdit } from "react-icons/fa";
 import { FaWrench, FaHistory } from "react-icons/fa"; // Icono para historial de mantenimiento
 import DeshabilitarVehiculo from "../deshabilitarvehiculo";
+import FormularioGestionarAlertas from "../../Mantenimiento/Formularios/CrearEditarAlerta"; // Importar el componente
 
 const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo, onKilometraje, onHistorialMantenimiento }) => {
+  const [selectedVehiculo, setSelectedVehiculo] = useState(null);
+
   const handleDeshabilitar = async () => {
     await fetchVehiculos(userId);
   };
@@ -20,8 +23,23 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo, onK
     onHistorialMantenimiento(vehiculo); // Lógica para gestionar el historial de mantenimiento
   };
 
+  const handleGestionarAlerta = (vehiculo) => {
+    setSelectedVehiculo(vehiculo); // Mostrar el formulario para gestionar la alerta
+  };
+
+  const handleCancel = () => {
+    setSelectedVehiculo(null); // Cerrar el formulario de alerta
+  };
+
   return (
     <div className="w-full">
+      {selectedVehiculo && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <FormularioGestionarAlertas vehiculo={selectedVehiculo} handleCancel={handleCancel} />
+          </div>
+        </div>
+      )}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 table-auto">
           <thead>
@@ -66,6 +84,13 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo, onK
                   >
                     <FaHistory />
                   </button>
+                  <button
+                    className="p-2 bg-orange-500 text-white rounded-full"
+                    title="Gestionar Alerta"
+                    onClick={() => handleGestionarAlerta(vehiculo)}
+                  >
+                    <FaBell />
+                  </button>
                   <DeshabilitarVehiculo
                     vehiculoId={vehiculo.id_vehiculo}
                     userId={userId}
@@ -108,6 +133,13 @@ const TablaVehiculos = ({ vehiculos, userId, fetchVehiculos, onEditVehiculo, onK
                 onClick={() => handleHistorialMantenimiento(vehiculo)}
               >
                 <FaHistory />
+              </button>
+              <button
+                className="p-2 bg-orange-500 text-white rounded-full"
+                title="Gestionar Alerta"
+                onClick={() => handleGestionarAlerta(vehiculo)}
+              >
+                <FaBell />
               </button>
               <DeshabilitarVehiculo
                 vehiculoId={vehiculo.id_vehiculo}

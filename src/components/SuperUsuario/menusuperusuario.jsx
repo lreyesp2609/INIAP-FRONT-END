@@ -16,6 +16,7 @@ import GestionUnidadesPorEstacion from "./Unidades/gestionunidades";
 import GestionCargos from "./Cargos/gestioncargos";
 import GestionBancos from "./Bancos/gestionbancos";
 import GestionEmpleadosJefes from "./Jefes/gestionempleadosjefes";
+import ListarAlertasActivas from "./Mantenimiento/Formularios/ListarAlertas";
 import API_URL from "../../Config";
 import { notification } from "antd";
 
@@ -124,6 +125,7 @@ const MenuSuperUsuario = () => {
         {view === "gestion-cargos" && <GestionCargos />}
         {view === "gestion-bancos" && <GestionBancos/>}
         {view === "gestion-jefes" && <GestionEmpleadosJefes />}
+        {view === "gestion-alertas" && <ListarAlertasActivas />}
 
       </div>
       <ChangePasswordModal
