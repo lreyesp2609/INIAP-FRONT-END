@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { notification } from 'antd';
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import API_URL from '../../../../Config';
+import { notification } from 'antd';
 
-const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario }) => {
+
+const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
     const [empleadoInput, setEmpleadoInput] = useState("");
     const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
-    const [conductorInput, setConductorInput] = useState("");
-    const [conductoresSeleccionados, setConductorsSeleccionados] = useState([]);
-    const [selectedRuta, setSelectedRuta] = useState('');
-    const [estadoOrden, setEstadoOrden] = useState(0);
-    const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState('');
     const [selectedYearInicio, setSelectedYearInicio] = useState('');
     const [selectedMonthInicio, setSelectedMonthInicio] = useState('');
     const [selectedDayInicio, setSelectedDayInicio] = useState('');
@@ -21,6 +17,12 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const [daysInicio, setDaysInicio] = useState([]);
     const [daysFin, setDaysFin] = useState([]);
 
+    const [ciudadesOrigen, setCiudadesOrigen] = useState([]);
+    const [ciudadesDestino, setCiudadesDestino] = useState([]);
+    const [selectedProvinciaOrigen, setSelectedProvinciaOrigen] = useState('Los Ríos');
+    const [selectedCiudadOrigen, setSelectedCiudadOrigen] = useState('Mocache');
+    const [selectedProvinciaDestino, setSelectedProvinciaDestino] = useState('');
+    const [selectedCiudadDestino, setSelectedCiudadDestino] = useState('');
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -65,6 +67,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
         return Array.from({ length: daysInMonth }, (_, i) => i + 1);
     };
 
+
     const handleAddEmpleado = () => {
         if (empleadoInput && !empleadosSeleccionados.includes(empleadoInput)) {
             setEmpleadosSeleccionados([...empleadosSeleccionados, empleadoInput]);
@@ -77,19 +80,30 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
         setEmpleadosSeleccionados(nuevosEmpleados);
     };
 
-    const handleAddConductor = () => {
-        if (conductorInput && !conductoresSeleccionados.includes(conductorInput)) {
-            setConductorsSeleccionados([...conductoresSeleccionados, conductorInput]);
-            setConductorInput("");
+    useEffect(() => {
+        const provinciaOrigen = provincias.find((p) => p.Provincia === 'Los Ríos');
+        if (provinciaOrigen) {
+            setCiudadesOrigen(provinciaOrigen.Ciudades);
         }
+    }, [provincias]);
+
+    const handleProvinciaOrigenChange = (e) => {
+        const provincia = e.target.value;
+        setSelectedProvinciaOrigen(provincia);
+        const selectedProvinciaData = provincias.find((p) => p.Provincia === provincia);
+        setCiudadesOrigen(selectedProvinciaData ? selectedProvinciaData.Ciudades : []);
+        setSelectedCiudadOrigen('');
     };
 
-    const handleRemoveConductor = (index) => {
-        const nuevosConductores = conductoresSeleccionados.filter((_, i) => i !== index);
-        setConductorsSeleccionados(nuevosConductores);
+    const handleProvinciaDestinoChange = (e) => {
+        const provincia = e.target.value;
+        setSelectedProvinciaDestino(provincia);
+        const selectedProvinciaData = provincias.find((p) => p.Provincia === provincia);
+        setCiudadesDestino(selectedProvinciaData ? selectedProvinciaData.Ciudades : []);
+        setSelectedCiudadDestino('');
     };
 
-    const handleGenerarReporteOrdenes = async () => {
+    const handleGenerarReporteInformes = async () => {
         try {
           const token = localStorage.getItem('token');
           if (!token) throw new Error('Token no encontrado');
@@ -118,8 +132,8 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
           const formData = new FormData();
           formData.append('fecha_inicio', fechaInicioFormatted || '');
           formData.append('fecha_fin', fechaFinFormatted || '');
-          formData.append('empleado', empleadosSeleccionados);
-          formData.append('conductor', conductoresSeleccionados);
+          formData.append('empleado', empleadoSeleccionado);
+          formData.append('conductor', conductorSeleccionado);
           formData.append('vehiculo', vehiculoSeleccionado);
           formData.append('ruta', selectedRuta);
           formData.append('estado', estadoOrden);
@@ -163,184 +177,129 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
 
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Órdenes de Movilización</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Reporte de Informes de Viaje</h2>
 
-            <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
-                {/* Ruta */}
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Ruta</label>
+            {/* Listado de empleados */}
+            <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Servidores
+                </label>
+                <div className="flex mb-2 items-center">
                     <select
-                        name="lugar_origen_destino_movilizacion"
-                        value={selectedRuta}
-                        onChange={(e) => setSelectedRuta(e.target.value)}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={empleadoInput}
+                        onChange={(e) => setEmpleadoInput(e.target.value)}
+                        className="w-full p-2 border rounded"
                     >
-                        <option value="">Selecciona una ruta</option>
-                        {rutas.map((ruta) => (
-                            <option key={ruta.id} value={ruta.ruta_descripcion}>
-                                {ruta.ruta_descripcion}
+                        <option value="">Seleccione un empleado</option>
+                        {empleados.map((emp) => (
+                            <option
+                                key={emp.id}
+                                value={`${emp.nombres} ${emp.apellidos}`}
+                            >
+                                {emp.nombres} {emp.apellidos}
                             </option>
                         ))}
                     </select>
-                </div>
-
-                {/* Vehículo */}
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Vehículo</label>
-                    <select
-                        value={vehiculoSeleccionado}
-                        onChange={(e) => setVehiculoSeleccionado(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button
+                        type="button"
+                        onClick={handleAddEmpleado}
+                        className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                     >
-                        <option value="">Seleccione un vehículo</option>
-                        {vehiculos.map((vehiculo) => (
-                            <option key={`vehiculo-${vehiculo.id_vehiculo}`} value={vehiculo.id_vehiculo}>
-                                {vehiculo.placa}
-                            </option>
-                        ))}
-                    </select>
+                        +
+                    </button>
                 </div>
-            </div>
-
-            <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                <div>
-                    {/* Listado de empleados */}
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Servidores
-                        </label>
-                        <div className="flex mb-2 items-center">
-                            <select
-                                value={empleadoInput}
-                                onChange={(e) => setEmpleadoInput(e.target.value)}
-                                className="w-full p-2 border rounded"
-                            >
-                                <option value="">Seleccione un empleado</option>
-                                {empleados.map((emp) => (
-                                    <option
-                                        key={emp.id}
-                                        value={`${emp.nombres} ${emp.apellidos}`}
-                                    >
-                                        {emp.nombres} {emp.apellidos}
-                                    </option>
-                                ))}
-                            </select>
+                <div className="flex flex-wrap gap-2">
+                    {empleadosSeleccionados.map((empleado, index) => (
+                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                            {empleado}
                             <button
                                 type="button"
-                                onClick={handleAddEmpleado}
-                                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                onClick={() => handleRemoveEmpleado(index)}
+                                className="ml-2 text-red-500 hover:text-red-700"
                             >
-                                +
+                                &times;
                             </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {empleadosSeleccionados.map((empleado, index) => (
-                                <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                                    {empleado}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveEmpleado(index)}
-                                        className="ml-2 text-red-500 hover:text-red-700"
-                                    >
-                                        &times;
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                        </span>
+                    ))}
                 </div>
-                <div>
-                    {/* Listado de conductores */}
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Conductores
-                        </label>
-                        <div className="flex mb-2 items-center">
-                            <select
-                                value={conductorInput}
-                                onChange={(e) => setConductorInput(e.target.value)}
-                                className="w-full p-2 border rounded"
-                            >
-                                <option value="">Seleccione un conductor</option>
-                                {conductores.map((c) => (
-                                    <option
-                                        key={c.id}
-                                        value={`${c.nombres} ${c.apellidos}`}
-                                    >
-                                        {c.nombres} {c.apellidos}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                type="button"
-                                onClick={handleAddConductor}
-                                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                            >
-                                +
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {conductoresSeleccionados.map((conductores, index) => (
-                                <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                                    {conductores}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveConductor(index)}
-                                        className="ml-2 text-red-500 hover:text-red-700"
-                                    >
-                                        &times;
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-
-
             </div>
-
+            {/* Selección de rutas */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                {/* Estado de la Orden */}
                 <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Estado de la Orden</label>
-                    <div className="flex flex-wrap sm:flex-nowrap items-center">
-                        <label className="inline-flex items-center ml-4">
-                            <input
-                                type="radio"
-                                value={0}
-                                checked={estadoOrden === 0}
-                                onChange={() => setEstadoOrden(0)}
-                                className="form-radio"
-                            />
-                            <span className="ml-2">Ambos</span>
-                        </label>
-                        <label className="inline-flex items-center ml-4">
-                            <input
-                                type="radio"
-                                value={1}
-                                checked={estadoOrden === 1}
-                                onChange={() => setEstadoOrden(1)}
-                                className="form-radio"
-                            />
-                            <span className="ml-2">Aprobada</span>
-                        </label>
-                        <label className="inline-flex items-center ml-4">
-                            <input
-                                type="radio"
-                                value={2}
-                                checked={estadoOrden === 2}
-                                onChange={() => setEstadoOrden(2)}
-                                className="form-radio"
-                            />
-                            <span className="ml-2">Rechazada</span>
-                        </label>
+                    <h3 className="text-lg font-semibold mb-2">Seleccionar Origen</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block mb-2">Provincia de Origen</label>
+                            <select
+                                value={selectedProvinciaOrigen}
+                                onChange={handleProvinciaOrigenChange}
+                                className="block w-full p-2 border"
+                            >
+                                <option value="">Seleccione una provincia</option>
+                                {provincias.map((provincia) => (
+                                    <option key={provincia.Provincia} value={provincia.Provincia}>
+                                        {provincia.Provincia}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block mb-2">Ciudad de Origen</label>
+                            <select
+                                value={selectedCiudadOrigen}
+                                onChange={(e) => setSelectedCiudadOrigen(e.target.value)}
+                                className="block w-full p-2 border"
+                                disabled={!selectedProvinciaOrigen}
+                            >
+                                <option value="">Seleccione una ciudad</option>
+                                {ciudadesOrigen.map((ciudad) => (
+                                    <option key={ciudad} value={ciudad}>
+                                        {ciudad}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex-1">
+                    <h3 className="text-lg font-semibold mb-2">Seleccionar Destino</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block mb-2">Provincia de Destino</label>
+                            <select
+                                value={selectedProvinciaDestino}
+                                onChange={handleProvinciaDestinoChange}
+                                className="block w-full p-2 border"
+                            >
+                                <option value="">Seleccione una provincia</option>
+                                {provincias.map((provincia) => (
+                                    <option key={provincia.Provincia} value={provincia.Provincia}>
+                                        {provincia.Provincia}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block mb-2">Ciudad de Destino</label>
+                            <select
+                                value={selectedCiudadDestino}
+                                onChange={(e) => setSelectedCiudadDestino(e.target.value)}
+                                className="block w-full p-2 border"
+                                disabled={!selectedProvinciaDestino}
+                            >
+                                <option value="">Seleccione una ciudad</option>
+                                {ciudadesDestino.map((ciudad) => (
+                                    <option key={ciudad} value={ciudad}>
+                                        {ciudad}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-
+            {/* Selección de fechas */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Fecha desde</label>
@@ -454,12 +413,11 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
             </div>
 
 
-
             {/* Botón generar reporte */}
             <div className="flex justify-end mt-4">
                 <button
                     onClick={() =>
-                        handleGenerarReporteOrdenes({
+                        handleGenerarReporteInformes({
                         })
                     }
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
@@ -468,7 +426,8 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 </button>
             </div>
         </div>
+
     );
 };
 
-export default FormularioReporte;
+export default FormularioReporteInformes;
