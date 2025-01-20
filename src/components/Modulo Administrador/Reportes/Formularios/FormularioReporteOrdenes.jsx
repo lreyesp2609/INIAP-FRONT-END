@@ -147,15 +147,15 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
         const nuevosVehiculos = vehiculosSeleccionados.filter((_, i) => i !== index);
         setVehiculosSeleccionados(nuevosVehiculos);
     };
-    
+
     const handleGenerarReporteOrdenes = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token no encontrado');
-    
+
             let fechaInicioFormatted = null;
             let fechaFinFormatted = null;
-    
+
             // Obtener la fecha actual en formato correcto
             const getCurrentDateFormatted = () => {
                 const fecha = getCurrentDateInGuayaquil();
@@ -164,21 +164,21 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 const day = String(fecha.getDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
             };
-    
+
             // Obtener el año actual
             const getCurrentYear = () => {
                 const fecha = getCurrentDateInGuayaquil();
                 return fecha.getFullYear();
             };
-    
+
             const currentYear = getCurrentYear();
             const currentDateFormatted = getCurrentDateFormatted();
-    
+
             // Obtener el último día de un mes específico
             const getLastDayOfMonth = (year, month) => {
                 return new Date(year, month, 0).getDate();
             };
-    
+
             // Construir la fecha de inicio
             if (!selectedYearInicio) {
                 // Si no se selecciona año de inicio, dejar fecha de inicio vacía
@@ -199,7 +199,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                     fechaInicioFormatted = `${selectedYearInicio}-01-01`;
                 }
             }
-    
+
             // Construir la fecha de fin
             if (!selectedYearFin || selectedYearFin === String(currentYear)) {
                 // Si no se selecciona año de fin, establecer fecha de fin como fecha actual
@@ -221,23 +221,23 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                     fechaFinFormatted = `${selectedYearFin}-12-31`;
                 }
             }
-    
+
             // Si no se selecciona fecha desde y solo se selecciona año hasta
             if (!selectedYearInicio && selectedYearFin) {
-                fechaInicioFormatted = '2022-01-01'; 
+                fechaInicioFormatted = '2022-01-01';
             }
-    
+
             // Construir el formData con las fechas y otros filtros
             const formData = new FormData();
             formData.append('fecha_inicio', fechaInicioFormatted || '');
             formData.append('fecha_fin', fechaFinFormatted || '');
-    
+
             empleadosSeleccionados.forEach((empleado) => formData.append('empleados', empleado));
             conductoresSeleccionados.forEach((conductor) => formData.append('conductores', conductor));
             vehiculosSeleccionados.forEach((vehiculo) => formData.append('vehiculos', vehiculo));
             rutasSeleccionadas.forEach((ruta) => formData.append('rutas', ruta));
             formData.append('estado', estadoOrden);
-    
+
             // Enviar solicitud al servidor
             const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
                 method: 'POST',
@@ -246,12 +246,12 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 },
                 body: formData,
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'Error en la respuesta del servidor');
             }
-    
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const popup = window.open('', '_blank');
@@ -274,7 +274,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
             });
         }
     };
-    
+
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Órdenes de Movilización</h2>
