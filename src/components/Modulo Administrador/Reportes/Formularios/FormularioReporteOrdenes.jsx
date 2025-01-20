@@ -14,6 +14,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const [vehiculoInput, setVehiculoInput] = useState("");
     const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
     const [estadoOrden, setEstadoOrden] = useState(0);
+
     const [selectedYearInicio, setSelectedYearInicio] = useState('');
     const [selectedMonthInicio, setSelectedMonthInicio] = useState('');
     const [selectedDayInicio, setSelectedDayInicio] = useState('');
@@ -23,10 +24,72 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const [daysInicio, setDaysInicio] = useState([]);
     const [daysFin, setDaysFin] = useState([]);
 
+    // Obtener la fecha actual de la zona horaria de Guayaquil (Ecuador)
+    const getCurrentDateInGuayaquil = () => {
+        const guayaquilTime = new Date().toLocaleString("en-US", { timeZone: "America/Guayaquil" });
+        return new Date(guayaquilTime);
+    };
 
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const currentDay = new Date().getDate();
+    // Obtener el año, mes y día actuales de la zona horaria de Guayaquil
+    const currentDate = getCurrentDateInGuayaquil();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;  // Los meses en JavaScript empiezan desde 0
+    const currentDay = currentDate.getDate();
+
+    const months = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+
+    // Función para obtener los días en un mes, considerando años bisiestos
+    const getDaysInMonth = (month, year) => {
+        return new Date(year, month, 0).getDate();
+    };
+
+    // Función para actualizar los días disponibles según el mes y el año
+    const updateDays = (setDays, year, month) => {
+        if (year && month) {
+            const daysInMonth = getDaysInMonth(month, year);
+            let maxDay = daysInMonth;
+
+            // Si es el año y mes actual, limitar hasta el día actual
+            if (parseInt(year) === currentYear && parseInt(month) === currentMonth) {
+                maxDay = currentDay;
+            }
+
+            setDays(Array.from(new Array(maxDay), (_, index) => index + 1));
+        } else {
+            setDays([]);
+        }
+    };
+
+    // Limitar los meses hasta el mes actual si estamos en el año actual
+    const filterMonths = (year) => {
+        if (parseInt(year) === currentYear) {
+            return months.slice(0, currentMonth);  // Limita hasta el mes actual
+        }
+        return months;  // Muestra todos los meses para años anteriores
+    };
+
+    // Filtrar los años hasta el año actual
+    const filterYears = () => {
+        return Array.from(
+            new Array(currentYear - 2021 + 1),
+            (_, index) => 2022 + index
+        ).filter(year => year <= currentYear);
+    };
+
+    // Efecto para actualizar los días de la fecha hasta
+    useEffect(() => {
+        updateDays(setDaysFin, selectedYearFin, selectedMonthFin);
+    }, [selectedYearFin, selectedMonthFin]);
+
+    // Efecto para actualizar los días de la fecha desde
+    useEffect(() => {
+        updateDays(setDaysInicio, selectedYearInicio, selectedMonthInicio);
+    }, [selectedYearInicio, selectedMonthInicio]);
+
+
     // Funciones de cambio para las fechas
     const handleYearChangeInicio = (e) => setSelectedYearInicio(e.target.value);
     const handleMonthChangeInicio = (e) => setSelectedMonthInicio(e.target.value);
@@ -34,38 +97,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const handleYearChangeFin = (e) => setSelectedYearFin(e.target.value);
     const handleMonthChangeFin = (e) => setSelectedMonthFin(e.target.value);
     const handleDayChangeFin = (e) => setSelectedDayFin(e.target.value);
-    const years = Array.from(new Array(currentYear - 2021), (val, index) => 2022 + index);
-    const months = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-    const getDaysInMonth = (month, year) => {
-        return new Date(year, month, 0).getDate();
-    };
-    const updateDays = (setDays, year, month) => {
-        if (year && month) {
-            const daysInMonth = getDaysInMonth(month, year);
-            const maxDay = (year === currentYear && month === currentMonth) ? currentDay : daysInMonth;
-            setDays(Array.from(new Array(maxDay), (val, index) => index + 1));
-        } else {
-            setDays([]);
-        }
-    };
 
-    useEffect(() => {
-        updateDays(setDaysInicio, selectedYearInicio, selectedMonthInicio);
-    }, [selectedYearInicio, selectedMonthInicio]);
-
-    useEffect(() => {
-        updateDays(setDaysFin, selectedYearFin, selectedMonthFin);
-    }, [selectedYearFin, selectedMonthFin]);
-
-    const filterYears = (year) => year === currentYear ? years.slice(0, -1) : years;
-    const filterMonths = (year) => year === currentYear ? months.slice(0, currentMonth) : months;
-    const filterDays = (month) => {
-        const daysInMonth = new Date(2024, month, 0).getDate();
-        return Array.from({ length: daysInMonth }, (_, i) => i + 1);
-    };
 
     const handleAddEmpleado = () => {
         if (empleadoInput && !empleadosSeleccionados.includes(empleadoInput)) {
@@ -104,8 +136,9 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     };
 
     const handleAddVehiculo = () => {
-        if (vehiculoInput && !vehiculosSeleccionados.includes(vehiculoInput)) {
-            setVehiculosSeleccionados([...vehiculosSeleccionados, vehiculoInput]);
+        const vehiculoSeleccionado = vehiculos.find(v => v.placa === vehiculoInput);
+        if (vehiculoSeleccionado && !vehiculosSeleccionados.includes(vehiculoSeleccionado.id_vehiculo)) {
+            setVehiculosSeleccionados([...vehiculosSeleccionados, vehiculoSeleccionado.id_vehiculo]);
             setVehiculoInput("");
         }
     };
@@ -114,42 +147,98 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
         const nuevosVehiculos = vehiculosSeleccionados.filter((_, i) => i !== index);
         setVehiculosSeleccionados(nuevosVehiculos);
     };
-
+    
     const handleGenerarReporteOrdenes = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token no encontrado');
-
+    
             let fechaInicioFormatted = null;
             let fechaFinFormatted = null;
-
-            if (selectedYearInicio && selectedMonthInicio && selectedDayInicio && selectedYearFin && selectedMonthFin && selectedDayFin) {
-                // Si se selecciona la fecha completa para inicio y fin.
-                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-${selectedDayInicio}`;
-                fechaFinFormatted = `${selectedYearFin}-${selectedMonthFin}-${selectedDayFin}`;
-            } else if (selectedYearInicio && selectedYearFin) {
-                // Si se seleccionan ambos años, desde el inicio del primer año hasta el final del segundo año.
-                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-                fechaFinFormatted = `${selectedYearFin}-12-31`;
-            } else if (selectedYearInicio && selectedMonthInicio && !selectedDayInicio) {
-                // Si se selecciona la fecha inicio sin día y no se selecciona fecha fin.
-                fechaInicioFormatted = `${selectedYearInicio}-${selectedMonthInicio}-01`;
-                fechaFinFormatted = new Date().toISOString().split('T')[0];
-            } else if (selectedYearInicio) {
-                // Si solo se selecciona el año inicio, usar todo ese año.
-                fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-                fechaFinFormatted = `${selectedYearInicio}-12-31`;
+    
+            // Obtener la fecha actual en formato correcto
+            const getCurrentDateFormatted = () => {
+                const fecha = getCurrentDateInGuayaquil();
+                const year = fecha.getFullYear();
+                const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                const day = String(fecha.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+    
+            // Obtener el año actual
+            const getCurrentYear = () => {
+                const fecha = getCurrentDateInGuayaquil();
+                return fecha.getFullYear();
+            };
+    
+            const currentYear = getCurrentYear();
+            const currentDateFormatted = getCurrentDateFormatted();
+    
+            // Obtener el último día de un mes específico
+            const getLastDayOfMonth = (year, month) => {
+                return new Date(year, month, 0).getDate();
+            };
+    
+            // Construir la fecha de inicio
+            if (!selectedYearInicio) {
+                // Si no se selecciona año de inicio, dejar fecha de inicio vacía
+                fechaInicioFormatted = '';
+            } else {
+                // Año desde seleccionado
+                if (selectedMonthInicio) {
+                    // Si se selecciona mes
+                    if (selectedDayInicio) {
+                        // Año, mes y día seleccionados
+                        fechaInicioFormatted = `${selectedYearInicio}-${String(selectedMonthInicio).padStart(2, '0')}-${String(selectedDayInicio).padStart(2, '0')}`;
+                    } else {
+                        // Solo año y mes seleccionados
+                        fechaInicioFormatted = `${selectedYearInicio}-${String(selectedMonthInicio).padStart(2, '0')}-01`;
+                    }
+                } else {
+                    // Solo año seleccionado
+                    fechaInicioFormatted = `${selectedYearInicio}-01-01`;
+                }
             }
-
+    
+            // Construir la fecha de fin
+            if (!selectedYearFin || selectedYearFin === String(currentYear)) {
+                // Si no se selecciona año de fin, establecer fecha de fin como fecha actual
+                fechaFinFormatted = currentDateFormatted;
+            } else {
+                // Año hasta seleccionado
+                if (selectedMonthFin) {
+                    // Si se selecciona mes
+                    if (selectedDayFin) {
+                        // Año, mes y día seleccionados
+                        fechaFinFormatted = `${selectedYearFin}-${String(selectedMonthFin).padStart(2, '0')}-${String(selectedDayFin).padStart(2, '0')}`;
+                    } else {
+                        // Solo año y mes seleccionados
+                        const lastDay = getLastDayOfMonth(selectedYearFin, selectedMonthFin);
+                        fechaFinFormatted = `${selectedYearFin}-${String(selectedMonthFin).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+                    }
+                } else {
+                    // Solo año seleccionado
+                    fechaFinFormatted = `${selectedYearFin}-12-31`;
+                }
+            }
+    
+            // Si no se selecciona fecha desde y solo se selecciona año hasta
+            if (!selectedYearInicio && selectedYearFin) {
+                fechaInicioFormatted = '2022-01-01'; 
+            }
+    
+            // Construir el formData con las fechas y otros filtros
             const formData = new FormData();
             formData.append('fecha_inicio', fechaInicioFormatted || '');
             formData.append('fecha_fin', fechaFinFormatted || '');
-            formData.append('empleado', empleadosSeleccionados);
-            formData.append('conductor', conductoresSeleccionados);
-            formData.append('vehiculo', vehiculoSeleccionado);
-            formData.append('ruta', selectedRuta);
+    
+            empleadosSeleccionados.forEach((empleado) => formData.append('empleados', empleado));
+            conductoresSeleccionados.forEach((conductor) => formData.append('conductores', conductor));
+            vehiculosSeleccionados.forEach((vehiculo) => formData.append('vehiculos', vehiculo));
+            rutasSeleccionadas.forEach((ruta) => formData.append('rutas', ruta));
             formData.append('estado', estadoOrden);
-
+    
+            // Enviar solicitud al servidor
             const response = await fetch(`${API_URL}/Reportes/reporte_ordenes/${idUsuario}/`, {
                 method: 'POST',
                 headers: {
@@ -157,12 +246,12 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 },
                 body: formData,
             });
-
+    
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'Error en la respuesta del servidor');
             }
-
+    
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const popup = window.open('', '_blank');
@@ -180,12 +269,12 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
         } catch (error) {
             notification.error({
                 message: 'Error',
-                description: `Error generando el reporte: ${error.message.replace(/^\{.*"error":\s*"/, '').replace(/"\}$/, '')}`,
+                description: `Error generando el reporte: ${error.message}`,
                 placement: 'topRight',
             });
         }
     };
-
+    
     return (
         <div className="p-6 bg-gray-100 rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Órdenes de Movilización</h2>
@@ -204,7 +293,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                         <option value="">Seleccione una Ruta</option>
                         {rutas.map((r) => (
                             <option
-                                key={r.id}
+                                key={r.id_ruta_movilizacion}
                                 value={r.ruta_descripcion}
                             >
                                 {r.ruta_descripcion}
@@ -238,7 +327,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
             {/* Vehículo */}
             <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
-                Vehículos
+                    Vehículos
                 </label>
                 <div className="flex mb-2 items-center">
                     <select
@@ -265,18 +354,21 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                     </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {vehiculosSeleccionados.map((vehiculo, index) => (
-                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                            {vehiculo}
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveVehiculo(index)}
-                                className="ml-2 text-red-500 hover:text-red-700"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    ))}
+                    {vehiculosSeleccionados.map((idVehiculo, index) => {
+                        const vehiculo = vehiculos.find(v => v.id_vehiculo === idVehiculo);
+                        return (
+                            <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                                {vehiculo ? vehiculo.placa : 'Vehículo no encontrado'}
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveVehiculo(index)}
+                                    className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                    &times;
+                                </button>
+                            </span>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -294,8 +386,8 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                         <option value="">Seleccione un empleado</option>
                         {empleados.map((emp) => (
                             <option
-                                key={emp.id}
-                                value={`${emp.nombres} ${emp.apellidos}`}
+                                key={emp.id_empleado}
+                                value={emp.id_empleado}
                             >
                                 {emp.nombres} {emp.apellidos}
                             </option>
@@ -309,22 +401,28 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                         +
                     </button>
                 </div>
+                {/* Listado de empleados */}
                 <div className="flex flex-wrap gap-2">
-                    {empleadosSeleccionados.map((empleado, index) => (
-                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                            {empleado}
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveEmpleado(index)}
-                                className="ml-2 text-red-500 hover:text-red-700"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    ))}
+                    {empleadosSeleccionados.map((empleadoId, index) => {
+                        // Encuentra el empleado por su ID
+                        const empleado = empleados.find(emp => emp.id_empleado === parseInt(empleadoId));
+                        return (
+                            <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                                {empleado ? `${empleado.nombres} ${empleado.apellidos}` : 'Empleado no encontrado'}
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveEmpleado(index)}
+                                    className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                    &times;
+                                </button>
+                            </span>
+                        );
+                    })}
                 </div>
+
             </div>
-            
+
             {/* Listado de conductores */}
             <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -339,8 +437,8 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                         <option value="">Seleccione un conductor</option>
                         {conductores.map((c) => (
                             <option
-                                key={c.id}
-                                value={`${c.nombres} ${c.apellidos}`}
+                                key={c.id_empleado}
+                                value={c.id_empleado}
                             >
                                 {c.nombres} {c.apellidos}
                             </option>
@@ -354,27 +452,30 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                         +
                     </button>
                 </div>
+                {/* Listado de conductores */}
                 <div className="flex flex-wrap gap-2">
-                    {conductoresSeleccionados.map((conductores, index) => (
-                        <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
-                            {conductores}
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveConductor(index)}
-                                className="ml-2 text-red-500 hover:text-red-700"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    ))}
+                    {conductoresSeleccionados.map((conductorId, index) => {
+                        // Encuentra el conductor por su ID
+                        const conductor = conductores.find(c => c.id_empleado === parseInt(conductorId));
+                        return (
+                            <span key={index} className="flex items-center bg-gray-200 rounded px-2 py-1">
+                                {conductor ? `${conductor.nombres} ${conductor.apellidos}` : 'Conductor no encontrado'}
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveConductor(index)}
+                                    className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                    &times;
+                                </button>
+                            </span>
+                        );
+                    })}
                 </div>
+
             </div>
 
-
-
-
+            {/* Estado de la Orden */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                {/* Estado de la Orden */}
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Estado de la Orden</label>
                     <div className="flex flex-wrap sm:flex-nowrap items-center">
@@ -412,7 +513,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 </div>
             </div>
 
-
+            {/* Fecha desde hasta */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Fecha desde</label>
@@ -425,7 +526,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Selecciona un año</option>
-                                {filterYears(selectedYearInicio).map((year) => (
+                                {filterYears().map((year) => (
                                     <option key={year} value={year}>
                                         {year}
                                     </option>
@@ -480,7 +581,7 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Selecciona un año</option>
-                                {filterYears(selectedYearFin).map((year) => (
+                                {filterYears().map((year) => (
                                     <option key={year} value={year}>
                                         {year}
                                     </option>
@@ -524,8 +625,6 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                     </div>
                 </div>
             </div>
-
-
 
             {/* Botón generar reporte */}
             <div className="flex justify-end mt-4">
