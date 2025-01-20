@@ -107,7 +107,7 @@ const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
         const nuevosEmpleados = empleadosSeleccionados.filter((_, i) => i !== index);
         setEmpleadosSeleccionados(nuevosEmpleados);
     };
-
+    
     const handleProvinciaChange = (e) => {
         const provincia = e.target.value;
         setSelectedProvincia(provincia);
@@ -207,7 +207,7 @@ const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
             const formData = new FormData();
             formData.append('fecha_inicio', fechaInicioFormatted || '');
             formData.append('fecha_fin', fechaFinFormatted || '');
-            empleadosSeleccionados.forEach((empleado, index) => formData.append(`empleados[${index}]`, empleado));
+            empleadosSeleccionados.forEach((empleado) => formData.append('empleados', empleado));
             formData.append('lugar', lugar || '');
 
 
@@ -252,8 +252,8 @@ const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
         <div className="p-6 bg-gray-100 rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Informes de Viaje</h2>
 
-            {/* Listado de empleados */}
-            <div className="mb-6">
+           {/* Listado de empleados */}
+           <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                     Servidores
                 </label>
@@ -302,6 +302,7 @@ const FormularioReporteInformes = ({ empleados, provincias, idUsuario }) => {
                 </div>
 
             </div>
+
             {/* Selección de ruta */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
                 <div className="flex-1">

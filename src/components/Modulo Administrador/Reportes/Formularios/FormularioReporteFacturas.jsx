@@ -243,8 +243,8 @@ const FormularioReporteFacturas = ({ empleados, idUsuario }) => {
         <div className="p-6 bg-gray-100 rounded-lg">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Justificación de Gastos</h2>
 
-            {/* Listado de empleados */}
-            <div className="mb-6">
+           {/* Listado de empleados */}
+           <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                     Servidores
                 </label>
@@ -291,6 +291,7 @@ const FormularioReporteFacturas = ({ empleados, idUsuario }) => {
                         );
                     })}
                 </div>
+
             </div>
 
             {/* Fecha desde hasta */}
