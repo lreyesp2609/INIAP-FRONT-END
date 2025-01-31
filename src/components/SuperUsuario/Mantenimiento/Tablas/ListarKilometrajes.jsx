@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa"; // Icono para el botón de retroceder
+import { FaArrowLeft, FaCar } from "react-icons/fa";
 import API_URL from "../../../../Config";
 
 const ListarKilometrajes = ({ vehiculo, handleCancel }) => {
@@ -8,7 +8,6 @@ const ListarKilometrajes = ({ vehiculo, handleCancel }) => {
   const userId = localStorage.getItem('userId');
   const vehiculoId = vehiculo.id_vehiculo;
 
-  // Función para obtener kilometraje
   useEffect(() => {
     const fetchKilometraje = async () => {
       try {
@@ -22,12 +21,10 @@ const ListarKilometrajes = ({ vehiculo, handleCancel }) => {
 
         if (response.ok) {
           const data = await response.json();
-          setKilometrajes(data); // Asignar los kilometrajes a la variable de estado
-        } else {
-          console.error('Error al obtener el kilometraje');
+          setKilometrajes(data);
         }
       } catch (error) {
-        console.error('Hubo un problema con la solicitud:', error);
+        console.error('Error:', error);
       }
     };
 
@@ -35,49 +32,97 @@ const ListarKilometrajes = ({ vehiculo, handleCancel }) => {
   }, [userId, vehiculoId, token]);
 
   return (
-    <div className="w-full p-4">
-      <button 
-        onClick={handleCancel} 
-        className="mb-4 px-4 py-2 bg-gray-600 text-white rounded-lg flex items-center">
-        <FaArrowLeft className="mr-2" />
-        Volver
+    <div className="max-w-6xl mx-auto p-6">
+      <button
+        onClick={handleCancel}
+        className="mb-6 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg flex items-center gap-2
+                 hover:bg-slate-200 transition-colors duration-200 text-sm font-medium"
+      >
+        <FaArrowLeft className="text-sm" />
+        Volver al vehículo
       </button>
-      <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md">
-        <table className="min-w-full bg-white border border-gray-200 table-auto">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">ID Vehículo</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Placa</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Marca</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Kilometraje</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Fecha Registro</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Evento</th>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-100">
+        <table className="w-full">
+          <thead className="bg-slate-50">
+            <tr>
+              {['Vehículo', 'Placa', 'Marca', 'Kilometraje', 'Fecha', 'Registrado por', 'Evento'].map((header, index) => (
+                <th
+                  key={index}
+                  className="px-6 py-4 text-left text-sm font-medium text-slate-500 uppercase tracking-wider border-b border-slate-100"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {kilometrajes.map((kilometraje, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.id_vehiculo}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.placa}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.marca}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.kilometraje}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.fecha_registro}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{kilometraje.evento}</td>
+              <tr
+                key={index}
+                className="hover:bg-slate-50 transition-colors duration-150"
+              >
+                <td className="px-6 py-4 text-sm text-slate-800 font-medium">#{kilometraje.id_vehiculo}</td>
+                <td className="px-6 py-4 text-sm text-slate-600">{kilometraje.placa}</td>
+                <td className="px-6 py-4 text-sm text-slate-600">{kilometraje.marca}</td>
+                <td className="px-6 py-4 text-sm text-slate-800 font-medium">{kilometraje.kilometraje.toLocaleString()} km</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{kilometraje.fecha_registro}</td>
+                <td className="px-6 py-4 text-sm text-slate-600">
+                  {kilometraje.registrado_por}
+                </td>
+                <td className="px-6 py-4">
+                  <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-full">
+                    {kilometraje.evento}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="block md:hidden">
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
         {kilometrajes.map((kilometraje, index) => (
-          <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4">
-            <p className="text-sm text-gray-700"><strong>ID Vehículo:</strong> {kilometraje.id_vehiculo}</p>
-            <p className="text-sm text-gray-700"><strong>Placa:</strong> {kilometraje.placa}</p>
-            <p className="text-sm text-gray-700"><strong>Marca:</strong> {kilometraje.marca}</p>
-            <p className="text-sm text-gray-700"><strong>Kilometraje:</strong> {kilometraje.kilometraje}</p>
-            <p className="text-sm text-gray-700"><strong>Fecha Registro:</strong> {kilometraje.fecha_registro}</p>
-            <p className="text-sm text-gray-700"><strong>Evento:</strong> {kilometraje.evento}</p>
+          <div
+            key={index}
+            className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"
+          >
+            <div className="flex items-start gap-3 mb-3">
+              <div className="p-2 bg-slate-100 rounded-lg">
+                <FaCar className="text-slate-600 text-lg" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-800">#{kilometraje.id_vehiculo}</h3>
+                <p className="text-xs text-slate-500">{kilometraje.marca}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-slate-500">Placa</p>
+                <p className="text-slate-800 font-medium">{kilometraje.placa}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Kilometraje</p>
+                <p className="text-slate-800 font-medium">{kilometraje.kilometraje.toLocaleString()} km</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Fecha</p>
+                <p className="text-slate-800">{kilometraje.fecha_registro}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Registrado por</p>
+                <p className="text-slate-800">{kilometraje.registrado_por}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Evento</p>
+                <span className="inline-block px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-full">
+                  {kilometraje.evento}
+                </span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
