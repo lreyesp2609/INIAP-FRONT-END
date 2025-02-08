@@ -5,7 +5,7 @@ import AgregarVehiculo from "./agregarvehiculo";
 import HabilitarVehiculo from "./habilitarvehiculo";
 import EditarVehiculo from "./editarvehiculo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faEye, faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import FormularioRegistrarKilometraje from "../Mantenimiento/Formularios/formulariomantenimiento";
 import ListarKilometrajes from "../Mantenimiento/Tablas/ListarKilometrajes";
 
@@ -23,6 +23,16 @@ const GestionVehiculos = () => {
   const [isKilometrajeFormVisible, setIsKilometrajeFormVisible] = useState(false); // Estado para mostrar el formulario
   const [selectedVehiculoForKilometraje, setSelectedVehiculoForKilometraje] = useState(null); // Vehículo seleccionado para el formulario
   const [isListarKilometrajesVisible, setIsListarKilometrajesVisible] = useState(false); // Nuevo estado
+
+
+  const [reporteFilters, setReporteFilters] = useState({
+    fecha_inicio: '',
+    fecha_fin: '',
+    vehiculo: '',
+    empleado: '',
+    evento: ''
+  });
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -57,6 +67,42 @@ const GestionVehiculos = () => {
       }
     } catch (error) {
       console.error("Error al obtener vehículos:", error);
+    }
+  };
+
+  const handleGenerarReporte = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !userId) return;
+  
+    try {
+      const formData = new FormData();
+      Object.entries(reporteFilters).forEach(([key, value]) => {
+        if (value) formData.append(key, value);
+      });
+  
+      const response = await fetch(`${API_URL}/Mantenimientos/reporte-kilometraje/${userId}/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `${token}`,
+        },
+        body: formData
+      });
+  
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'reporte_kilometraje.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        console.error('Error al generar el reporte');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -121,7 +167,7 @@ const GestionVehiculos = () => {
     setIsListarKilometrajesVisible(false);  // Cerrar el listado de kilometrajes
     setIsKilometrajeFormVisible(false);  // Asegurarse de que el formulario también esté cerrado
   };
-  
+
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -178,6 +224,7 @@ const GestionVehiculos = () => {
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
             <h1 className="text-2xl font-light text-center md:text-left">Gestión de Vehículos</h1>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
+              {/* Botón existente para vehículos deshabilitados */}
               <button
                 onClick={handleHabilitarVehiculos}
                 className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 border-b-4 border-yellow-700 hover:border-yellow-300 rounded w-full md:w-auto text-center"
@@ -185,6 +232,17 @@ const GestionVehiculos = () => {
                 <FontAwesomeIcon icon={faEye} className="mr-2" />
                 Ver Vehículos Deshabilitados
               </button>
+
+              {/* Nuevo botón para generar reporte */}
+              <button
+                onClick={handleGenerarReporte}
+                className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 border-b-4 border-purple-700 hover:border-purple-300 rounded w-full md:w-auto text-center"
+              >
+                <FontAwesomeIcon icon={faFilePdf} className="mr-2" />
+                Generar Reporte
+              </button>
+
+              {/* Botón existente para agregar vehículo */}
               <button
                 onClick={handleAddVehiculo}
                 className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 border-b-4 border-green-900 hover:border-green-300 rounded w-full md:w-auto text-center"
