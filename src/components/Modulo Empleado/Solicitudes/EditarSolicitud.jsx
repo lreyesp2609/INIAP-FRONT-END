@@ -201,6 +201,47 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
     setSolicitud({ ...solicitud, [field]: e.target.value });
   };
 
+  // Nueva función para actualizar el estado a pendiente
+  const actualizarEstadoPendiente = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token no encontrado');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Informes/cambiar-estado-pendiente/${id_solicitud}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Estado actualizado:', data);
+        return true;
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error al actualizar el estado de la solicitud');
+        return false;
+      }
+    } catch (error) {
+      console.log('Error al actualizar el estado de la solicitud:', error);
+      setError('Error al actualizar el estado de la solicitud: ' + error.message);
+      return false;
+    }
+  };
+
+  // Función modificada para manejar el botón "Cancelar"
+  const handleCancelar = async () => {
+    const estadoActualizado = await actualizarEstadoPendiente();
+    if (estadoActualizado && typeof onClose === 'function') {
+      onClose();
+    }
+  };
+
   const handleRutaChange = (index, field, value) => {
     const updatedRutas = [...rutas];
     updatedRutas[index] = { ...updatedRutas[index], [field]: value };
@@ -303,6 +344,10 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
       if (response.ok) {
         const data = await response.json();
         console.log('Solicitud actualizada:', data);
+
+        // Actualizar el estado a pendiente después de guardar los cambios
+        await actualizarEstadoPendiente();
+
         if (typeof onUpdate === 'function') {
           onUpdate(data);
         }
@@ -674,7 +719,7 @@ const EditarSolicitudEmpleado = ({ id_solicitud, onClose, onUpdate }) => {
           </div>
         </div>
         <div className="flex justify-between">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+          <button type="button" onClick={handleCancelar} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
             Cancelar
           </button>
           <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
