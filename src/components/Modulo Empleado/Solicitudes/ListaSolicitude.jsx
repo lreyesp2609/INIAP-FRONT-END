@@ -131,11 +131,40 @@ const ListarSolicitudesPendientes = () => {
   );
   const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
 
-  const handleEditSolicitud = (id_solicitud) => {
-    setEditSolicitudId(id_solicitud);
-    setShowEditModal(true);
-  };
+  // Función actualizada para cambiar estado a "en edición" antes de abrir modal
+  const handleEditSolicitud = async (id_solicitud) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token no encontrado");
 
+      // Llamar al endpoint para cambiar el estado a "en edición"
+      const url = `${API_URL}/Informes/cambiar-estado-solicitud-edicion/${id_solicitud}/`;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al cambiar estado de la solicitud a 'en edición'");
+      }
+
+      console.log("Estado cambiado a 'en edición' exitosamente");
+      
+      // Actualizar datos después de cambiar el estado
+      await fetchSolicitudes();
+      
+      // Continuar con la apertura del modal de edición
+      setEditSolicitudId(id_solicitud);
+      setShowEditModal(true);
+      
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Ocurrió un error al preparar la solicitud para edición");
+    }
+  };
 
   const handleVer = (id_solicitud) => {
     setSelectedSolicitudId(id_solicitud);
@@ -215,7 +244,10 @@ const ListarSolicitudesPendientes = () => {
       {showEditModal && editSolicitudId && (
         <EditarSolicitudEmpleado
           id_solicitud={editSolicitudId}
-          onClose={() => setShowEditModal(false)}
+          onClose={() => {
+            setShowEditModal(false);
+            fetchSolicitudes(); // Refrescar datos al cerrar modal de edición
+          }}
         />
       )}
 
@@ -355,13 +387,15 @@ const ListarSolicitudesPendientes = () => {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-medium">{solicitud["Codigo de Solicitud"]}</h3>
                     <div className="flex space-x-2">
-                      <button
-                        className="p-2 bg-yellow-500 text-white rounded-full"
-                        title="Editar Solicitud de Movilización"
-                        onClick={() => handleEditSolicitud(solicitud.id)}
-                      >
-                        <FontAwesomeIcon icon={faFileEdit} />
-                      </button>
+                      {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "en edición") && (
+                        <button
+                          className="p-2 bg-yellow-500 text-white rounded-full"
+                          title="Editar Solicitud de Movilización"
+                          onClick={() => handleEditSolicitud(solicitud.id)}
+                        >
+                          <FontAwesomeIcon icon={faFileEdit} />
+                        </button>
+                      )}
                       <button
                         className="p-2 bg-blue-500 text-white rounded-full"
                         title="Ver Solicitud de Movilización"
@@ -369,13 +403,15 @@ const ListarSolicitudesPendientes = () => {
                       >
                         <FontAwesomeIcon icon={faEye} />
                       </button>
-                      <button
-                        className="p-2 bg-red-500 text-white rounded-full"
-                        title="Cancelar Solicitud de Movilización"
-                        onClick={() => handleConfirmCancel(solicitud.id)}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
+                      {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "en edición") && (
+                        <button
+                          className="p-2 bg-red-500 text-white rounded-full"
+                          title="Cancelar Solicitud de Movilización"
+                          onClick={() => handleConfirmCancel(solicitud.id)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <p className="text-gray-600"><strong>Fecha:</strong> {solicitud["Fecha Solicitud"]}</p>
@@ -392,7 +428,7 @@ const ListarSolicitudesPendientes = () => {
               >
                 Anterior
               </button>
-              <span className="text-center md:text-left">{`Página ${currentPage} de ${totalPages}`}</span>
+              <span className="text-center md:text-left">Página {currentPage} de {totalPages}</span>
               <button
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 border-b-4 border-gray-600 hover:border-gray-500 rounded"
@@ -426,7 +462,6 @@ const ListarSolicitudesPendientes = () => {
           </>
         )}
     </div>
-
   );
 };
 
