@@ -30,7 +30,7 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                 }
                 const response = await fetch(`${API_URL}/Informes/listar-solicitud-empleado/${id_solicitud}/`, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
 
@@ -76,7 +76,7 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
             const updateResponse = await fetch(`${API_URL}/Informes/actualizar-solicitud/${id_solicitud}/`, {
                 method: 'PUT',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -94,7 +94,7 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                 const createMotivoCanceladoResponse = await fetch(`${API_URL}/Informes/crear-motivo-cancelado/${id_solicitud}/`, {
                     method: 'POST',
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
@@ -113,6 +113,37 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
         } catch (error) {
             console.log(`Error al ${modalAction} la solicitud:`, error);
             setError(`Error al ${modalAction} la solicitud: ` + error.message);
+        }
+    };
+
+    // Nueva función para cambiar el estado a pendiente al cerrar
+    const handleClose = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('Token no encontrado');
+                return;
+            }
+
+            // Actualizamos el estado de la solicitud a pendiente
+            const updateResponse = await fetch(`${API_URL}/Informes/cambiar-estado-pendiente/${id_solicitud}/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json();
+                throw new Error(errorData.error || 'Error al cambiar el estado a pendiente');
+            }
+
+            console.log('Solicitud cambiada a pendiente exitosamente');
+            onClose(); // Cerrar el componente
+        } catch (error) {
+            console.log('Error al cambiar estado a pendiente:', error);
+            setError('Error al cambiar estado a pendiente: ' + error.message);
         }
     };
 
@@ -399,7 +430,7 @@ const MostrarSolicitudPendienteAdmin = ({ id_solicitud, onClose }) => {
                     </button>
                     <button
                         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
-                        onClick={onClose}
+                        onClick={handleClose}
                     >
                         Cerrar
                     </button>
