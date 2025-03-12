@@ -312,7 +312,7 @@ const ListarSolicitudesPendientes = () => {
                           {solicitud["Estado"]}
                         </td>
                         <td className="py-3 px-6 text-left">
-                          {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "pendiente") && (
+                          {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "en edición") && (
                             <button
                               className="p-2 bg-yellow-500 text-white rounded-full mr-2"
                               title="Editar Solicitud de Movilización"
@@ -328,7 +328,7 @@ const ListarSolicitudesPendientes = () => {
                           >
                             <FontAwesomeIcon icon={faEye} />
                           </button>
-                          {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "pendiente") && (
+                          {(solicitud["Estado"] !== "en revisión" && solicitud["Estado"] !== "en edición") && (
                             <button
                               className="p-2 bg-red-500 text-white rounded-full mr-2"
                               title="Cancelar Solicitud de Movilización"
