@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { notification } from 'antd';
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import API_URL from '../../../../Config';
+import 'moment/locale/es';
+import { DatePicker, notification } from 'antd';
+import moment from 'moment';
 
 const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario }) => {
     const [empleadoInput, setEmpleadoInput] = useState("");
@@ -14,90 +16,19 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
     const [vehiculoInput, setVehiculoInput] = useState("");
     const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
     const [estadoOrden, setEstadoOrden] = useState(0);
+    const [fechaInicio, setFechaInicio] = useState(null);
+    const [fechaFin, setFechaFin] = useState(null);
 
-    const [selectedYearInicio, setSelectedYearInicio] = useState('');
-    const [selectedMonthInicio, setSelectedMonthInicio] = useState('');
-    const [selectedDayInicio, setSelectedDayInicio] = useState('');
-    const [selectedYearFin, setSelectedYearFin] = useState('');
-    const [selectedMonthFin, setSelectedMonthFin] = useState('');
-    const [selectedDayFin, setSelectedDayFin] = useState('');
-    const [daysInicio, setDaysInicio] = useState([]);
-    const [daysFin, setDaysFin] = useState([]);
+    const fechaMinima = moment("2022-01-01");
+    const fechaActual = moment().endOf('year').format("YYYY-MM-DD")
 
-    // Obtener la fecha actual de la zona horaria de Guayaquil (Ecuador)
-    const getCurrentDateInGuayaquil = () => {
-        const guayaquilTime = new Date().toLocaleString("en-US", { timeZone: "America/Guayaquil" });
-        return new Date(guayaquilTime);
+    const handleFechaInicioChange = (date) => {
+        setFechaInicio(date ? date : null);
     };
 
-    // Obtener el año, mes y día actuales de la zona horaria de Guayaquil
-    const currentDate = getCurrentDateInGuayaquil();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;  // Los meses en JavaScript empiezan desde 0
-    const currentDay = currentDate.getDate();
-
-    const months = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-
-    // Función para obtener los días en un mes, considerando años bisiestos
-    const getDaysInMonth = (month, year) => {
-        return new Date(year, month, 0).getDate();
+    const handleFechaFinChange = (date) => {
+        setFechaFin(date ? date : null);
     };
-
-    // Función para actualizar los días disponibles según el mes y el año
-    const updateDays = (setDays, year, month) => {
-        if (year && month) {
-            const daysInMonth = getDaysInMonth(month, year);
-            let maxDay = daysInMonth;
-
-            // Si es el año y mes actual, limitar hasta el día actual
-            if (parseInt(year) === currentYear && parseInt(month) === currentMonth) {
-                maxDay = currentDay;
-            }
-
-            setDays(Array.from(new Array(maxDay), (_, index) => index + 1));
-        } else {
-            setDays([]);
-        }
-    };
-
-    // Limitar los meses hasta el mes actual si estamos en el año actual
-    const filterMonths = (year) => {
-        if (parseInt(year) === currentYear) {
-            return months.slice(0, currentMonth);  // Limita hasta el mes actual
-        }
-        return months;  // Muestra todos los meses para años anteriores
-    };
-
-    // Filtrar los años hasta el año actual
-    const filterYears = () => {
-        return Array.from(
-            new Array(currentYear - 2021 + 1),
-            (_, index) => 2022 + index
-        ).filter(year => year <= currentYear);
-    };
-
-    // Efecto para actualizar los días de la fecha hasta
-    useEffect(() => {
-        updateDays(setDaysFin, selectedYearFin, selectedMonthFin);
-    }, [selectedYearFin, selectedMonthFin]);
-
-    // Efecto para actualizar los días de la fecha desde
-    useEffect(() => {
-        updateDays(setDaysInicio, selectedYearInicio, selectedMonthInicio);
-    }, [selectedYearInicio, selectedMonthInicio]);
-
-
-    // Funciones de cambio para las fechas
-    const handleYearChangeInicio = (e) => setSelectedYearInicio(e.target.value);
-    const handleMonthChangeInicio = (e) => setSelectedMonthInicio(e.target.value);
-    const handleDayChangeInicio = (e) => setSelectedDayInicio(e.target.value);
-    const handleYearChangeFin = (e) => setSelectedYearFin(e.target.value);
-    const handleMonthChangeFin = (e) => setSelectedMonthFin(e.target.value);
-    const handleDayChangeFin = (e) => setSelectedDayFin(e.target.value);
-
 
     const handleAddEmpleado = () => {
         if (empleadoInput && !empleadosSeleccionados.includes(empleadoInput)) {
@@ -153,81 +84,15 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token no encontrado');
 
-            let fechaInicioFormatted = null;
-            let fechaFinFormatted = null;
+            const fechaInicioFormatted = fechaInicio
+                ? fechaInicio.format("YYYY-MM-DD")
+                : "2022-01-01";
 
-            // Obtener la fecha actual en formato correcto
-            const getCurrentDateFormatted = () => {
-                const fecha = getCurrentDateInGuayaquil();
-                const year = fecha.getFullYear();
-                const month = String(fecha.getMonth() + 1).padStart(2, '0');
-                const day = String(fecha.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
+            const fechaFinFormatted = fechaFin
+                ? fechaFin.format("YYYY-MM-DD")
+                : fechaActual;
 
-            // Obtener el año actual
-            const getCurrentYear = () => {
-                const fecha = getCurrentDateInGuayaquil();
-                return fecha.getFullYear();
-            };
-
-            const currentYear = getCurrentYear();
-            const currentDateFormatted = getCurrentDateFormatted();
-
-            // Obtener el último día de un mes específico
-            const getLastDayOfMonth = (year, month) => {
-                return new Date(year, month, 0).getDate();
-            };
-
-            // Construir la fecha de inicio
-            if (!selectedYearInicio) {
-                // Si no se selecciona año de inicio, dejar fecha de inicio vacía
-                fechaInicioFormatted = '';
-            } else {
-                // Año desde seleccionado
-                if (selectedMonthInicio) {
-                    // Si se selecciona mes
-                    if (selectedDayInicio) {
-                        // Año, mes y día seleccionados
-                        fechaInicioFormatted = `${selectedYearInicio}-${String(selectedMonthInicio).padStart(2, '0')}-${String(selectedDayInicio).padStart(2, '0')}`;
-                    } else {
-                        // Solo año y mes seleccionados
-                        fechaInicioFormatted = `${selectedYearInicio}-${String(selectedMonthInicio).padStart(2, '0')}-01`;
-                    }
-                } else {
-                    // Solo año seleccionado
-                    fechaInicioFormatted = `${selectedYearInicio}-01-01`;
-                }
-            }
-
-            // Construir la fecha de fin
-            if (!selectedYearFin || selectedYearFin === String(currentYear)) {
-                // Si no se selecciona año de fin, establecer fecha de fin como fecha actual
-                fechaFinFormatted = currentDateFormatted;
-            } else {
-                // Año hasta seleccionado
-                if (selectedMonthFin) {
-                    // Si se selecciona mes
-                    if (selectedDayFin) {
-                        // Año, mes y día seleccionados
-                        fechaFinFormatted = `${selectedYearFin}-${String(selectedMonthFin).padStart(2, '0')}-${String(selectedDayFin).padStart(2, '0')}`;
-                    } else {
-                        // Solo año y mes seleccionados
-                        const lastDay = getLastDayOfMonth(selectedYearFin, selectedMonthFin);
-                        fechaFinFormatted = `${selectedYearFin}-${String(selectedMonthFin).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-                    }
-                } else {
-                    // Solo año seleccionado
-                    fechaFinFormatted = `${selectedYearFin}-12-31`;
-                }
-            }
-
-            // Si no se selecciona fecha desde y solo se selecciona año hasta
-            if (!selectedYearInicio && selectedYearFin) {
-                fechaInicioFormatted = '2022-01-01';
-            }
-
-            // Construir el formData con las fechas y otros filtros
+            // Construir formData
             const formData = new FormData();
             formData.append('fecha_inicio', fechaInicioFormatted || '');
             formData.append('fecha_fin', fechaFinFormatted || '');
@@ -513,116 +378,27 @@ const FormularioReporte = ({ rutas, vehiculos, conductores, empleados, idUsuario
                 </div>
             </div>
 
-            {/* Fecha desde hasta */}
+            {/* Fecha desde/hasta */}
             <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Fecha desde</label>
-                    <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Año</label>
-                            <select
-                                value={selectedYearInicio}
-                                onChange={handleYearChangeInicio}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">Selecciona un año</option>
-                                {filterYears().map((year) => (
-                                    <option key={year} value={year}>
-                                        {year}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Mes</label>
-                            <select
-                                value={selectedMonthInicio}
-                                onChange={handleMonthChangeInicio}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={!selectedYearInicio}
-                            >
-                                <option value="">Selecciona un mes</option>
-                                {filterMonths(selectedYearInicio).map((month, index) => (
-                                    <option key={index} value={index + 1}>
-                                        {month}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Día</label>
-                            <select
-                                value={selectedDayInicio}
-                                onChange={handleDayChangeInicio}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={!selectedMonthInicio}
-                            >
-                                <option value="">Selecciona un día</option>
-                                {daysInicio.map((day) => (
-                                    <option key={day} value={day}>
-                                        {day}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+                    <DatePicker
+                        value={fechaInicio}
+                        onChange={handleFechaInicioChange}
+                        format="YYYY-MM-DD"
+                        className="w-full"
+                        disabledDate={(date) => date.isBefore(fechaMinima)}
+                    />
                 </div>
-
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Fecha hasta</label>
-                    <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mt-4">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Año</label>
-                            <select
-                                value={selectedYearFin}
-                                onChange={handleYearChangeFin}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">Selecciona un año</option>
-                                {filterYears().map((year) => (
-                                    <option key={year} value={year}>
-                                        {year}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Mes</label>
-                            <select
-                                value={selectedMonthFin}
-                                onChange={handleMonthChangeFin}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={!selectedYearFin}
-                            >
-                                <option value="">Selecciona un mes</option>
-                                {filterMonths(selectedYearFin).map((month, index) => (
-                                    <option key={index} value={index + 1}>
-                                        {month}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Día</label>
-                            <select
-                                value={selectedDayFin}
-                                onChange={handleDayChangeFin}
-                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={!selectedMonthFin}
-                            >
-                                <option value="">Selecciona un día</option>
-                                {daysFin.map((day) => (
-                                    <option key={day} value={day}>
-                                        {day}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+                    <DatePicker
+                        value={fechaFin}
+                        onChange={handleFechaFinChange}
+                        format="YYYY-MM-DD"
+                        className="w-full"
+                        disabledDate={(date) => date.isBefore(fechaMinima)}
+                    />
                 </div>
             </div>
 
